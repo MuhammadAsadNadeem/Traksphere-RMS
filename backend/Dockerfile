@@ -1,14 +1,23 @@
-# Build stage
-FROM node:14-alpine as builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# Base image
+FROM node:20.18.0-alpine
 
-# Production stage
-FROM node:14-alpine
+# Set working directory
 WORKDIR /app
-COPY --from=builder /app .
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the application (if required, e.g., TypeScript)
+# RUN npm run build
+
+# Expose the application port (replace 3000 with your actual application port)
 EXPOSE 5000
-CMD ["npm", "start"]
+
+# Specify the command to run your application
+CMD ["npm", "run", "dev"]
