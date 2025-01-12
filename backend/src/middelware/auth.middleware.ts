@@ -29,8 +29,6 @@ const authMiddleware: RequestHandler = (req: Request, res: Response, next: NextF
                         res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
                         return;
                     }
-                    console.log(user);
-
                     (req as any).user = user;
                     next();
                 } else {

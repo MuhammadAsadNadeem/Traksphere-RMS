@@ -3,9 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import { validate as isUUID } from "uuid";
 import userService from "../services/user.service";
 import bcrypt from "bcrypt";
-// import mailerService from "../utils/mailerService";
-// import redisService from "../utils/redisService";
+import { UpdateProfileDto } from '../dto/user.dto';
 import { HttpError } from "../utils/errorHandler";
+import multer from "multer";
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -21,22 +21,19 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     if (!isUUID(id)) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid ID format." });
-      return;
+      throw new HttpError("Invalid ID format.", StatusCodes.BAD_REQUEST);
     }
 
     const user = await userService.findById(id);
     if (user) {
       res.status(StatusCodes.OK).json(user);
     } else {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
+      throw new HttpError("User not found.", StatusCodes.NOT_FOUND);
     }
   } catch (error) {
     next(error);
   }
 };
-
-
 
 const changePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -44,16 +41,12 @@ const changePassword = async (req: Request, res: Response, next: NextFunction) =
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Current password and new password are required." });
-      return;
+      throw new HttpError("Current password and new password are required.", StatusCodes.BAD_REQUEST);
     }
 
     const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isPasswordMatch) {
-      res.status(StatusCodes.UNAUTHORIZED).json({ message: "Current password is incorrect." });
-      return;
+      throw new HttpError("Current password is incorrect.", StatusCodes.UNAUTHORIZED);
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -68,21 +61,19 @@ const changePassword = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-
 const deleteUserByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email } = req.params;
 
     if (!email) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "Email is required." });
-      return;
+      throw new HttpError("Email is required.", StatusCodes.BAD_REQUEST);
+
     }
 
     const user = await userService.findByEmail(email);
 
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
-      return;
+      throw new HttpError("User not found.", StatusCodes.NOT_FOUND);
     }
 
     const result = await userService.deleteUserByEmail(email);
@@ -103,13 +94,11 @@ const getUserByEmail = async (req: Request, res: Response, next: NextFunction) =
     console.log(email)
     const user = await userService.findByEmail(email);
     if (!email) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "Email is required." });
-      return;
+      throw new HttpError("Email is required.", StatusCodes.BAD_REQUEST);
     }
 
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "User not found." });
-      return;
+      throw new HttpError("User not found.", StatusCodes.NOT_FOUND);
     }
 
     res.status(StatusCodes.OK).json(user);
@@ -121,13 +110,32 @@ const getUserByEmail = async (req: Request, res: Response, next: NextFunction) =
 const fetchUserData = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = (req as any).user;
-    console.log("done", user.id);
     const data = await userService.fetchUserDetails(user.id);
     res.status(StatusCodes.OK).json({ ...data });
   } catch (error) {
     next(error);
   }
 };
+
+const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = (req as any).user;
+    const profileData: UpdateProfileDto = req.body;
+    const isUpdated = await userService.update(user.id, profileData);
+
+    if (!isUpdated) {
+      throw new HttpError("Profile not updated. Please try again.", StatusCodes.BAD_REQUEST);
+    }
+
+    res.status(StatusCodes.OK).json({ message: "Profile updated successfully." });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
 
 export default {
   getAllUsers,
@@ -136,6 +144,6 @@ export default {
   getUserByEmail,
   deleteUserByEmail,
   fetchUserData,
-
+  updateProfile,
 
 };

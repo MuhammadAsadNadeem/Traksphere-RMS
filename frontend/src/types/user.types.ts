@@ -16,3 +16,14 @@ export type ChangePasswordType = {
 
 }
 
+export type Profile = {
+    email: string,
+    fullname: string,
+    registrationNumber: string,
+    departmentName: string,
+    phoneNumber: string,
+    busNumber: string,
+    stopAddress: string;
+
+}
+

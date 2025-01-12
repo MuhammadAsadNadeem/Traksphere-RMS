@@ -76,7 +76,49 @@ class UserService {
 
 
 
+  async uploadImage(userId: string, imageBuffer: Buffer): Promise<boolean> {
+    const base64Image = imageBuffer.toString("base64");
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    user.profile_image = base64Image;
+    await this.userRepository.save(user);
+    return true;
+  }
+
+  async getImage(userId: string): Promise<string | null> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user || !user.profile_image) {
+      throw new Error("No image found for the user.");
+    }
+
+    return user.profile_image;
+  }
+
+
+  async updateProfile(userId: string, profileData: Partial<User>): Promise<boolean> {
+    try {
+      const result = await this.userRepository.update(userId, profileData);
+      return result && result.affected ? result.affected > 0 : false;
+    } catch (error) {
+      throw new Error('Error updating user profile.');
+    }
+  }
+
 }
+
+
+
+
+
+
+
+
 
 export default new UserService();
 

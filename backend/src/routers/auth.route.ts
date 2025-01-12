@@ -7,8 +7,6 @@ router.post("/signup", controller.signup);
 router.post("/signin", controller.signin);
 router.get("/send-otp", controller.sendOtp);
 router.post("/forgot-password", controller.forgotPassword);
-router.post("/complete-signup", controller.updateProfile);
-
-
+router.post("/complete-signup", controller.completeSignup);
 
 export default router;

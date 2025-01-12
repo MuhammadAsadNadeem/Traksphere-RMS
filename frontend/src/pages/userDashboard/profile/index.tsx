@@ -39,6 +39,7 @@ const Profile: React.FC = () => {
 
   const handleSaveClick = () => {
     console.log("Updated Profile:", profile);
+    console.log("Profile Image Base64:", profileImage);
     setIsEditing(false);
   };
 
@@ -46,15 +47,27 @@ const Profile: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload a valid image file.");
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target && event.target.result) {
-          setProfileImage(event.target.result as string);
+          setProfileImage(event.target.result as string); // Update Base64 string
         }
       };
 
-      reader.readAsDataURL(file);
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        alert("Failed to load image. Please try again.");
+      };
+
+      reader.readAsDataURL(file); // Convert file to Base64
     }
   };
 

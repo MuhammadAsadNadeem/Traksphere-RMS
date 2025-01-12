@@ -2,7 +2,7 @@ import "reflect-metadata";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import config from "./config";
-import userRoutes from "./routers/user.request";
+import userRoutes from "./routers/user.route";
 import authRoutes from "./routers/auth.route";
 import { errorHandler, HttpError } from "./utils/errorHandler";
 

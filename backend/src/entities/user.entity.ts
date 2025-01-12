@@ -31,6 +31,9 @@ export class User {
   @Column({ nullable: true })
   stopAddress: string;
 
+  @Column({ nullable: true })
+  profile_image: string;
+
 
   constructor() {
     if (!this.id) {

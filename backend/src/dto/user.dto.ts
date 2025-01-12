@@ -16,3 +16,12 @@ export interface UserDto {
     stopAddress: string;
 };
 
+export interface UpdateProfileDto {
+    fullname?: string;
+    phoneNumber?: string;
+    departmentName?: string;
+    busNumber?: string;
+    stopAddress?: string;
+    profile_image?: string;
+
+}

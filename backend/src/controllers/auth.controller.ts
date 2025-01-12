@@ -34,7 +34,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+const completeSignup = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, ...profileData } = req.body;
         const sanitizedEmail = email.trim();
@@ -131,7 +131,7 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
 
 export default {
     signup,
-    updateProfile,
+    completeSignup,
     signin,
     sendOtp,
     forgotPassword,

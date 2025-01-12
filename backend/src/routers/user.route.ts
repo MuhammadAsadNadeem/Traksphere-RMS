@@ -2,6 +2,7 @@ import { Router } from "express";
 import controller from "../controllers/user.controller";
 import authMiddleware from "../middelware/auth.middleware";
 
+
 const router = Router()
     .use(authMiddleware)
     .get("/", controller.getAllUsers)
@@ -9,6 +10,7 @@ const router = Router()
     .get("/:id", controller.getUserById)
     .get("/useremail:email", controller.getUserByEmail)
     .post("/change-password", controller.changePassword)
-    .delete("/:email", controller.deleteUserByEmail);
+    .delete("/:email", controller.deleteUserByEmail)
+    .post("/update-profile", controller.updateProfile);
 
 export default router;
