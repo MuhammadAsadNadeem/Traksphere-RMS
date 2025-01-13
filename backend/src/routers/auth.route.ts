@@ -3,10 +3,12 @@ import controller from "../controllers/auth.controller";
 
 const router = Router()
 
-router.post("/signup", controller.signup);
-router.post("/signin", controller.signin);
 router.get("/send-otp", controller.sendOtp);
+router.post("/signup", controller.signUp);
+router.post("/complete-signup", controller.completeSignUp);
+router.post("/signin", controller.signIn);
 router.post("/forgot-password", controller.forgotPassword);
-router.post("/complete-signup", controller.completeSignup);
+
+
 
 export default router;

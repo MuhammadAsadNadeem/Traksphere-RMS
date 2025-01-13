@@ -8,7 +8,7 @@ import mailerService from '../utils/mailerService';
 import userService from '../services/user.service';
 import bcrypt from "bcrypt";
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
+const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, code }: signUpDto = req.body;
         if (!email || !password || !code) {
@@ -34,7 +34,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const completeSignup = async (req: Request, res: Response, next: NextFunction) => {
+const completeSignUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, ...profileData } = req.body;
         const sanitizedEmail = email.trim();
@@ -49,16 +49,16 @@ const completeSignup = async (req: Request, res: Response, next: NextFunction) =
 
         const isUpdated = await userService.update(user.id, profileData);
         if (!isUpdated) {
-            throw new HttpError("Profile not updated.", StatusCodes.BAD_REQUEST);
+            throw new HttpError("Profile not Created.", StatusCodes.BAD_REQUEST);
         }
 
-        res.status(StatusCodes.OK).json({ message: "Profile updated." });
+        res.status(StatusCodes.OK).json({ message: "New Profile Created." });
     } catch (error) {
         next(error);
     }
 };
 
-const signin = async (req: Request, res: Response, next: NextFunction) => {
+const signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -74,7 +74,6 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
 const sendOtp = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const email = req.query?.email as string;
-        console.log(email)
         if (!email) {
             throw new HttpError("email is required in params", StatusCodes.BAD_REQUEST);
         }
@@ -129,10 +128,12 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
     }
 };
 
+
+
 export default {
-    signup,
-    completeSignup,
-    signin,
+    signUp,
+    completeSignUp,
+    signIn,
     sendOtp,
     forgotPassword,
 }

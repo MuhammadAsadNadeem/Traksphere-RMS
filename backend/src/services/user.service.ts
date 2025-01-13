@@ -1,8 +1,6 @@
 import { Repository } from "typeorm";
 import { User } from "../entities/user.entity";
 import db from "../db";
-import { UUID } from "crypto";
-
 
 class UserService {
   private userRepository: Repository<User>;
@@ -28,24 +26,24 @@ class UserService {
     return false
   }
 
-  // Fetch all users
+  // --------------Get all users-----------------------
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
       select: [
         "id",
-        "fullname",
+        "fullName",
         "departmentName",
         "registrationNumber",
         "email",
         "phoneNumber",
-        "busNumber",
+        "routeNumber",
         "gender",
-        "stopAddress",
+        "stopArea",
       ],
     });
   }
 
-  // Fetch a user by ID
+  //----------- Get  a user by ID ----------------------------
   async findById(id: string): Promise<User | null> {
     return await this.userRepository.findOne({ where: { id } });
   }
@@ -70,34 +68,8 @@ class UserService {
   async fetchUserDetails(userId: string): Promise<User | null> {
     return await this.userRepository.findOne({
       where: { id: userId },
-      select: ['fullname', 'email', 'phoneNumber', 'busNumber', 'stopAddress'],
+      select: ['id', 'fullName', 'email', 'registrationNumber', 'departmentName', 'routeNumber', 'phoneNumber', 'stopArea'],
     });
-  }
-
-
-
-  async uploadImage(userId: string, imageBuffer: Buffer): Promise<boolean> {
-    const base64Image = imageBuffer.toString("base64");
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) {
-      throw new Error("User not found.");
-    }
-
-    user.profile_image = base64Image;
-    await this.userRepository.save(user);
-    return true;
-  }
-
-  async getImage(userId: string): Promise<string | null> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user || !user.profile_image) {
-      throw new Error("No image found for the user.");
-    }
-
-    return user.profile_image;
   }
 
 
@@ -111,14 +83,6 @@ class UserService {
   }
 
 }
-
-
-
-
-
-
-
-
 
 export default new UserService();
 

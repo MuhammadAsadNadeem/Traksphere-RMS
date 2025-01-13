@@ -7,21 +7,21 @@ export interface signUpDto {
 
 export interface UserDto {
     email: string,
-    fullname: string,
+    fullName: string,
     registrationNumber: string,
     departmentName: string,
     phoneNumber: string,
-    busNumber: string,
+    routeNumber: string,
     gender: string,
-    stopAddress: string;
+    stopArea: string;
 };
 
 export interface UpdateProfileDto {
-    fullname?: string;
+    fullName?: string;
     phoneNumber?: string;
     departmentName?: string;
-    busNumber?: string;
-    stopAddress?: string;
-    profile_image?: string;
+    routeNumber?: string;
+    stopArea?: string;
+    registrationNumber?: string;
 
 }

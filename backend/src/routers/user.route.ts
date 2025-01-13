@@ -6,11 +6,11 @@ import authMiddleware from "../middelware/auth.middleware";
 const router = Router()
     .use(authMiddleware)
     .get("/", controller.getAllUsers)
-    .get("/profile", controller.fetchUserData)
-    .get("/:id", controller.getUserById)
-    .get("/useremail:email", controller.getUserByEmail)
+    .get("/get-profile", controller.getProfile)
+    .post("/update-profile", controller.updateProfile)
     .post("/change-password", controller.changePassword)
     .delete("/:email", controller.deleteUserByEmail)
-    .post("/update-profile", controller.updateProfile);
+    .get("/:id", controller.getUserById)
+    .get("/useremail:email", controller.getUserByEmail);
 
 export default router;

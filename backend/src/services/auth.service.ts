@@ -15,7 +15,6 @@ export class authService {
         this.userRepository = db.user;
     }
 
-    //------------Signup----------------------
     async signUp(userData: signUpDto) {
         const { email, password } = userData;
 
@@ -35,7 +34,6 @@ export class authService {
         return newUser;
     }
 
-    //------------Signin----------------------
     async signIn(email: string, password: string) {
         const user = await this.userRepository.findOne({ where: { email } });
 

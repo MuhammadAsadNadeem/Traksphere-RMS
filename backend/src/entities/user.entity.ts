@@ -7,13 +7,14 @@ export class User {
   id: string;
   @Column({ unique: true, nullable: false })
   email: string;
+
   @Column({ nullable: false })
   password: string;
 
   @Column({ nullable: true })
-  fullname: string;
+  fullName: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true, nullable: true })
   registrationNumber: string;
 
   @Column({ nullable: true })
@@ -26,13 +27,10 @@ export class User {
   phoneNumber: string;
 
   @Column({ nullable: true })
-  busNumber: string;
+  routeNumber: string;
 
   @Column({ nullable: true })
-  stopAddress: string;
-
-  @Column({ nullable: true })
-  profile_image: string;
+  stopArea: string;
 
 
   constructor() {

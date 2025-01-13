@@ -5,7 +5,7 @@ import userService from "../services/user.service";
 import bcrypt from "bcrypt";
 import { UpdateProfileDto } from '../dto/user.dto';
 import { HttpError } from "../utils/errorHandler";
-import multer from "multer";
+
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -107,7 +107,7 @@ const getUserByEmail = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-const fetchUserData = async (req: Request, res: Response, next: NextFunction) => {
+const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = (req as any).user;
     const data = await userService.fetchUserDetails(user.id);
@@ -143,7 +143,7 @@ export default {
   changePassword,
   getUserByEmail,
   deleteUserByEmail,
-  fetchUserData,
+  getProfile,
   updateProfile,
 
 };
