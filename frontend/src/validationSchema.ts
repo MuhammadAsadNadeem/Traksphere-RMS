@@ -25,15 +25,15 @@ export const signUpSchema = Yup.object({
 });
 
 export const userProfileSchema = Yup.object({
-    fullname: Yup.string().required("Full Name is required."),
+    fullName: Yup.string().required("Full Name is required."),
     departmentName: Yup.string().required("Department Name is required."),
     registrationNumber: Yup.string().required("Registration Number is required."),
     phoneNumber: Yup.string()
         .matches(/^\d{11}$/, "Phone number must be 11 digits.")
         .required("Phone number is required."),
     gender: Yup.string().required("Please select a gender."),
-    busNumber: Yup.string().required("Bus number is required."),
-    stopAddress: Yup.string().required("Stop Area is required."),
+    routeNumber: Yup.string().required("Bus number is required."),
+    stopArea: Yup.string().required("Stop Area is required."),
 });
 
 export const forgotPasswordSchema = Yup.object({

@@ -12,8 +12,8 @@ import { useFormik, FormikHelpers } from "formik";
 import { userProfileSchema } from "../../validationSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
-import { ProfileType } from "../../types/user.types";
-import userThunk from "../../store/user/userThunk";
+import { SignUpPart2 } from "../../types/user.types";
+import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { routes } from "../../routes";
 
@@ -25,12 +25,12 @@ const UserProfile: React.FC = () => {
   const email = location.state?.email;
 
   const onSubmit = async (
-    values: ProfileType,
-    { setSubmitting, resetForm }: FormikHelpers<ProfileType>
+    values: SignUpPart2,
+    { setSubmitting, resetForm }: FormikHelpers<SignUpPart2>
   ) => {
     try {
       setSubmitting(true);
-      await dispatch(userThunk.updateProfile(values)).unwrap();
+      await dispatch(authThunk.completeSignup(values)).unwrap();
       resetForm();
       navigate(routes.login);
     } catch (error) {
@@ -42,17 +42,17 @@ const UserProfile: React.FC = () => {
 
   const formik = useFormik({
     initialValues: {
-      fullname: "",
+      fullName: "",
       departmentName: "",
       registrationNumber: "",
       phoneNumber: "",
       gender: "",
-      busNumber: "",
-      stopAddress: "",
+      routeNumber: "",
+      stopArea: "",
       email: email || "",
     },
     validationSchema: userProfileSchema,
-    onSubmit,
+    onSubmit: onSubmit,
   });
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -77,7 +77,7 @@ const UserProfile: React.FC = () => {
         }}
       >
         <Typography variant="h4" align="center" fontWeight="bold">
-          Profile
+          Create Profile
         </Typography>
         <Box
           component="form"
@@ -90,13 +90,13 @@ const UserProfile: React.FC = () => {
         >
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
-              name="fullname"
+              name="fullName"
               label="Full Name"
-              value={formik.values.fullname}
+              value={formik.values.fullName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={formik.touched.fullname && Boolean(formik.errors.fullname)}
-              helperText={formik.touched.fullname && formik.errors.fullname}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
               fullWidth
               variant="outlined"
             />
@@ -105,6 +105,7 @@ const UserProfile: React.FC = () => {
             <TextField
               name="departmentName"
               label="Department"
+              select
               value={formik.values.departmentName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -117,7 +118,23 @@ const UserProfile: React.FC = () => {
               }
               fullWidth
               variant="outlined"
-            />
+            >
+              <MenuItem value="Electrical Engineering">
+                Electrical Engineering
+              </MenuItem>
+              <MenuItem value="Computer Science">Computer Science</MenuItem>
+              <MenuItem value="Software Engineering">
+                Software Engineering
+              </MenuItem>
+              <MenuItem value="Biomedical Engineering">
+                Biomedical Engineering
+              </MenuItem>
+              <MenuItem value="Chemical Engineering">
+                Chemical Engineering
+              </MenuItem>
+              <MenuItem value="Biotechnology">Biotechnology</MenuItem>
+              <MenuItem value="Basic Science">Basic Science</MenuItem>
+            </TextField>
             <TextField
               name="registrationNumber"
               label="Registration No"
@@ -174,16 +191,18 @@ const UserProfile: React.FC = () => {
             </TextField>
 
             <TextField
-              name="busNumber"
-              label="Bus Number"
+              name="routeNumber"
+              label="Route Number"
               select
-              value={formik.values.busNumber}
+              value={formik.values.routeNumber}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={
-                formik.touched.busNumber && Boolean(formik.errors.busNumber)
+                formik.touched.routeNumber && Boolean(formik.errors.routeNumber)
               }
-              helperText={formik.touched.busNumber && formik.errors.busNumber}
+              helperText={
+                formik.touched.routeNumber && formik.errors.routeNumber
+              }
               fullWidth
               variant="outlined"
             >
@@ -196,15 +215,13 @@ const UserProfile: React.FC = () => {
           </Box>
 
           <TextField
-            name="stopAddress"
+            name="stopArea"
             label="Stop Area"
-            value={formik.values.stopAddress}
+            value={formik.values.stopArea}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={
-              formik.touched.stopAddress && Boolean(formik.errors.stopAddress)
-            }
-            helperText={formik.touched.stopAddress && formik.errors.stopAddress}
+            error={formik.touched.stopArea && Boolean(formik.errors.stopArea)}
+            helperText={formik.touched.stopArea && formik.errors.stopArea}
             fullWidth
             variant="outlined"
           />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -7,69 +7,113 @@ import {
   Paper,
   Grid,
   Avatar,
+  CircularProgress,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import userThunk from "../../../store/user/userThunk";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import toaster from "../../../utils/toaster";
+import { UpdateProfileType } from "../../../types/user.types";
 
 const Profile: React.FC = () => {
+  const userProfile = useAppSelector((state) => state.userSlice.profile);
   const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState<UpdateProfileType | null>(null);
+  const dispatch = useAppDispatch();
 
-  const [profile, setProfile] = useState({
-    fullName: "John Doe",
-    email: "asadnadeem206@gmail.com",
-    department: "Computer Science",
-    registrationNumber: "123456",
-    phoneNumber: "9876543210",
-    busNumber: "10",
-    stopArea: "Main Square",
-  });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        await dispatch(userThunk.getProfile()).unwrap();
+      } catch (error) {
+        toaster.error(error as string);
+      }
+    };
 
-  const [profileImage, setProfileImage] = useState<string | null>(
-    "https://via.placeholder.com/150"
-  );
+    if (!userProfile) {
+      fetchProfile();
+    } else {
+      setProfile(userProfile);
+    }
+  }, [dispatch, userProfile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    setProfile((prevProfile) => ({
+      ...prevProfile!,
+      [name]: value,
+    }));
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
+  const handleToggle = () => {
+    setIsEditing((prev) => !prev);
   };
 
-  const handleSaveClick = () => {
-    console.log("Updated Profile:", profile);
-    console.log("Profile Image Base64:", profileImage);
-    setIsEditing(false);
-  };
-
-  // Handle Image Upload
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        alert("Please upload a valid image file.");
-        return;
+  const handleSave = async () => {
+    try {
+      if (isEditing && profile) {
+        await dispatch(userThunk.updateProfile(profile)).unwrap();
+        toaster.success("Profile updated successfully!");
       }
-
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        if (event.target && event.target.result) {
-          setProfileImage(event.target.result as string); // Update Base64 string
-        }
-      };
-
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        alert("Failed to load image. Please try again.");
-      };
-
-      reader.readAsDataURL(file); // Convert file to Base64
+    } catch (error) {
+      toaster.error(error as string);
+    } finally {
+      handleToggle();
     }
   };
+
+  function stringToColor(string: string) {
+    let hash = 0;
+    let i;
+
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = "#";
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+
+    return color;
+  }
+
+  function stringAvatar(name: string) {
+    const nameParts = name.split(" ");
+    const initials =
+      nameParts.length > 1
+        ? `${nameParts[0][0]}${nameParts[1][0]}`
+        : `${nameParts[0][0] || ""}`;
+
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+        width: { sm: 100 },
+        height: { sm: 100 },
+        margin: "0 auto",
+      },
+      children: initials.toUpperCase(),
+    };
+  }
+
+  if (!profile) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "80vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress size="3rem" />;
+      </Box>
+    );
+  }
 
   return (
     <Paper
@@ -85,45 +129,25 @@ const Profile: React.FC = () => {
       <Box position="relative" mb={2}>
         <Avatar
           alt="Profile Picture"
-          src={profileImage || "https://via.placeholder.com/150"}
-          sx={{
-            width: { xs: 80, sm: 100 },
-            height: { xs: 80, sm: 100 },
-            margin: "0 auto",
-          }}
+          {...stringAvatar(profile.fullName || "")}
         />
-        {isEditing && (
-          <Box mt={1}>
-            <Button variant="outlined" component="label" size="small">
-              Upload Picture
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleImageChange}
-              />
-            </Button>
-          </Box>
-        )}
       </Box>
 
-      {/* Welcome Text */}
       <Typography
         variant="h5"
         fontWeight="bold"
         sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}
       >
-        Welcome, {profile.fullName}
+        Welcome, {profile.fullName || ""}
       </Typography>
       <Typography
         color="gray"
         mb={3}
         sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
       >
-        {profile.email}
+        {userProfile?.email || ""}
       </Typography>
 
-      {/* Profile Form */}
       <Box component="form" noValidate autoComplete="off">
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
@@ -131,7 +155,7 @@ const Profile: React.FC = () => {
               fullWidth
               label="Full Name"
               name="fullName"
-              value={profile.fullName}
+              value={profile.fullName || ""}
               onChange={handleChange}
               disabled={!isEditing}
               size="small"
@@ -142,7 +166,7 @@ const Profile: React.FC = () => {
               fullWidth
               label="Department"
               name="department"
-              value={profile.department}
+              value={profile.departmentName}
               onChange={handleChange}
               disabled={!isEditing}
               size="small"
@@ -175,7 +199,7 @@ const Profile: React.FC = () => {
               fullWidth
               label="Bus Number"
               name="busNumber"
-              value={profile.busNumber}
+              value={profile.routeNumber}
               onChange={handleChange}
               disabled={!isEditing}
               size="small"
@@ -195,27 +219,15 @@ const Profile: React.FC = () => {
         </Grid>
       </Box>
 
-      {/* Buttons */}
       <Box sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}>
-        {isEditing ? (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
-            onClick={handleSaveClick}
-          >
-            Save
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="info"
-            startIcon={<EditIcon />}
-            onClick={handleEditClick}
-          >
-            Edit Profile
-          </Button>
-        )}
+        <Button
+          variant="contained"
+          color={isEditing ? "primary" : "info"}
+          startIcon={isEditing ? <SaveIcon /> : <EditIcon />}
+          onClick={handleSave}
+        >
+          {isEditing ? "Save" : "Edit Profile"}
+        </Button>
       </Box>
     </Paper>
   );

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../axios";
-import { Profile, ChangePasswordType } from "../../types/user.types";
+import { UpdateProfileType, ChangePasswordType } from "../../types/user.types";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
@@ -8,21 +8,17 @@ import toaster from "../../utils/toaster";
 
 export enum UserApiPathEnum {
     CHANGE_PASSWORD = "api/user/change-password",
-    PROFILE = "api/user/profile",
+    GET_PROFILE = "api/user/get-profile",
+    UPDATE_PROFILE = "api/user/update-profile",
 }
-
-
 
 const changePassword = createAsyncThunk(UserApiPathEnum.CHANGE_PASSWORD,
     async (values: ChangePasswordType, { rejectWithValue }) => {
         try {
             const res = await instance.post(UserApiPathEnum.CHANGE_PASSWORD, values);
             if (res.status === HttpStatusCode.Ok) {
-                if (res.data.data?.token) {
-                    localStorage.setItem("token", res.data.data?.token);
-                }
                 toaster.success(res.data.message);
-                return res.data.data;
+                return res.data.data
             }
         } catch (error) {
             return rejectWithValue(errorReturn(error));
@@ -30,19 +26,25 @@ const changePassword = createAsyncThunk(UserApiPathEnum.CHANGE_PASSWORD,
     }
 );
 
-
-const profile = createAsyncThunk(UserApiPathEnum.PROFILE,
-    async (values: Profile, { rejectWithValue }) => {
+const updateProfile = createAsyncThunk(UserApiPathEnum.UPDATE_PROFILE,
+    async (values: UpdateProfileType, { rejectWithValue }) => {
         try {
-            const res = await instance.get(UserApiPathEnum.PROFILE, {
-                params: values,
-            })
+            const res = await instance.post(UserApiPathEnum.UPDATE_PROFILE, values)
             if (res.status === HttpStatusCode.Ok) {
-                if (res.data.data?.token) {
-                    localStorage.setItem("token", res.data.data?.token);
-                }
-                toaster.success(res.data.message);
-                return res.data.data;
+                return res.data.data
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+const getProfile = createAsyncThunk(UserApiPathEnum.GET_PROFILE,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get(UserApiPathEnum.GET_PROFILE)
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data;
             }
         } catch (error) {
             return rejectWithValue(errorReturn(error));
@@ -51,7 +53,7 @@ const profile = createAsyncThunk(UserApiPathEnum.PROFILE,
 );
 
 export default {
-
     changePassword,
-    profile,
+    getProfile,
+    updateProfile,
 };

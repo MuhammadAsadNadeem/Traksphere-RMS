@@ -1,29 +1,38 @@
 export type ProfileType = {
+    id: string,
     email: string,
-    fullname: string,
+    fullName: string,
     registrationNumber: string,
     departmentName: string,
     phoneNumber: string,
-    busNumber: string,
+    routeNumber: string,
     gender: string,
-    stopAddress: string;
-
+    stopArea: string,
 }
+
+export type SignUpPart2 = {
+    email: string,
+    fullName: string,
+    registrationNumber: string,
+    departmentName: string,
+    phoneNumber: string,
+    routeNumber: string,
+    gender: string,
+    stopArea: string,
+}
+
 export type ChangePasswordType = {
     currentPassword: string,
     newPassword: string,
-    confirmPassword: string
-
+    confirmPassword: string,
 }
 
-export type Profile = {
-    email: string,
-    fullname: string,
-    registrationNumber: string,
-    departmentName: string,
-    phoneNumber: string,
-    busNumber: string,
-    stopAddress: string;
-
+export type UpdateProfileType = {
+    fullName?: string,
+    registrationNumber?: string,
+    departmentName?: string,
+    phoneNumber?: string,
+    routeNumber?: string,
+    stopArea?: string,
 }
 

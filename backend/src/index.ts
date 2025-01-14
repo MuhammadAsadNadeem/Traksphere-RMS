@@ -4,7 +4,7 @@ import cors from "cors";
 import config from "./config";
 import userRoutes from "./routers/user.route";
 import authRoutes from "./routers/auth.route";
-import { errorHandler, HttpError } from "./utils/errorHandler";
+import { errorHandler } from "./utils/errorHandler";
 
 const app = express();
 app.use(cors());

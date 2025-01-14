@@ -4,6 +4,7 @@ import { ForgotPasswordType, LoginType, SignupType } from "../../types/auth.type
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
+import { SignUpPart2 } from "../../types/user.types";
 
 export enum AuthApiPathEnum {
     LOGIN = "api/auth/signin",
@@ -41,7 +42,7 @@ const signup = createAsyncThunk(AuthApiPathEnum.SIGNUP, async (values: SignupTyp
 })
 
 const completeSignup = createAsyncThunk(AuthApiPathEnum.SIGNUP_PART2,
-    async (values: ProfileType, { rejectWithValue }) => {
+    async (values: SignUpPart2, { rejectWithValue }) => {
         try {
             const res = await instance.post(AuthApiPathEnum.SIGNUP_PART2, values);
             if (res.status === HttpStatusCode.Ok) {

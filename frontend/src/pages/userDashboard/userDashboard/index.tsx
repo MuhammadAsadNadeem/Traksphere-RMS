@@ -137,7 +137,6 @@ const UserDashboard = () => {
               </Paper>
             </Grid>
 
-            {/* Feature 4 - Report Complaints */}
             <Grid item xs={12} md={3}>
               <Paper
                 sx={{

@@ -7,7 +7,6 @@ import SideBar from "./pages/adminDashboard/dashlayout/sidebar";
 import UserPanel from "./pages/userDashboard/userPanel";
 import Dashboard from "./pages/userDashboard/userDashboard";
 import RouteDetails from "./pages/userDashboard/routeDetails";
-import Compliant from "./pages/userDashboard/compliantLog";
 import ViewUsers from "./pages/adminDashboard/viewusers";
 import ManageUser from "./pages/adminDashboard/manageuser";
 import Drivers from "./pages/adminDashboard/drivers";
@@ -19,9 +18,8 @@ import ChangePassword from "./pages/changePassword";
 export const routes = {
   login: "/login",
   signup: "/signup",
-  profile: "/profile",
+  profile: "/complete-signup",
   forgotPassword: "/forgot-password",
-  verifyPasssword: "/verify",
   homePage: "/",
   adminDashboard: "/admin",
   Dashboard: "/dashmenu",
@@ -36,7 +34,6 @@ export const routes = {
   leaflet: "/user",
   routedetails: "/viewroutes",
   userPanel: "/userpanel",
-  compliant: "/compliantLog",
 };
 
 export const PublicRoutes = [
@@ -73,10 +70,7 @@ export const PublicRoutes = [
     path: routes.routedetails,
     element: <RouteDetails />,
   },
-  {
-    path: routes.compliant,
-    element: <Compliant />,
-  },
+
   {
     path: routes.profile,
     element: <UpdateProfile />,

@@ -15,7 +15,6 @@ import {
 import { indigo } from "@mui/material/colors";
 import MenuIcon from "@mui/icons-material/Menu";
 import { IoSettingsSharp } from "react-icons/io5";
-import { BiMessageSquareError } from "react-icons/bi";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { MdOutlineDirectionsBus } from "react-icons/md";
 import { BsPerson } from "react-icons/bs";
@@ -24,7 +23,6 @@ import { motion } from "framer-motion";
 import UserDashboard from "../userDashboard";
 import RouteDetails from "../routeDetails";
 import User from "../routeMap/user";
-import Compliant from "../compliantLog";
 import Profile from "../profile";
 import ChangePassword from "../../changePassword";
 
@@ -62,11 +60,7 @@ const UserPanel = () => {
       icon: <MdOutlineDirectionsBus size={30} />,
       view: "viewRoutes",
     },
-    {
-      label: "Log Complaint",
-      icon: <BiMessageSquareError size={30} />,
-      view: "complaint",
-    },
+
     { label: "Profile", icon: <BsPerson size={30} />, view: "profile" },
     {
       label: "Settings",
@@ -79,7 +73,6 @@ const UserPanel = () => {
     <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
 
-      {/* Sidebar with more animations */}
       <Drawer
         variant="permanent"
         sx={{
@@ -92,12 +85,11 @@ const UserPanel = () => {
             color: "#fff",
             height: "calc(100vh - 60px)",
             top: 58,
-            transition: "width 0.3s ease", // Smooth transition for sidebar expansion
+            transition: "width 0.3s ease",
           },
         }}
       >
         <List>
-          {/* Hamburger Menu Button with Rotation */}
           <ListItem disablePadding>
             <ListItemButton onClick={handleSidebarToggle}>
               <ListItemIcon
@@ -122,7 +114,6 @@ const UserPanel = () => {
             </ListItemButton>
           </ListItem>
 
-          {/* Menu Items with More Interactive Animations */}
           {menuItems.map((item) => (
             <motion.div
               key={item.view}
@@ -143,8 +134,8 @@ const UserPanel = () => {
                         : "inherit",
                     "&:hover": {
                       backgroundColor: "rgba(255, 255, 255, 0.27)",
-                      transform: "scale(1.1)", // Bounce effect on hover
-                      transition: "transform 0.2s ease", // Smooth bounce effect
+                      transform: "scale(1.1)",
+                      transition: "transform 0.2s ease",
                     },
                     px: isSidebarExpanded ? 2 : 1,
                     borderRadius: 1,
@@ -185,7 +176,6 @@ const UserPanel = () => {
         </List>
       </Drawer>
 
-      {/* Main Content with Dynamic Animations */}
       <Box
         component="main"
         sx={{
@@ -198,14 +188,13 @@ const UserPanel = () => {
         <Container>
           <motion.div
             key={selectedView}
-            initial={{ opacity: 0, y: 50 }} // Slide from the bottom
-            animate={{ opacity: 1, y: 0 }} // Slide to its original position
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             {selectedView === "dashboard" && <UserDashboard />}
             {selectedView === "viewRoutes" && <RouteDetails />}
             {selectedView === "user" && <User />}
-            {selectedView === "complaint" && <Compliant />}
             {selectedView === "profile" && <Profile />}
             {selectedView === "settings" && <ChangePassword />}
           </motion.div>

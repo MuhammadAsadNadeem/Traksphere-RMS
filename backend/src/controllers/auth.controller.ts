@@ -78,7 +78,6 @@ const sendOtp = async (req: Request, res: Response, next: NextFunction) => {
             throw new HttpError("email is required in params", StatusCodes.BAD_REQUEST);
         }
         let { otp }: any = await redisService.getCache(email)
-        console.log(otp)
         if (!otp) {
             otp = mailerService.generateOtp();
             await redisService.setCache(email, { otp })

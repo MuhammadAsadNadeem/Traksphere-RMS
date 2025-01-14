@@ -24,9 +24,9 @@ const Navbar: React.FC = () => {
   const islogin = useAppSelector((state) => state.userSlice.token);
 
   const handleLogout = async () => {
-    await dispatch(logout());
     localStorage.clear();
     navigate(routes.login);
+    await dispatch(logout());
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
