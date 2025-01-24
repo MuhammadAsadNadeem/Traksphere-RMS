@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import authService from '../services/auth.service';
-import { signUpDto } from '../dto/user.dto';
+import { SignUpDto } from '../dto/user.dto';
 import { StatusCodes } from 'http-status-codes';
 import { HttpError } from '../utils/errorHandler';
 import redisService from "../utils/redisService";
@@ -8,9 +8,10 @@ import mailerService from '../utils/mailerService';
 import userService from '../services/user.service';
 import bcrypt from "bcrypt";
 
+
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { email, password, code }: signUpDto = req.body;
+        const { email, password, code }: SignUpDto = req.body;
         if (!email || !password || !code) {
             throw new HttpError("email, password and code are required", StatusCodes.BAD_REQUEST);
         }
@@ -36,10 +37,20 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
 const completeSignUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { email, ...profileData } = req.body;
+        const { email, registrationNumber, ...profileData } = req.body;
         const sanitizedEmail = email.trim();
+
         if (!sanitizedEmail) {
             throw new HttpError("Valid email is required.", StatusCodes.BAD_REQUEST);
+        }
+
+        if (!registrationNumber) {
+            throw new HttpError("Registration number is required.", StatusCodes.BAD_REQUEST);
+        }
+
+        const existingUserByRegNo = await authService.findByRegistrationNumber(registrationNumber);
+        if (existingUserByRegNo) {
+            throw new HttpError("Registration number already in use.", StatusCodes.BAD_REQUEST);
         }
 
         const user = await userService.findByEmail(sanitizedEmail);
@@ -47,16 +58,19 @@ const completeSignUp = async (req: Request, res: Response, next: NextFunction) =
             throw new HttpError("User not found.", StatusCodes.NOT_FOUND);
         }
 
-        const isUpdated = await userService.update(user.id, profileData);
+        const isUpdated = await userService.update(user.id, { ...profileData, registrationNumber });
         if (!isUpdated) {
-            throw new HttpError("Profile not Created.", StatusCodes.BAD_REQUEST);
+            throw new HttpError("Profile not created.", StatusCodes.BAD_REQUEST);
         }
 
-        res.status(StatusCodes.OK).json({ message: "New Profile Created." });
+        res.status(StatusCodes.OK).json({ message: "Profile created successfully." });
     } catch (error) {
         next(error);
     }
 };
+
+
+
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {

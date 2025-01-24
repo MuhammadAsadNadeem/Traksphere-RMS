@@ -1,6 +1,6 @@
 import db from "../db";
 import { Repository } from "typeorm";
-import { signUpDto } from "../dto/user.dto";
+import { SignUpDto } from "../dto/user.dto";
 import config from "../config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -15,7 +15,7 @@ export class authService {
         this.userRepository = db.user;
     }
 
-    async signUp(userData: signUpDto) {
+    async signUp(userData: SignUpDto) {
         const { email, password } = userData;
 
         const userExist = await this.userRepository.findOneBy({ email });
@@ -33,6 +33,17 @@ export class authService {
         await this.userRepository.save(newUser);
         return newUser;
     }
+
+    async findByRegistrationNumber(registrationNumber: string): Promise<User | null> {
+        try {
+
+            const user = await this.userRepository.findOne({ where: { registrationNumber } });
+            return user;
+        } catch (error) {
+            throw new Error('There was an error while checking the registration number.');
+        }
+    }
+
 
     async signIn(email: string, password: string) {
         const user = await this.userRepository.findOne({ where: { email } });

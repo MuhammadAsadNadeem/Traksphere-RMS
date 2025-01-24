@@ -14,7 +14,6 @@ class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-
   // ----------------Update user profile--------------------
 
 
@@ -26,44 +25,15 @@ class UserService {
     return false
   }
 
-  // --------------Get all users-----------------------
-  async findAll(): Promise<User[]> {
-    return await this.userRepository.find({
-      select: [
-        "id",
-        "fullName",
-        "departmentName",
-        "registrationNumber",
-        "email",
-        "phoneNumber",
-        "routeNumber",
-        "gender",
-        "stopArea",
-      ],
-    });
-  }
+
 
   //----------- Get  a user by ID ----------------------------
   async findById(id: string): Promise<User | null> {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  // ---------------------Delete user------------------------
 
-  async deleteUserByEmail(email: string): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    await this.userRepository.remove(user);
-
-    return 'User deleted successfully';
-  }
-
-
-
-  //--------------------Fetch User Details ---------------------
+  //--------------------Get User Details ---------------------
 
   async fetchUserDetails(userId: string): Promise<User | null> {
     return await this.userRepository.findOne({

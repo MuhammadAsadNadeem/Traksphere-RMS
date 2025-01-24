@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { v4 as uuidv4 } from "uuid";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Route } from "./route.entity";
 
 @Entity()
 export class Driver {
@@ -9,24 +9,13 @@ export class Driver {
     @Column({ nullable: false })
     fullName: string;
 
-    @Column({ unique: true, nullable: false })
-    CnicNumber: string;
-
     @Column({ nullable: true })
     phoneNumber: string;
 
-    @Column({ nullable: true })
-    routeNumber: string;
+    @Column({ unique: true, nullable: false })
+    cnicNumber: string;
 
-    @Column({ unique: true, nullable: true })
-    busNumber: string;
+    @OneToMany(() => Driver, (driver) => driver.routes)
+    routes: Route[];
 
-    @Column({ type: "simple-array", nullable: true })
-    stopName: string[];
-
-    constructor() {
-        if (!this.id) {
-            this.id = uuidv4();
-        }
-    }
 }

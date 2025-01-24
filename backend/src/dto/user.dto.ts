@@ -1,11 +1,11 @@
 
-export interface signUpDto {
+export interface SignUpDto {
     email: string,
     password: string,
     code?: string,
 };
 
-export interface UserDto {
+export interface completeSignUpDto {
     email: string,
     fullName: string,
     registrationNumber: string,
@@ -14,6 +14,7 @@ export interface UserDto {
     routeNumber: string,
     gender: string,
     stopArea: string;
+    isSuperuser: boolean;
 };
 
 export interface UpdateProfileDto {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
@@ -14,7 +14,7 @@ export class User {
   @Column({ nullable: true })
   fullName: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ nullable: true })
   registrationNumber: string;
 
   @Column({ nullable: true })
@@ -32,7 +32,14 @@ export class User {
   @Column({ nullable: true })
   stopArea: string;
 
+  @Column({ default: false })
+  isSuperuser: boolean;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
   constructor() {
     if (!this.id) {
       this.id = uuidv4();
