@@ -1,3 +1,16 @@
+export interface UserDto {
+    id: string,
+    email: string,
+    fullName: string,
+    registrationNumber: string,
+    departmentName: string,
+    phoneNumber: string,
+    routeNumber: string,
+    gender: string,
+    stopArea: string;
+    isSuperuser: boolean;
+};
+
 
 export interface SignUpDto {
     email: string,

@@ -4,6 +4,7 @@ import { validate as isUUID } from "uuid";
 import adminService from "../services/admin.service";
 import { HttpError } from "../utils/errorHandler";
 import { StopDto } from "../dto/stop.dto";
+import { UpdateRouteDto, RouteDto } from "../dto/route.dto";
 
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -202,15 +203,15 @@ const addNewRoute = async (req: Request, res: Response, next: NextFunction) => {
                 StatusCodes.BAD_REQUEST
             );
         }
-
-        //const newRoute = 
-        await adminService.addRoute({
+        const RouteDto: RouteDto = {
             vehicleNumber,
             routeName,
             routeNumber,
             driverId,
             busStopIds
-        });
+        };
+        //const newRoute = 
+        await adminService.addRoute(RouteDto);
         res.status(StatusCodes.CREATED).json({
             message: "New Route Created successfully",
             //newRoute,
@@ -257,25 +258,24 @@ const updateRouteById = async (req: Request, res: Response, next: NextFunction) 
         }
 
         const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = req.body;
-        console.log(req.body);
-        // if (!vehicleNumber || !routeName || !routeNumber || !driverId || !busStopIds) {
-        //     throw new HttpError(
-        //         "At least one field (vehicleNumber, routeName, routeNumber, driverId, busStopIds) is required",
-        //         StatusCodes.BAD_REQUEST
-        //     );
-        // }
-
-        const updatedRoute = await adminService.updateRoute(id as string, {
+        if (!vehicleNumber || !routeName || !routeNumber || !driverId || !busStopIds) {
+            throw new HttpError(
+                "At least one field (vehicleNumber, routeName, routeNumber, driverId, busStopIds) is required",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+        const updateRouteDto: UpdateRouteDto = {
             vehicleNumber,
             routeName,
             routeNumber,
             driverId,
             busStopIds,
-        });
-
+        };
+        // const updatedRoute =
+        await adminService.updateRoute(id as string, updateRouteDto);
         res.status(StatusCodes.OK).json({
             message: "Route updated successfully",
-            updatedRoute,
+            // updatedRoute,
         });
     } catch (error) {
         next(error);
