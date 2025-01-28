@@ -17,6 +17,7 @@ const router = Router()
     .put("/update-stop", controller.updateStopById)
     .delete("/delete-stop", controller.deleteStopById)
     .post("/add-route", controller.addNewRoute)
-//.get("/get-routes", controller.getAllRoutes)
-
+    .get("/get-routes", controller.getAllRoutes)
+    .delete("/delete-route", controller.deleteRouteById)
+    .put("/update-route", controller.updateRouteById)
 export default router;

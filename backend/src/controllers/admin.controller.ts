@@ -196,23 +196,24 @@ const deleteStopById = async (req: Request, res: Response, next: NextFunction) =
 const addNewRoute = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = req.body;
-
-        if (!vehicleNumber || !routeName || !routeNumber || !driverId || !busStopIds) {
+        if (!vehicleNumber || !routeName || !routeNumber || !driverId) {
             throw new HttpError(
                 "vehicleNumber, routeName, routeNumber, busStopIds, and driverId are required",
                 StatusCodes.BAD_REQUEST
             );
         }
 
-        const newRoute = await adminService.addRoute({
+        //const newRoute = 
+        await adminService.addRoute({
             vehicleNumber,
             routeName,
             routeNumber,
             driverId,
+            busStopIds
         });
         res.status(StatusCodes.CREATED).json({
             message: "New Route Created successfully",
-            newRoute,
+            //newRoute,
         });
 
     } catch (error) {
@@ -220,16 +221,66 @@ const addNewRoute = async (req: Request, res: Response, next: NextFunction) => {
     };
 }
 
-// const getAllRoutes = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
+const deleteRouteById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.query;
 
-//         const routes = await adminService.getAllRoutes();
+        if (!isUUID(id)) {
+            throw new HttpError("Invalid Stop ID format", StatusCodes.BAD_REQUEST);
+        }
 
-//         res.status(StatusCodes.OK).json(routes);
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+        await adminService.deleteRouteById(id as string);
+        res.status(StatusCodes.OK).json({
+            message: "Route deleted successfully",
+
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getAllRoutes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const routes = await adminService.getAllRoutes();
+        res.status(StatusCodes.OK).json(routes);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateRouteById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.query;
+
+        if (!isUUID(id as string)) {
+            throw new HttpError("Invalid route ID format", StatusCodes.BAD_REQUEST);
+        }
+
+        const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = req.body;
+        console.log(req.body);
+        // if (!vehicleNumber || !routeName || !routeNumber || !driverId || !busStopIds) {
+        //     throw new HttpError(
+        //         "At least one field (vehicleNumber, routeName, routeNumber, driverId, busStopIds) is required",
+        //         StatusCodes.BAD_REQUEST
+        //     );
+        // }
+
+        const updatedRoute = await adminService.updateRoute(id as string, {
+            vehicleNumber,
+            routeName,
+            routeNumber,
+            driverId,
+            busStopIds,
+        });
+
+        res.status(StatusCodes.OK).json({
+            message: "Route updated successfully",
+            updatedRoute,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 export default {
     getAllUsers,
@@ -243,6 +294,8 @@ export default {
     getAllStops,
     deleteStopById,
     addNewRoute,
-    //getAllRoutes,
+    getAllRoutes,
+    deleteRouteById,
+    updateRouteById,
 
 };

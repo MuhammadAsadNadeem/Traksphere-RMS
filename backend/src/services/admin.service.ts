@@ -7,7 +7,7 @@ import { HttpError } from "../utils/errorHandler";
 import { StatusCodes } from "http-status-codes";
 import { StopDto } from "../dto/stop.dto";
 import { DriverDto } from "../dto/driver.dto";
-import { RouteDto } from "../dto/route.dto";
+import { RouteDto, UpdateRouteDto } from "../dto/route.dto";
 import { Route } from "../entities/route.entity";
 
 export class AdminService {
@@ -173,25 +173,42 @@ export class AdminService {
     }
 
     async addRoute(data: any) {
-        const { vehicleNumber, routeName, routeNumber, driverId, busStops } = data;
+        const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = data;
 
         const existingRoute = await this.routeRepository.findOne({
             where: { vehicleNumber },
         });
         if (existingRoute) {
-            throw new HttpError("A route with this vehicle number already exists.", StatusCodes.BAD_REQUEST);
+            throw new HttpError(
+                "A route with this vehicle number already exists.",
+                StatusCodes.BAD_REQUEST
+            );
         }
 
         const existingDriverRoute = await this.routeRepository.findOne({
             where: { driver: { id: driverId } },
         });
         if (existingDriverRoute) {
-            throw new HttpError("This driver is already assigned to another route.", StatusCodes.BAD_REQUEST);
+            throw new HttpError(
+                "This driver is already assigned to another route.",
+                StatusCodes.BAD_REQUEST
+            );
         }
 
         const driver = await this.driverRepository.findOne({ where: { id: driverId } });
         if (!driver) {
-            throw new HttpError("Driver with the specified ID not found.", StatusCodes.NOT_FOUND);
+            throw new HttpError(
+                "Driver with the specified ID not found.",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        const foundStops = await this.busStopRepository.findByIds(busStopIds);
+        if (foundStops.length !== busStopIds.length) {
+            throw new HttpError(
+                "One or more bus stop IDs are invalid.",
+                StatusCodes.BAD_REQUEST
+            );
         }
 
         const newRoute = this.routeRepository.create({
@@ -199,26 +216,95 @@ export class AdminService {
             routeName,
             routeNumber,
             driver,
+            busStops: foundStops,
         });
 
         await this.routeRepository.save(newRoute);
+        return newRoute
+    }
+    async getAllRoutes(): Promise<Route[]> {
+        try {
 
-        const routes = new Route();
-        routes.busStops = busStops;
+            const routes = await this.routeRepository.find({
+                relations: ["driver", "busStops"],
+            });
 
-        await this.routeRepository.save(routes);
+            if (!routes || routes.length === 0) {
+                throw new HttpError("No routes found.", StatusCodes.NOT_FOUND);
+            }
 
-        return {
-            id: newRoute.id,
-            vehicleNumber: newRoute.vehicleNumber,
-            routeName: newRoute.routeName,
-            routeNumber: newRoute.routeNumber,
-            driverName: driver.fullName,
-            driverPhoneNumber: driver.phoneNumber,
-        };
+            return routes;
+        } catch (error) {
+            throw new HttpError("An error occurred while fetching routes.", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
     }
 
+    async deleteRouteById(id: string): Promise<Route> {
+        const route = await this.routeRepository.findOneBy({ id });
 
+        if (!route) {
+            throw new HttpError("Route not found", StatusCodes.NOT_FOUND);
+        }
+
+        await this.routeRepository.delete(id);
+        return route;
+    }
+
+    async updateRoute(
+        id: string,
+        data: UpdateRouteDto
+    ): Promise<Route> {
+        const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = data;
+
+        const route = await this.routeRepository.findOne({
+            where: { id },
+            relations: ["driver", "busStops"],
+        });
+        if (!route) {
+            throw new HttpError("Route not found.", StatusCodes.NOT_FOUND);
+        }
+
+        if (vehicleNumber && vehicleNumber !== route.vehicleNumber) {
+            const existingRoute = await this.routeRepository.findOne({
+                where: { vehicleNumber },
+            });
+            if (existingRoute) {
+                throw new HttpError("A route with this vehicle number already exists.", StatusCodes.BAD_REQUEST);
+            }
+            route.vehicleNumber = vehicleNumber;
+        }
+
+        if (routeName) route.routeName = routeName;
+        if (routeNumber) route.routeNumber = routeNumber;
+
+        if (driverId) {
+            const driver = await this.driverRepository.findOne({ where: { id: driverId } });
+            if (!driver) {
+                throw new HttpError("Driver with the specified ID not found.", StatusCodes.NOT_FOUND);
+            }
+            const existingDriverRoute = await this.routeRepository.findOne({
+                where: { driver: { id: driverId } },
+            });
+            if (existingDriverRoute && existingDriverRoute.id !== id) {
+                throw new HttpError("This driver is already assigned to another route.", StatusCodes.BAD_REQUEST);
+            }
+            route.driver = driver;
+        }
+
+        if (busStopIds) {
+            const busStops = await this.busStopRepository.findByIds(busStopIds);
+            if (busStops.length !== busStopIds.length) {
+                throw new HttpError("One or more bus stop IDs are invalid.", StatusCodes.BAD_REQUEST);
+            }
+            route.busStops = busStops;
+        }
+
+
+        return await this.routeRepository.save(route);
+    }
 }
+
+
+
 
 export default new AdminService();

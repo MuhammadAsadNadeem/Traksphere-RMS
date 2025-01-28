@@ -5,3 +5,10 @@ export interface RouteDto {
     driverId: string;
     busStopIds: string[];
 }
+export interface UpdateRouteDto {
+    routeName?: string;
+    routeNumber?: string;
+    vehicleNumber?: string;
+    driverId?: string;
+    busStopIds?: string[];
+}

@@ -23,6 +23,7 @@ export class Route {
 
     @ManyToMany(() => BusStop, (busStops) => busStops.routes, { eager: true, cascade: true })
     @JoinTable()
+
     busStops: BusStop[];
 
 
