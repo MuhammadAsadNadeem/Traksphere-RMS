@@ -280,7 +280,18 @@ const updateRouteById = async (req: Request, res: Response, next: NextFunction) 
     } catch (error) {
         next(error);
     }
+
 };
+
+const getAllCounts = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const counts = await adminService.getCounts();
+        res.status(StatusCodes.OK).json(counts);
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export default {
     getAllUsers,
@@ -297,5 +308,6 @@ export default {
     getAllRoutes,
     deleteRouteById,
     updateRouteById,
+    getAllCounts,
 
 };

@@ -20,4 +20,5 @@ const router = Router()
     .get("/get-routes", controller.getAllRoutes)
     .delete("/delete-route", controller.deleteRouteById)
     .put("/update-route", controller.updateRouteById)
+    .get("/get-counts", controller.getAllCounts)
 export default router;

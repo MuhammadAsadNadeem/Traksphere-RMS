@@ -44,8 +44,6 @@ export class AdminService {
 
     }
 
-
-
     async deleteUserById(id: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
 
@@ -285,6 +283,29 @@ export class AdminService {
 
         return await this.routeRepository.save(route);
     }
+
+
+    async getCounts() {
+        try {
+            const userCount = await this.userRepository.count({
+                where: { isSuperuser: false }
+            });
+            const busStopCount = await this.busStopRepository.count();
+            const routeCount = await this.routeRepository.count();
+            const driverCount = await this.driverRepository.count();
+
+            return {
+                totalUsers: userCount,
+                totalBusStops: busStopCount,
+                totalRoutes: routeCount,
+                totalDrivers: driverCount
+            };
+        } catch (error) {
+            throw new HttpError("Error fetching counts.", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
 
 
