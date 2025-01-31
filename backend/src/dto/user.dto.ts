@@ -11,7 +11,6 @@ export interface UserDto {
     isSuperuser: boolean;
 };
 
-
 export interface SignUpDto {
     email: string,
     password: string,
@@ -39,3 +38,16 @@ export interface UpdateProfileDto {
     registrationNumber?: string;
 
 }
+
+export interface UpdateUserDto {
+    id: string,
+    email?: string,
+    fullName?: string,
+    registrationNumber?: string,
+    departmentName?: string,
+    phoneNumber?: string,
+    routeNumber?: string,
+    gender?: string,
+    stopArea?: string;
+
+};

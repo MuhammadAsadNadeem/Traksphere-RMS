@@ -5,6 +5,7 @@ import adminService from "../services/admin.service";
 import { HttpError } from "../utils/errorHandler";
 import { StopDto } from "../dto/stop.dto";
 import { UpdateRouteDto, RouteDto } from "../dto/route.dto";
+import { UpdateUserDto } from "../dto/user.dto";
 
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -12,6 +13,46 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
         const users = await adminService.findAllUser();
         res.status(StatusCodes.OK).json(users);
     } catch (error) {
+        next(error);
+    }
+};
+
+const updateUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.query;
+
+        if (!isUUID(id)) {
+            throw new HttpError("Invalid user ID format", StatusCodes.BAD_REQUEST);
+        }
+
+        const { email, fullName, registrationNumber, departmentName, phoneNumber, routeNumber, gender, stopArea } = req.body;
+
+
+        if (!email && !fullName && !registrationNumber && !departmentName && !phoneNumber && !routeNumber && !gender && !stopArea) {
+            throw new HttpError("At least one field is required for update", StatusCodes.BAD_REQUEST);
+        }
+
+        const userData: UpdateUserDto = {
+            id: id as string,
+            email,
+            fullName,
+            registrationNumber,
+            departmentName,
+            phoneNumber,
+            routeNumber,
+            gender,
+            stopArea,
+
+        };
+
+        // const updatedUser = 
+        await adminService.updateUserById(id as string, userData);
+        res.status(StatusCodes.OK).json({
+            message: "User updated successfully",
+            // updatedUser,
+        });
+    } catch (error) {
+
         next(error);
     }
 };
@@ -44,7 +85,7 @@ const addDriver = async (req: Request, res: Response, next: NextFunction) => {
             throw new HttpError("All fields are required", StatusCodes.BAD_REQUEST);
         }
 
-        await adminService.addDriver({
+        await adminService.addNewDriver({
             fullName,
             phoneNumber,
             cnicNumber,
@@ -295,6 +336,7 @@ const getAllCounts = async (req: Request, res: Response, next: NextFunction) => 
 
 export default {
     getAllUsers,
+    updateUserById,
     deleteUserById,
     addDriver,
     deleteDriverById,

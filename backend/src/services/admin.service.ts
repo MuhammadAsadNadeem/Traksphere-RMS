@@ -9,6 +9,7 @@ import { StopDto } from "../dto/stop.dto";
 import { DriverDto } from "../dto/driver.dto";
 import { RouteDto, UpdateRouteDto } from "../dto/route.dto";
 import { Route } from "../entities/route.entity";
+import { UpdateUserDto } from "../dto/user.dto";
 
 export class AdminService {
     private userRepository: Repository<User>;
@@ -44,6 +45,32 @@ export class AdminService {
 
     }
 
+    async updateUserById(id: string, userData: UpdateUserDto): Promise<User> {
+        const { email, fullName, registrationNumber, departmentName, phoneNumber, routeNumber, gender, stopArea } = userData;
+
+
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new HttpError('User not found.', StatusCodes.NOT_FOUND);
+        }
+
+        if (email) user.email = email;
+        if (fullName) user.fullName = fullName;
+        if (registrationNumber) user.registrationNumber = registrationNumber;
+        if (departmentName) user.departmentName = departmentName;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (routeNumber) user.routeNumber = routeNumber;
+        if (gender) user.gender = gender;
+        if (stopArea) user.stopArea = stopArea;
+
+        try {
+            await this.userRepository.save(user);
+            return user;
+        } catch (error) {
+            throw new HttpError('Failed to update user.', StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     async deleteUserById(id: string): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
 
@@ -56,7 +83,7 @@ export class AdminService {
     }
 
 
-    async addDriver(driverData: Partial<Driver>): Promise<Driver> {
+    async addNewDriver(driverData: Partial<Driver>): Promise<Driver> {
         const { cnicNumber } = driverData;
 
         const existingDriver = await this.driverRepository.findOne({

@@ -15,6 +15,6 @@ export class BusStop {
     @Column({ type: "float", nullable: false })
     longitude: number;
 
-    @ManyToMany(() => Route, (route) => route.busStops)
+    @ManyToMany(() => Route, (route) => route.busStops, { onDelete: 'CASCADE' })
     routes: Route[];
 }
