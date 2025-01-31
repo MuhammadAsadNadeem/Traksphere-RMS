@@ -5,33 +5,43 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   TextField,
+  IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import Header from "../../../components/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { mockDataUsers } from "../data/mockData";
 import { indigo } from "@mui/material/colors";
-
-interface User {
-  id: number;
-  full_name: string;
-  department: string;
-  registration_number: string;
-  email: string;
-  phone_number: string;
-  route_no: number;
-  stop_area: string;
-  gender: string;
-}
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Header from "../../../components/Header";
+import { UserResponse } from "../../../types/admin.types";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchUsers } from "../../../store/thunks/adminThunk.ts";
 
 const ManageUser: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(mockDataUsers);
+  const [users, setUsers] = useState<UserResponse[]>();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Filter users based on search term
+  const filteredUsers = users.filter((user) =>
+    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Columns for DataGrid
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", flex: 0.5, minWidth: 100 },
+    { field: "id", headerName: "ID", flex: 1, minWidth: 50 },
     {
       field: "full_name",
       headerName: "Full Name",
@@ -52,62 +62,84 @@ const ManageUser: React.FC = () => {
       minWidth: 150,
     },
     { field: "email", headerName: "Email", flex: 1, minWidth: 150 },
-    { field: "gender", headerName: "Gender", flex: 1, minWidth: 150 },
-
+    { field: "gender", headerName: "Gender", flex: 1, minWidth: 100 },
     {
       field: "phone_number",
-      headerName: "Phone Number",
+      headerName: "Contact Number",
       flex: 1,
       minWidth: 150,
     },
-    { field: "route_no", headerName: "Route", flex: 0.5, minWidth: 100 },
+    { field: "route_no", headerName: "Route", flex: 1, minWidth: 100 },
     { field: "stop_area", headerName: "Stop Area", flex: 1, minWidth: 150 },
-
     {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 200,
-      renderCell: (params: { row: User }) => (
+      minWidth: isMobile ? 100 : 150,
+      renderCell: (params: { row: MockUser }) => (
         <>
-          <Button
-            variant="contained"
+          <IconButton
             color="primary"
-            size="small"
-            sx={{ marginRight: "5px" }}
             onClick={() => handleEditUser(params.row)}
+            aria-label="edit"
           >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
+            <EditIcon />
+          </IconButton>
+          <IconButton
             color="error"
-            size="small"
-            sx={{ margin: "5px" }}
             onClick={() => handleDeleteUser(params.row.id)}
+            aria-label="delete"
           >
-            Delete
-          </Button>
+            <DeleteIcon />
+          </IconButton>
         </>
       ),
     },
   ];
 
+  // Handle Delete User
   const handleDeleteUser = (id: number): void => {
-    const updatedUsers = users.filter((user) => user.id !== id);
-    setUsers(updatedUsers);
+    setUserToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
-  const handleEditUser = (user: User): void => {
+  const confirmDelete = (): void => {
+    if (userToDelete) {
+      const updatedUsers = users.filter((user) => user.id !== userToDelete);
+      setUsers(updatedUsers);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  // Handle Edit User
+  const handleEditUser = (user: MockUser): void => {
     setSelectedUser(user);
     setOpenDialog(true);
   };
 
+  // Handle Create User
+  const handleCreateUser = (): void => {
+    setSelectedUser({
+      id: users.length + 1, // Generate a unique ID
+      full_name: "",
+      department: "",
+      registration_number: "",
+      email: "",
+      gender: "",
+      phone_number: "",
+      route_no: "",
+      stop_area: "",
+    });
+    setOpenDialog(true);
+  };
+
+  // Handle Close Dialog
   const handleCloseDialog = (): void => {
     setOpenDialog(false);
     setSelectedUser(null);
   };
 
+  // Handle Update User
   const handleUpdateUser = (): void => {
     if (selectedUser) {
       const updatedUsers = users.map((user) =>
@@ -118,6 +150,7 @@ const ManageUser: React.FC = () => {
     }
   };
 
+  // Handle Input Change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     if (selectedUser) {
@@ -130,49 +163,81 @@ const ManageUser: React.FC = () => {
 
   return (
     <Box m="10px">
-      <Header title=" Mange Users" subtitle="List of All Users" />
+      <Header title="Manage Users" subtitle="List of All Users" />
 
+      {/* Search Bar */}
+      <TextField
+        label="Search Users"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{ mb: 2 }}
+      />
+
+      {/* DataGrid */}
       <Box
         mt="40px"
-        height="85vh"
-        maxWidth="100vw"
-        sx={{ "& .MuiDataGrid-root": { border: "none" } }}
+        height="75vh"
+        sx={{
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { borderBottom: "none" },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: indigo[400],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            backgroundColor: indigo[400],
+          },
+          "& .MuiCheckbox-root": {
+            color: `${indigo[400]} !important`,
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: indigo[50],
+          },
+          "& .MuiDataGrid-row:nth-of-type(odd)": {
+            backgroundColor: indigo[100],
+          },
+        }}
       >
         <DataGrid
-          rows={users}
+          rows={filteredUsers}
           columns={columns}
-          sx={{
-            "& .MuiDataGrid-root": {
-              border: "none",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: indigo[400],
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: indigo[400],
-            },
-            "& .MuiCheckbox-root": {
-              color: `${indigo[400]} !important`,
-            },
-            "& .MuiDataGrid-iconSeparator": {
-              color: indigo[400],
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${indigo[400]} !important`,
-            },
-          }}
+          checkboxSelection
+          pagination
+          pageSizeOptions={[5, 10, 25]}
         />
       </Box>
 
+      {/* Edit User Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle color={indigo[500]}>Edit User</DialogTitle>
+        <DialogTitle color={indigo[500]}>
+          {selectedUser?.id ? "Edit User" : "Create User"}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialog}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
+          <DialogContentText>
+            {selectedUser?.id
+              ? "Update the user details below."
+              : "Enter the details for the new user."}
+          </DialogContentText>
           <TextField
             label="Full Name"
             variant="outlined"
@@ -201,7 +266,7 @@ const ManageUser: React.FC = () => {
             onChange={handleInputChange}
           />
           <TextField
-            label="Phone Number"
+            label="Contact Number"
             variant="outlined"
             fullWidth
             margin="normal"
@@ -251,7 +316,30 @@ const ManageUser: React.FC = () => {
             Cancel
           </Button>
           <Button onClick={handleUpdateUser} color="primary">
-            Update
+            {selectedUser?.id ? "Update" : "Create"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this user?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

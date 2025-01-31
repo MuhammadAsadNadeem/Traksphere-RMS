@@ -1,151 +1,226 @@
 import React, { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  Typography,
-  Collapse,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { indigo } from "@mui/material/colors";
 
-// Dummy Data
-interface Stop {
-  value: string;
-  label: string;
+interface RouteType {
+  id: number;
+  routeName: string;
+  driverName: string;
+  busNumber: string;
+  stops: string;
 }
 
-interface Route {
-  id: string;
-  route_no: string;
-  driver: {
-    label: string;
-    phone: string;
+const RouteManagement: React.FC = () => {
+  const [routes, setRoutes] = useState<RouteType[]>([
+    {
+      id: 1,
+      routeName: "Anarkali Route",
+      driverName: "Shafeq Ahmad",
+      busNumber: "FBR-1023",
+      stops: "UET KSK Campus - Band Road",
+    },
+    {
+      id: 2,
+      routeName: "Route 01",
+      driverName: "Ansar",
+      busNumber: "FBR-10232",
+      stops: "UET KSK Campus - UET KSK Campus",
+    },
+    {
+      id: 3,
+      routeName: "Route 10",
+      driverName: "Maqsood Khan",
+      busNumber: "FBR-12034",
+      stops: "UET KSK Campus - Band Road",
+    },
+  ]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [editRoute, setEditRoute] = useState<RouteType | null>(null);
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "#", width: 50 },
+    { field: "routeName", headerName: "Route", flex: 1 },
+    { field: "driverName", headerName: "Driver Name", flex: 1 },
+    { field: "busNumber", headerName: "Bus #", flex: 1 },
+    { field: "stops", headerName: "Stops", flex: 2 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell: (params: { row: RouteType }) => (
+        <>
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            onClick={() => handleEdit(params.row)}
+            sx={{ marginRight: 1 }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  const handleAddRoute = (): void => {
+    setEditRoute(null);
+    setOpenDialog(true);
   };
-  vehicle_no: string;
-  stops: Stop[];
-}
 
-const dummyRoutes: Route[] = [
-  {
-    id: "1",
-    route_no: "01",
-    driver: { label: "John Doe", phone: "123-456-7890" },
-    vehicle_no: "B123",
-    stops: [
-      { value: "A", label: "Stop A" },
-      { value: "B", label: "Stop B" },
-      { value: "C", label: "Stop C" },
-    ],
-  },
-  {
-    id: "2",
-    route_no: "02",
-    driver: { label: "Jane Smith", phone: "987-654-3210" },
-    vehicle_no: "B456",
-    stops: [
-      { value: "D", label: "Stop D" },
-      { value: "E", label: "Stop E" },
-      { value: "F", label: "Stop F" },
-    ],
-  },
-];
+  const handleEdit = (route: RouteType): void => {
+    setEditRoute(route);
+    setOpenDialog(true);
+  };
 
-const RouteDetails: React.FC = () => {
-  const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
+  const handleDelete = (id: number): void => {
+    setRoutes((prevRoutes) => prevRoutes.filter((route) => route.id !== id));
+  };
 
-  const toggleRoute = (routeId: string) => {
-    setExpandedRoute((prev) => (prev === routeId ? null : routeId));
+  const handleSave = (newRoute: RouteType): void => {
+    if (editRoute) {
+      setRoutes((prevRoutes) =>
+        prevRoutes.map((route) => (route.id === newRoute.id ? newRoute : route))
+      );
+    } else {
+      setRoutes((prevRoutes) => [
+        ...prevRoutes,
+        { ...newRoute, id: prevRoutes.length + 1 },
+      ]);
+    }
+    setOpenDialog(false);
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        Available Routes
-      </Typography>
-      <Box display="flex" flexDirection="column" gap={2}>
-        {dummyRoutes.map((route) => (
-          <Card
-            key={route.id}
-            sx={{
-              backgroundColor: "primary.main",
-              color: "white",
-              borderRadius: 2,
-              transition: "0.3s",
-              "&:hover": { backgroundColor: "primary.dark" },
-            }}
-          >
-            {/* Route Header */}
-            <Box
-              onClick={() => toggleRoute(route.id)}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              p={2}
-              sx={{ cursor: "pointer" }}
-            >
-              <Box>
-                <Typography variant="h6" fontWeight="bold">
-                  Route Name:{" "}
-                  <Typography component="span" fontWeight="light">
-                    {route.route_no}
-                  </Typography>
-                </Typography>
-                <Typography>
-                  Driver Name:{" "}
-                  <Typography component="span" fontWeight="light">
-                    {route.driver.label}
-                  </Typography>
-                </Typography>
-                <Typography>
-                  Driver Ph_no:{" "}
-                  <Typography component="span" fontWeight="light">
-                    {route.driver.phone}
-                  </Typography>
-                </Typography>
-                <Typography>
-                  Bus #:{" "}
-                  <Typography component="span" fontWeight="light">
-                    {route.vehicle_no}
-                  </Typography>
-                </Typography>
-              </Box>
-              <IconButton sx={{ color: "white" }}>
-                {expandedRoute === route.id ? <ExpandLess /> : <ExpandMore />}
-              </IconButton>
-            </Box>
+    <Box m={4}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mb: 2 }}
+        onClick={handleAddRoute}
+      >
+        Add New Route
+      </Button>
 
-            {/* Expanded Details */}
-            <Collapse
-              in={expandedRoute === route.id}
-              timeout="auto"
-              unmountOnExit
-            >
-              <CardContent sx={{ bgcolor: "white", color: "black" }}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="medium"
-                  sx={{ borderBottom: "1px solid #ddd", pb: 1, mb: 2 }}
-                >
-                  All Stops
-                </Typography>
-                <List>
-                  {route.stops.map((stop) => (
-                    <ListItem key={stop.value} sx={{ pl: 2 }}>
-                      <ListItemText primary={stop.label} />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Collapse>
-          </Card>
-        ))}
-      </Box>
+      <DataGrid
+        rows={routes}
+        columns={columns}
+        autoHeight
+        //disableSelectionOnClick
+        sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: indigo[500],
+            color: "#fff",
+          },
+        }}
+      />
+
+      {openDialog && (
+        <RouteDialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          onSave={handleSave}
+          route={editRoute}
+        />
+      )}
     </Box>
   );
 };
 
-export default RouteDetails;
+interface RouteDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: (route: RouteType) => void;
+  route: RouteType | null;
+}
+
+const RouteDialog: React.FC<RouteDialogProps> = ({
+  open,
+  onClose,
+  onSave,
+  route,
+}) => {
+  const [formValues, setFormValues] = useState<RouteType>(
+    route || {
+      id: 0,
+      routeName: "",
+      driverName: "",
+      busNumber: "",
+      stops: "",
+    }
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    onSave(formValues);
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{route ? "Edit Route" : "Add New Route"}</DialogTitle>
+      <DialogContent>
+        <TextField
+          label="Route Name"
+          name="routeName"
+          value={formValues.routeName}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Driver Name"
+          name="driverName"
+          value={formValues.driverName}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Bus Number"
+          name="busNumber"
+          value={formValues.busNumber}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Stops"
+          name="stops"
+          value={formValues.stops}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} color="primary">
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default RouteManagement;

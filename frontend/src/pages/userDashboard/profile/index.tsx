@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import userThunk from "../../../store/user/userThunk";
+import userThunk from "../../../store/thunks/userThunk";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import toaster from "../../../utils/toaster";
 import { UpdateProfileType } from "../../../types/user.types";

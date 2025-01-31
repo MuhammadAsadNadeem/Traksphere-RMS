@@ -14,7 +14,7 @@ import { changePasswordSchema } from "../../validationSchema";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
 import { routes } from "../../routes";
-import userThunk from "../../store/user/userThunk";
+import userThunk from "../../store/thunks/userThunk";
 import { ChangePasswordType } from "../../types/user.types";
 import toaster from "../../utils/toaster";
 

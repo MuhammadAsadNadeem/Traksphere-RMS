@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit"
-import userSlice from "./user/userSlice";
-
+import userSlice from "./thunks/userSlice";
+import adminSlice from "./thunks/adminSlice"
 const store = configureStore({
     reducer: {
         userSlice,
+        adminSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false,

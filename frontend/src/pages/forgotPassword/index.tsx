@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
 import { forgotPasswordSchema } from "../../validationSchema";
 import { ForgotPasswordType } from "../../types/auth.types";
-import authThunk from "../../store/user/authThunk";
+import authThunk from "../../store/thunks/authThunk";
 import toaster from "../../utils/toaster";
 import SendOtpBtn from "../../components/SendOtpBtn";
 import { routes } from "../../routes";

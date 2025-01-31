@@ -7,58 +7,48 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  DialogContentText,
+  MenuItem,
 } from "@mui/material";
-import Header from "../../../components/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { mockDataDrivers } from "../data/mockData";
 import { indigo } from "@mui/material/colors";
+import { useFormik } from "formik";
+import { driverSchema } from "../../../validationSchema";
+import { DriverType } from "../../../types/driver.types";
 
-// Define driver type
-interface Driver {
-  id: number;
-  name: string;
-  bus_number: string;
-  route_number: number;
-  contact_number: string;
-}
-
-const ManageDriver = () => {
-  const [drivers, setDrivers] = useState<Driver[]>(mockDataDrivers); // Specify driver type
+const ManageDriver: React.FC = () => {
+  const [drivers, setDrivers] = useState<DriverType[]>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [currentDriver, setCurrentDriver] = useState<Driver | null>(null); // Specify possible null type
-  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-  const [driverToDelete, setDriverToDelete] = useState<Driver | null>(null); // Specify possible null type
+  const [editDriver, setEditDriver] = useState<DriverType | null>(null);
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 0.5, minWidth: 80 },
+    { field: "fullName", headerName: "Driver Name", flex: 1, minWidth: 150 },
+    { field: "busNumber", headerName: "Bus Number", flex: 1, minWidth: 150 },
     {
-      field: "name",
-      headerName: "Driver Name",
+      field: "routeNumber",
+      headerName: "Route Number",
       flex: 1,
-      minWidth: 130,
-      cellClassName: "name-column--cell",
+      minWidth: 150,
     },
-    { field: "bus_number", headerName: "Bus No", flex: 1, minWidth: 130 },
-    { field: "route_number", headerName: "Route No", flex: 1, minWidth: 130 },
     {
-      field: "contact_number",
+      field: "contactNumber",
       headerName: "Contact Number",
       flex: 1,
-      minWidth: 130,
+      minWidth: 150,
     },
+    { field: "cnicNumber", headerName: "CNIC Number", flex: 1, minWidth: 150 },
     {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 130,
-      renderCell: (params: { row: Driver }) => (
+      minWidth: 200,
+      renderCell: (params: { row: DriverType }) => (
         <>
           <Button
             variant="contained"
             color="primary"
             size="small"
-            sx={{ marginRight: "2px" }}
+            sx={{ marginRight: 1 }}
             onClick={() => handleEdit(params.row)}
           >
             Edit
@@ -67,8 +57,7 @@ const ManageDriver = () => {
             variant="contained"
             color="error"
             size="small"
-            sx={{ margin: "2px" }}
-            onClick={() => handleDelete(params.row)}
+            onClick={() => handleDelete(params.row.id)}
           >
             Delete
           </Button>
@@ -77,152 +66,165 @@ const ManageDriver = () => {
     },
   ];
 
-  const handleEdit = (driver: Driver): void => {
-    setCurrentDriver(driver);
+  const formik = useFormik({
+    initialValues: {
+      id: 0,
+      fullName: "",
+      cnicNumber: "",
+      busNumber: "",
+      routeNumber: "",
+      contactNumber: "",
+    },
+    validationSchema: driverSchema,
+    onSubmit: (values) => {
+      if (editDriver) {
+        setDrivers((prevDrivers) =>
+          prevDrivers.map((driver) =>
+            driver.id === values.id ? values : driver
+          )
+        );
+      } else {
+        setDrivers((prevDrivers) => [
+          ...prevDrivers,
+          { ...values, id: prevDrivers.length + 1 },
+        ]);
+      }
+      handleCloseDialog();
+    },
+  });
+
+  const handleAddDriver = (): void => {
+    setEditDriver(null);
+    formik.resetForm();
     setOpenDialog(true);
   };
 
-  const handleDelete = (driver: Driver): void => {
-    setDriverToDelete(driver);
-    setOpenDeleteDialog(true);
+  const handleEdit = (driver: DriverType): void => {
+    setEditDriver(driver);
+    formik.setValues(driver);
+    setOpenDialog(true);
   };
 
-  const confirmDelete = (): void => {
-    if (driverToDelete) {
-      setDrivers(drivers.filter((driver) => driver.id !== driverToDelete.id));
-      setOpenDeleteDialog(false);
-      setDriverToDelete(null);
-    }
+  const handleDelete = (id: number): void => {
+    setDrivers((prevDrivers) =>
+      prevDrivers.filter((driver) => driver.id !== id)
+    );
   };
 
   const handleCloseDialog = (): void => {
     setOpenDialog(false);
-    setCurrentDriver(null);
-  };
-
-  const handleSaveDriver = (): void => {
-    if (currentDriver) {
-      setDrivers(
-        drivers.map((driver) =>
-          driver.id === currentDriver.id ? currentDriver : driver
-        )
-      );
-      setOpenDialog(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (currentDriver) {
-      const { name, value } = e.target;
-      setCurrentDriver({
-        ...currentDriver,
-        [name]: value,
-      });
-    }
+    formik.resetForm();
   };
 
   return (
-    <Box
-      ml="20px"
-      mt="40px"
-      height="85vh"
-      maxWidth="100vw"
-      sx={{ "& .MuiDataGrid-root": { border: "none" } }}
-    >
-      <Header title="Manage Drivers" subtitle="List of All Drivers" />
+    <Box m={4}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mb: 2 }}
+        onClick={handleAddDriver}
+      >
+        Add New Driver
+      </Button>
 
       <DataGrid
         rows={drivers}
         columns={columns}
+        autoHeight
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: indigo[400],
-            borderBottom: "none",
           },
           "& .MuiDataGrid-footerContainer": {
             backgroundColor: indigo[500],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${indigo[400]} !important`,
-          },
-          "& .MuiDataGrid-iconSeparator": {
-            color: indigo[400],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: `${indigo[400]} !important`,
           },
         }}
       />
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle color={indigo[700]}>Edit Driver</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Driver Name"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="name"
-            value={currentDriver?.name || ""}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Bus Number"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="bus_number"
-            value={currentDriver?.bus_number || ""}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Route Number"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="route_number"
-            value={currentDriver?.route_number || ""}
-            onChange={handleChange}
-          />
-          <TextField
-            label="Contact Number"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="contact_number"
-            value={currentDriver?.contact_number || ""}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button color="primary" onClick={handleSaveDriver}>
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={openDeleteDialog}
-        onClose={() => setOpenDeleteDialog(false)}
-      >
-        <DialogTitle>Delete Driver</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this driver?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} color="error">
-            Delete
-          </Button>
-        </DialogActions>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogTitle>
+            {editDriver ? "Edit Driver" : "Add New Driver"}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Driver Name"
+              name="fullName"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Bus Number"
+              name="busNumber"
+              value={formik.values.busNumber}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.busNumber && Boolean(formik.errors.busNumber)
+              }
+              helperText={formik.touched.busNumber && formik.errors.busNumber}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Route Number"
+              name="routeNumber"
+              value={formik.values.routeNumber}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.routeNumber && Boolean(formik.errors.routeNumber)
+              }
+              helperText={
+                formik.touched.routeNumber && formik.errors.routeNumber
+              }
+              fullWidth
+              margin="normal"
+              select
+            >
+              {Array.from({ length: 15 }, (_, i) => (
+                <MenuItem key={i + 1} value={(i + 1).toString()}>
+                  {i + 1}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              label="Contact Number"
+              name="contactNumber"
+              value={formik.values.contactNumber}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.contactNumber &&
+                Boolean(formik.errors.contactNumber)
+              }
+              helperText={
+                formik.touched.contactNumber && formik.errors.contactNumber
+              }
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="CNIC Number"
+              name="cnicNumber"
+              value={formik.values.cnicNumber}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.cnicNumber && Boolean(formik.errors.cnicNumber)
+              }
+              helperText={formik.touched.cnicNumber && formik.errors.cnicNumber}
+              fullWidth
+              margin="normal"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button type="submit" color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </Box>
   );

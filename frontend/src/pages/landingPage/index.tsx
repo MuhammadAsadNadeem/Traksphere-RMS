@@ -9,7 +9,7 @@ import { routes } from "../../routes";
 import FeatureCard from "./components/featureCard";
 import AboutSection from "./components/aboutSection";
 
-const Home: React.FC = () => {
+const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   return (
     <Box>
@@ -137,4 +137,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default LandingPage;

@@ -1,39 +1,38 @@
-import LoginPage from "./pages/login/index";
+import LoginPage from "./pages/logIn/index";
 import ForgotPassword from "./pages/forgotPassword/index";
-import SignUp from "./pages/signup/signupPart1";
-import UpdateProfile from "./pages/signup/signupPart2";
-import Home from "./pages/home/index";
-import SideBar from "./pages/adminDashboard/dashlayout/sidebar";
-import UserPanel from "./pages/userDashboard/userPanel";
+import SignUp from "./pages/signUp/signupPart1";
+import UpdateProfile from "./pages/signUp/signupPart2";
+import LandingPage from "./pages/landingPage/index";
+import AdminPanel from "./pages/adminDashboard/adminPanel";
 import Dashboard from "./pages/userDashboard/userDashboard";
 import RouteDetails from "./pages/userDashboard/routeDetails";
-import ViewUsers from "./pages/adminDashboard/viewusers";
-import ManageUser from "./pages/adminDashboard/manageuser";
+import ViewUsers from "./pages/adminDashboard/viewUsers";
+import ManageUser from "./pages/adminDashboard/manageUser";
 import Drivers from "./pages/adminDashboard/drivers";
 import AddDriver from "./pages/adminDashboard/addDriver";
 import ManageDriver from "./pages/adminDashboard/manageDriver";
 import User from "./pages/userDashboard/routeMap/user";
 import ChangePassword from "./pages/changePassword";
+import UserPanel from "./pages/userDashboard/userPanel";
 
 export const routes = {
   login: "/login",
   signup: "/signup",
   profile: "/complete-signup",
   forgotPassword: "/forgot-password",
-  homePage: "/",
-  adminDashboard: "/admin",
-  Dashboard: "/dashmenu",
-  sidebar: "/dashboard",
-  viewusers: "/viewusers",
-  manageuser: "/manageuser",
+  landingPage: "/",
+  adminPanel: "/admin-panel",
+  viewusers: "/view-users",
+  manageuser: "/manage-user",
   drivers: "/drivers",
-  addDriver: "/addDriver",
-  manageDriver: "/manageDriver",
+  addDriver: "/add-driver",
+  manageDriver: "/manage-driver",
+  userPanel: "/user-panel",
+  Dashboard: "/user-dashboard",
   settings: "/settings",
   changePassword: "/change-password",
   leaflet: "/user",
   routedetails: "/viewroutes",
-  userPanel: "/userpanel",
 };
 
 export const PublicRoutes = [
@@ -51,12 +50,12 @@ export const PublicRoutes = [
   },
 
   {
-    path: routes.homePage,
-    element: <Home />,
+    path: routes.landingPage,
+    element: <LandingPage />,
   },
   {
-    path: routes.sidebar,
-    element: <SideBar />,
+    path: routes.adminPanel,
+    element: <AdminPanel />,
   },
   {
     path: routes.userPanel,

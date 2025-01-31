@@ -57,3 +57,18 @@ export const changePasswordSchema = Yup.object({
         .oneOf([Yup.ref("newPassword")], "Passwords do not match")
         .required("Confirm password is required."),
 });
+
+export const driverSchema = Yup.object({
+    fullName: Yup.string().required("Full Name is required."),
+    busNumber: Yup.string().required("Bus Number is required"),
+    cnicNumber: Yup.string()
+        .length(13, "CNIC Number must be 13 digits")
+        .matches(/^[0-9]+$/, "CNIC Number must contain only digits")
+        .required("CNIC Number is required"),
+    contactNumber: Yup.string()
+        .matches(/^\d{11}$/, "Phone number must be 11 digits.")
+        .required("Phone number is required."),
+    routeNumber: Yup.string().required("Bus number is required."),
+
+});
+

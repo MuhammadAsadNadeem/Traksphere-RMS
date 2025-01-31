@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 
-const UserProfile: React.FC = () => {
+const AddDriver: React.FC = () => {
   const [form, setForm] = useState({
     name: "",
     phoneNumber: "",
@@ -145,4 +145,4 @@ const UserProfile: React.FC = () => {
   );
 };
 
-export default UserProfile;
+export default AddDriver;
