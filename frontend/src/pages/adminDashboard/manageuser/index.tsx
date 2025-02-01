@@ -1,343 +1,268 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  fetchAllUsers,
+  editUserById,
+  deleteUserById,
+} from "../../../store/thunks/adminThunk";
+import { UserResponse, UpdateUserType } from "../../../types/admin.types";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
   IconButton,
-  useMediaQuery,
-  useTheme,
+  Typography,
+  InputAdornment,
 } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { indigo } from "@mui/material/colors";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Header from "../../../components/Header";
-import { UserResponse } from "../../../types/admin.types";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { fetchUsers } from "../../../store/thunks/adminThunk.ts";
+import { Edit, Delete, Search } from "@mui/icons-material";
+import toaster from "../../../utils/toaster"; // Import the custom toaster utility
 
 const ManageUser: React.FC = () => {
-  const [users, setUsers] = useState<UserResponse[]>();
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const users = useAppSelector((state) => state.adminSlice.users);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
-  const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // Fetch users on component mount
+  useEffect(() => {
+    dispatch(fetchAllUsers({})); // Pass any filters if needed
+  }, [dispatch]);
 
-  // Filter users based on search term
-  const filteredUsers = users.filter((user) =>
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Add displayId to each user
+  const usersWithDisplayId = (users || []).map((user, index) => ({
+    ...user,
+    displayId: index + 1,
+  }));
+
+  // Handle edit user
+  const handleEditUser = (user: UserResponse) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  };
+
+  // Handle delete user
+  const handleDeleteUser = (userId: string) => {
+    setUserToDelete(userId);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm delete
+  const confirmDelete = () => {
+    if (userToDelete) {
+      dispatch(deleteUserById(userToDelete))
+        .unwrap()
+        .then(() => {
+          toaster.success("User deleted successfully!"); // Show success toast
+          setDeleteDialogOpen(false);
+          dispatch(fetchAllUsers({})); // Refresh the list
+        })
+        .catch(() => {
+          toaster.error("Failed to delete user."); // Show error toast
+        });
+    }
+  };
+
+  // Handle update user
+  const handleUpdateUser = () => {
+    if (selectedUser) {
+      const updatedUser: UpdateUserType = {
+        id: selectedUser.id,
+        email: selectedUser.email,
+        fullName: selectedUser.fullName,
+        registrationNumber: selectedUser.registrationNumber,
+        departmentName: selectedUser.departmentName,
+        phoneNumber: selectedUser.phoneNumber,
+        routeNumber: selectedUser.routeNumber,
+        gender: selectedUser.gender,
+        stopArea: selectedUser.stopArea,
+      };
+
+      dispatch(editUserById({ userId: selectedUser.id, values: updatedUser }))
+        .unwrap()
+        .then(() => {
+          toaster.success("User updated successfully!"); // Show success toast
+          setOpenDialog(false);
+          dispatch(fetchAllUsers({})); // Refresh the list
+        })
+        .catch(() => {
+          toaster.error("Failed to update user."); // Show error toast
+        });
+    }
+  };
+
+  // Filter users based on search query
+  const filteredUsers = usersWithDisplayId.filter((user) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return (
+      user.fullName.toLowerCase().includes(lowerCaseQuery) ||
+      user.email.toLowerCase().includes(lowerCaseQuery) ||
+      user.phoneNumber.toLowerCase().includes(lowerCaseQuery) ||
+      user.registrationNumber.toLowerCase().includes(lowerCaseQuery)
+    );
+  });
 
   // Columns for DataGrid
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", flex: 1, minWidth: 50 },
-    {
-      field: "full_name",
-      headerName: "Full Name",
-      flex: 1,
-      minWidth: 150,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "department",
-      headerName: "Department",
-      flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "registration_number",
-      headerName: "Registration No",
-      flex: 1,
-      minWidth: 150,
-    },
-    { field: "email", headerName: "Email", flex: 1, minWidth: 150 },
-    { field: "gender", headerName: "Gender", flex: 1, minWidth: 100 },
-    {
-      field: "phone_number",
-      headerName: "Contact Number",
-      flex: 1,
-      minWidth: 150,
-    },
-    { field: "route_no", headerName: "Route", flex: 1, minWidth: 100 },
-    { field: "stop_area", headerName: "Stop Area", flex: 1, minWidth: 150 },
+    { field: "displayId", headerName: "ID", flex: 1 }, // Use displayId for the ID column
+    { field: "fullName", headerName: "Full Name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "registrationNumber", headerName: "Registration No", flex: 1 },
+    { field: "departmentName", headerName: "Department", flex: 1 },
+    { field: "phoneNumber", headerName: "Phone No", flex: 1 },
+    { field: "routeNumber", headerName: "Route No", flex: 1 },
+    { field: "stopArea", headerName: "Stop Area", flex: 1 },
     {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: isMobile ? 100 : 150,
-      renderCell: (params: { row: MockUser }) => (
+      renderCell: (params) => (
         <>
-          <IconButton
-            color="primary"
-            onClick={() => handleEditUser(params.row)}
-            aria-label="edit"
-          >
-            <EditIcon />
+          <IconButton onClick={() => handleEditUser(params.row)}>
+            <Edit sx={{ color: "blue" }} />
           </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteUser(params.row.id)}
-            aria-label="delete"
-          >
-            <DeleteIcon />
+          <IconButton onClick={() => handleDeleteUser(params.row.id)}>
+            <Delete sx={{ color: "red" }} />
           </IconButton>
         </>
       ),
     },
   ];
 
-  // Handle Delete User
-  const handleDeleteUser = (id: number): void => {
-    setUserToDelete(id);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = (): void => {
-    if (userToDelete) {
-      const updatedUsers = users.filter((user) => user.id !== userToDelete);
-      setUsers(updatedUsers);
-      setDeleteDialogOpen(false);
-    }
-  };
-
-  // Handle Edit User
-  const handleEditUser = (user: MockUser): void => {
-    setSelectedUser(user);
-    setOpenDialog(true);
-  };
-
-  // Handle Create User
-  const handleCreateUser = (): void => {
-    setSelectedUser({
-      id: users.length + 1, // Generate a unique ID
-      full_name: "",
-      department: "",
-      registration_number: "",
-      email: "",
-      gender: "",
-      phone_number: "",
-      route_no: "",
-      stop_area: "",
-    });
-    setOpenDialog(true);
-  };
-
-  // Handle Close Dialog
-  const handleCloseDialog = (): void => {
-    setOpenDialog(false);
-    setSelectedUser(null);
-  };
-
-  // Handle Update User
-  const handleUpdateUser = (): void => {
-    if (selectedUser) {
-      const updatedUsers = users.map((user) =>
-        user.id === selectedUser.id ? selectedUser : user
-      );
-      setUsers(updatedUsers);
-      setOpenDialog(false);
-    }
-  };
-
-  // Handle Input Change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    if (selectedUser) {
-      setSelectedUser((prevState) => ({
-        ...prevState!,
-        [name]: value,
-      }));
-    }
-  };
-
   return (
-    <Box m="10px">
-      <Header title="Manage Users" subtitle="List of All Users" />
+    <Box>
+      {/* Heading */}
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Manage Users
+      </Typography>
 
-      {/* Search Bar */}
+      {/* Search Bar with Icon */}
       <TextField
-        label="Search Users"
-        variant="outlined"
         fullWidth
         margin="normal"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        variant="outlined"
+        placeholder="Search by full name, email, phone number, or registration number..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 2 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
       />
 
-      {/* DataGrid */}
-      <Box
-        mt="40px"
-        height="75vh"
-        sx={{
-          "& .MuiDataGrid-root": { border: "none" },
-          "& .MuiDataGrid-cell": { borderBottom: "none" },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: indigo[400],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            backgroundColor: indigo[400],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${indigo[400]} !important`,
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: indigo[50],
-          },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: indigo[100],
+      <DataGrid
+        rows={filteredUsers}
+        columns={columns}
+        getRowId={(row) => row.id} // Use the actual database ID for row identification
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 10, page: 0 },
           },
         }}
-      >
-        <DataGrid
-          rows={filteredUsers}
-          columns={columns}
-          checkboxSelection
-          pagination
-          pageSizeOptions={[5, 10, 25]}
-        />
-      </Box>
+      />
 
-      {/* Edit User Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle color={indigo[500]}>
-          {selectedUser?.id ? "Edit User" : "Create User"}
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+      {/* Edit Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {selectedUser?.id
-              ? "Update the user details below."
-              : "Enter the details for the new user."}
-          </DialogContentText>
           <TextField
             label="Full Name"
-            variant="outlined"
+            value={selectedUser?.fullName || ""}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser!, fullName: e.target.value })
+            }
             fullWidth
             margin="normal"
-            name="full_name"
-            value={selectedUser?.full_name || ""}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Department Name"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="department"
-            value={selectedUser?.department || ""}
-            onChange={handleInputChange}
           />
           <TextField
             label="Email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="email"
             value={selectedUser?.email || ""}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Contact Number"
-            variant="outlined"
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser!, email: e.target.value })
+            }
             fullWidth
             margin="normal"
-            name="phone_number"
-            value={selectedUser?.phone_number || ""}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Route No"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="route_no"
-            value={selectedUser?.route_no || ""}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Stop Area"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="stop_area"
-            value={selectedUser?.stop_area || ""}
-            onChange={handleInputChange}
-          />
-          <TextField
-            label="Gender"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            name="gender"
-            value={selectedUser?.gender || ""}
-            onChange={handleInputChange}
           />
           <TextField
             label="Registration Number"
-            variant="outlined"
+            value={selectedUser?.registrationNumber || ""}
+            onChange={(e) =>
+              setSelectedUser({
+                ...selectedUser!,
+                registrationNumber: e.target.value,
+              })
+            }
             fullWidth
             margin="normal"
-            name="registration_number"
-            value={selectedUser?.registration_number || ""}
-            onChange={handleInputChange}
+          />
+          <TextField
+            label="Department Name"
+            value={selectedUser?.departmentName || ""}
+            onChange={(e) =>
+              setSelectedUser({
+                ...selectedUser!,
+                departmentName: e.target.value,
+              })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Phone Number"
+            value={selectedUser?.phoneNumber || ""}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser!, phoneNumber: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Route Number"
+            value={selectedUser?.routeNumber || ""}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser!, routeNumber: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Stop Area"
+            value={selectedUser?.stopArea || ""}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser!, stopArea: e.target.value })
+            }
+            fullWidth
+            margin="normal"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleUpdateUser} color="primary">
-            {selectedUser?.id ? "Update" : "Create"}
-          </Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={handleUpdateUser}>Save</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
       >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this user?
-          </DialogContentText>
+          Are you sure you want to delete this user?
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
-            Cancel
-          </Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
           <Button onClick={confirmDelete} color="error">
             Delete
           </Button>

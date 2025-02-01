@@ -3,15 +3,14 @@ import instance from "../../axios";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import { setCounts, setBusStops, setLoading, setUsers } from "./adminSlice";
-import { BusStopResponse, CountsResponse, UserResponse } from "../../types/admin.types";
+import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
 
 export enum AdminApiPathEnum {
     COUNTS = "api/admin/get-counts",
-    BUSSTOPS = "api/admin/get-stops",
-    FETCHUSERS = "api/admin/get-users",
-    UPDATEUSER = "api/admin/update-user",
-    DELETEUSER = "api/admin/delete-user"
-
+    BUS_STOPS = "api/admin/get-stops",
+    FETCH_USERS = "api/admin/get-users",
+    UPDATE_USER = "api/admin/update-user",
+    DELETE_USER = "api/admin/delete-user"
 }
 
 
@@ -33,12 +32,13 @@ export const fetchCounts = createAsyncThunk(
     }
 );
 
+
 export const fetchBusStops = createAsyncThunk(
-    AdminApiPathEnum.BUSSTOPS,
+    AdminApiPathEnum.BUS_STOPS,
     async (_, { dispatch, rejectWithValue }) => {
         dispatch(setLoading(true));
         try {
-            const res = await instance.get<BusStopResponse[]>(AdminApiPathEnum.BUSSTOPS);
+            const res = await instance.get<BusStopResponse[]>(AdminApiPathEnum.BUS_STOPS);
             if (res.status === HttpStatusCode.Ok) {
                 const busStops: BusStopResponse[] = res.data.map((stop) => ({
                     id: stop.id,
@@ -58,25 +58,12 @@ export const fetchBusStops = createAsyncThunk(
 );
 
 
-export const fetchUsers = createAsyncThunk(
-    AdminApiPathEnum.FETCHUSERS,
-    async (params: UserResponse, { dispatch, rejectWithValue }) => {
+export const fetchAllUsers = createAsyncThunk(
+    AdminApiPathEnum.FETCH_USERS,
+    async (params: Partial<UserResponse>, { dispatch, rejectWithValue }) => {
         dispatch(setLoading(true));
         try {
-            const res = await instance.get<UserResponse[]>(AdminApiPathEnum.FETCHUSERS, {
-                params: {
-                    id: params.id,
-                    email: params.email,
-                    fullName: params.fullName,
-                    registrationNumber: params.registrationNumber,
-                    departmentName: params.departmentName,
-                    phoneNumber: params.phoneNumber,
-                    routeNumber: params.routeNumber,
-                    gender: params.gender,
-                    stopArea: params.stopArea,
-                },
-            });
-
+            const res = await instance.get<UserResponse[]>(AdminApiPathEnum.FETCH_USERS, { params });
             if (res.status === HttpStatusCode.Ok) {
                 const users: UserResponse[] = res.data.map((user) => ({
                     id: user.id,
@@ -89,7 +76,6 @@ export const fetchUsers = createAsyncThunk(
                     gender: user.gender,
                     stopArea: user.stopArea,
                 }));
-
                 dispatch(setUsers(users));
                 return users;
             }
@@ -102,9 +88,43 @@ export const fetchUsers = createAsyncThunk(
 );
 
 
+export const editUserById = createAsyncThunk(
+    AdminApiPathEnum.UPDATE_USER,
+    async ({ userId, values }: { userId: string; values: UpdateUserType }, { rejectWithValue }) => {
+        try {
+            const res = await instance.put(AdminApiPathEnum.UPDATE_USER, values, {
+                params: { id: userId }, // Pass userId as a query parameter
+            });
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+export const deleteUserById = createAsyncThunk(
+    AdminApiPathEnum.DELETE_USER,
+    async (userId: string, { rejectWithValue }) => {
+        try {
+            const res = await instance.delete(AdminApiPathEnum.DELETE_USER, {
+                params: { id: userId }, // Pass userId as a query parameter
+            });
+            if (res.status === HttpStatusCode.Ok) {
+                return userId;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
 
 export default {
     fetchCounts,
     fetchBusStops,
-    fetchUsers,
-};
+    fetchAllUsers,
+    editUserById,
+    deleteUserById,
+}

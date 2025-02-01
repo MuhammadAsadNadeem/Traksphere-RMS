@@ -16,13 +16,25 @@ export type BusStopResponse = {
 
 export type UserResponse = {
     id: string,
-    full_name: string,
-    department: string,
-    registration_number: string,
     email: string,
-    phone_number: string,
-    route_no: string,
-    stop_area: string,
+    fullName: string,
+    registrationNumber: string,
+    departmentName: string,
+    phoneNumber: string,
+    routeNumber: string,
     gender: string,
     stopArea: string;
 }
+
+export type UpdateUserType = {
+    id: string,
+    email?: string,
+    fullName?: string,
+    registrationNumber?: string,
+    departmentName?: string,
+    phoneNumber?: string,
+    routeNumber?: string,
+    gender?: string,
+    stopArea?: string;
+}
+

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchCounts, fetchBusStops, fetchUsers } from "../../store/thunks/adminThunk";
+import { fetchCounts, fetchBusStops, fetchAllUsers } from "../../store/thunks/adminThunk";
 import { CountsResponse, BusStopResponse, UserResponse } from "../../types/admin.types";
 
 interface AdminState {
@@ -64,15 +64,15 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(fetchUsers.pending, (state) => {
+            .addCase(fetchAllUsers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchUsers.fulfilled, (state, action) => {
+            .addCase(fetchAllUsers.fulfilled, (state, action) => {
                 state.loading = false;
                 state.users = action.payload;
             })
-            .addCase(fetchUsers.rejected, (state, action) => {
+            .addCase(fetchAllUsers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });
