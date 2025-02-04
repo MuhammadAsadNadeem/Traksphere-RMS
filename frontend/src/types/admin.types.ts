@@ -38,3 +38,9 @@ export type UpdateUserType = {
     stopArea?: string;
 }
 
+export type DriverResponse = {
+    id: string,
+    fullName: string;
+    phoneNumber: string;
+    cnicNumber: string;
+}

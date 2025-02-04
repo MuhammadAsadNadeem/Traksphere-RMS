@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit"
-import userSlice from "./thunks/userSlice";
-import adminSlice from "./thunks/adminSlice"
+import userSlice from "./user/userSlice";
+import adminSlice from "./user/adminSlice"
 const store = configureStore({
     reducer: {
         userSlice,

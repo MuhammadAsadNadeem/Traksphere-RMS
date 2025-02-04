@@ -14,7 +14,7 @@ import logo from "../assets/images/logo.svg";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../routes";
-import { logout } from "../store/thunks/userSlice";
+import { logout } from "../store/user/userSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 const Navbar: React.FC = () => {

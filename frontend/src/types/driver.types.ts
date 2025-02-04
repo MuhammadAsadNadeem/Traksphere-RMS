@@ -1,8 +1,12 @@
 export type DriverType = {
-    id: number;
+    id?: string;
     fullName: string;
-    routeNumber: string;
-    busNumber: string;
-    contactNumber: string;
+    phoneNumber: string;
+    cnicNumber: string;
+}
+export type UpdateDriverType = {
+    id: string,
+    fullName: string;
+    phoneNumber: string;
     cnicNumber: string;
 }

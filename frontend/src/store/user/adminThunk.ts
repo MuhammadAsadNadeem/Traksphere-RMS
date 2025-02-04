@@ -4,13 +4,20 @@ import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import { setCounts, setBusStops, setLoading, setUsers } from "./adminSlice";
 import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
+import toaster from "../../utils/toaster";
+import { DriverType, UpdateDriverType } from "../../types/driver.types";
+
 
 export enum AdminApiPathEnum {
     COUNTS = "api/admin/get-counts",
     BUS_STOPS = "api/admin/get-stops",
     FETCH_USERS = "api/admin/get-users",
     UPDATE_USER = "api/admin/update-user",
-    DELETE_USER = "api/admin/delete-user"
+    DELETE_USER = "api/admin/delete-user",
+    ADD_Driver = "api/admin/add-driver",
+    FETCH_DRIVERS = "api/admin/get-drivers",
+    UPDATE_DRIVER = "api/admin/update-driver",
+    DElETE_DRIVER = "api/admin/delete-driver",
 }
 
 
@@ -93,7 +100,7 @@ export const editUserById = createAsyncThunk(
     async ({ userId, values }: { userId: string; values: UpdateUserType }, { rejectWithValue }) => {
         try {
             const res = await instance.put(AdminApiPathEnum.UPDATE_USER, values, {
-                params: { id: userId }, // Pass userId as a query parameter
+                params: { id: userId },
             });
             if (res.status === HttpStatusCode.Ok) {
                 return res.data.data;
@@ -109,7 +116,7 @@ export const deleteUserById = createAsyncThunk(
     async (userId: string, { rejectWithValue }) => {
         try {
             const res = await instance.delete(AdminApiPathEnum.DELETE_USER, {
-                params: { id: userId }, // Pass userId as a query parameter
+                params: { id: userId },
             });
             if (res.status === HttpStatusCode.Ok) {
                 return userId;
@@ -120,6 +127,69 @@ export const deleteUserById = createAsyncThunk(
     }
 );
 
+export const addNewDriver = createAsyncThunk(AdminApiPathEnum.ADD_Driver,
+    async (values: DriverType, { rejectWithValue }) => {
+        try {
+            const res = await instance.post(AdminApiPathEnum.ADD_Driver, values);
+            if (res.status === HttpStatusCode.Ok) {
+                toaster.success(res.data.message);
+                return res.data.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+
+export const fetchAllDrivers = createAsyncThunk(AdminApiPathEnum.FETCH_DRIVERS,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get(AdminApiPathEnum.FETCH_DRIVERS)
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+export const editDriverById = createAsyncThunk(
+    AdminApiPathEnum.UPDATE_DRIVER,
+    async ({ userId, values }: { userId: string; values: UpdateDriverType }, { rejectWithValue }) => {
+        try {
+            const res = await instance.put(AdminApiPathEnum.UPDATE_DRIVER, values, {
+                params: { id: userId },
+            });
+
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data?.data;
+            } else {
+
+                throw new Error("Failed to update driver");
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+export const deleteDriverById = createAsyncThunk(
+    AdminApiPathEnum.DElETE_DRIVER,
+    async (userId: string, { rejectWithValue }) => {
+        try {
+            const res = await instance.delete(AdminApiPathEnum.DElETE_DRIVER, {
+                params: { id: userId },
+            });
+            if (res.status === HttpStatusCode.Ok) {
+                return userId;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
 
 export default {
     fetchCounts,
@@ -127,4 +197,9 @@ export default {
     fetchAllUsers,
     editUserById,
     deleteUserById,
+    addNewDriver,
+    fetchAllDrivers,
+    editDriverById,
+    deleteDriverById,
+
 }

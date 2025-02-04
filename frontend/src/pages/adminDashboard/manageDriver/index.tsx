@@ -1,4 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  fetchAllDrivers,
+  editDriverById,
+  deleteDriverById,
+  addNewDriver,
+} from "../../../store/user/adminThunk";
+import { DriverResponse } from "../../../types/admin.types";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -7,224 +16,374 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  MenuItem,
+  IconButton,
+  Typography,
+  InputAdornment,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Edit, Delete, Search, Add, Refresh } from "@mui/icons-material";
+import toaster from "../../../utils/toaster";
 import { indigo } from "@mui/material/colors";
-import { useFormik } from "formik";
-import { driverSchema } from "../../../validationSchema";
-import { DriverType } from "../../../types/driver.types";
+import { UpdateDriverType } from "../../../types/driver.types";
 
 const ManageDriver: React.FC = () => {
-  const [drivers, setDrivers] = useState<DriverType[]>([]);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [editDriver, setEditDriver] = useState<DriverType | null>(null);
+  const dispatch = useAppDispatch();
+  const drivers = useAppSelector((state) => state.adminSlice.drivers);
+  const [selectedDriver, setSelectedDriver] = useState<DriverResponse | null>(
+    null
+  );
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [driverToDelete, setDriverToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isAddMode, setIsAddMode] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    dispatch(fetchAllDrivers());
+  }, [dispatch]);
+
+  const driversWithDisplayId = (drivers || [])
+    .filter((driver) => driver != null)
+    .map((driver, index) => ({
+      ...driver,
+      displayId: index + 1,
+      id: driver.id || `driver-${index + 1}`,
+    }));
+
+  const validatePhoneNumber = (phoneNumber: string): boolean => {
+    return /^\d{11}$/.test(phoneNumber);
+  };
+
+  const validateCnicNumber = (cnicNumber: string): boolean => {
+    return /^\d{13}$/.test(cnicNumber);
+  };
+
+  const handleEditDriver = (driver: DriverResponse | null) => {
+    if (!driver) {
+      toaster.error("Invalid driver data.");
+      return;
+    }
+
+    setSelectedDriver(driver);
+    setIsAddMode(false);
+    setOpenDialog(true);
+  };
+
+  const handleAddDriver = () => {
+    setSelectedDriver({
+      id: "",
+      fullName: "",
+      cnicNumber: "",
+      phoneNumber: "",
+    });
+    setIsAddMode(true);
+    setOpenDialog(true);
+  };
+
+  const handleDeleteDriver = (driverId: string) => {
+    setDriverToDelete(driverId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (driverToDelete) {
+      dispatch(deleteDriverById(driverToDelete))
+        .unwrap()
+        .then(() => {
+          toaster.success("Driver deleted successfully!");
+          setDeleteDialogOpen(false);
+          dispatch(fetchAllDrivers());
+        })
+        .catch(() => {
+          toaster.error("Failed to delete driver.");
+        });
+    }
+  };
+
+  const handleUpdateDriver = () => {
+    if (!selectedDriver) {
+      toaster.error("No driver selected for update.");
+      return;
+    }
+
+    if (
+      !selectedDriver.fullName ||
+      !selectedDriver.cnicNumber ||
+      !selectedDriver.phoneNumber
+    ) {
+      toaster.error("All fields are required.");
+      return;
+    }
+
+    if (!validatePhoneNumber(selectedDriver.phoneNumber)) {
+      toaster.error("Phone number must be exactly 11 digits.");
+      return;
+    }
+    if (!validateCnicNumber(selectedDriver.cnicNumber)) {
+      toaster.error("CNIC number must be exactly 13 digits.");
+      return;
+    }
+
+    const updatedDriver: UpdateDriverType = {
+      id: selectedDriver.id,
+      fullName: selectedDriver.fullName,
+      cnicNumber: selectedDriver.cnicNumber,
+      phoneNumber: selectedDriver.phoneNumber,
+    };
+
+    dispatch(
+      editDriverById({ userId: selectedDriver.id, values: updatedDriver })
+    )
+      .unwrap()
+      .then(() => {
+        toaster.success("Driver updated successfully!");
+        setOpenDialog(false);
+        dispatch(fetchAllDrivers());
+      })
+      .catch((error) => {
+        console.error("Failed to update driver:", error);
+        toaster.error("Failed to update driver.");
+      });
+  };
+
+  const handleAddNewDriver = () => {
+    if (selectedDriver) {
+      if (
+        !selectedDriver.fullName ||
+        !selectedDriver.cnicNumber ||
+        !selectedDriver.phoneNumber
+      ) {
+        toaster.error("All fields are required.");
+        return;
+      }
+
+      if (!validatePhoneNumber(selectedDriver.phoneNumber)) {
+        toaster.error("Phone number must be exactly 11 digits.");
+        return;
+      }
+      if (!validateCnicNumber(selectedDriver.cnicNumber)) {
+        toaster.error("CNIC number must be exactly 13 digits.");
+        return;
+      }
+
+      const newDriver: UpdateDriverType = {
+        id: selectedDriver.id,
+        fullName: selectedDriver.fullName,
+        cnicNumber: selectedDriver.cnicNumber,
+        phoneNumber: selectedDriver.phoneNumber,
+      };
+
+      dispatch(addNewDriver(newDriver))
+        .unwrap()
+        .then(() => {
+          toaster.success("Driver added successfully!");
+          setOpenDialog(false);
+          dispatch(fetchAllDrivers());
+        })
+        .catch((error) => {
+          console.error("Failed to add driver:", error);
+          toaster.error("Failed to add driver.");
+        });
+    }
+  };
+
+  const filteredDrivers = driversWithDisplayId.filter((driver) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return (
+      (driver.fullName || "").toLowerCase().includes(lowerCaseQuery) ||
+      (driver.cnicNumber || "").toLowerCase().includes(lowerCaseQuery) ||
+      (driver.phoneNumber || "").toLowerCase().includes(lowerCaseQuery)
+    );
+  });
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", flex: 0.5, minWidth: 80 },
-    { field: "fullName", headerName: "Driver Name", flex: 1, minWidth: 150 },
-    { field: "busNumber", headerName: "Bus Number", flex: 1, minWidth: 150 },
-    {
-      field: "routeNumber",
-      headerName: "Route Number",
-      flex: 1,
-      minWidth: 150,
-    },
-    {
-      field: "contactNumber",
-      headerName: "Contact Number",
-      flex: 1,
-      minWidth: 150,
-    },
-    { field: "cnicNumber", headerName: "CNIC Number", flex: 1, minWidth: 150 },
+    { field: "displayId", headerName: "ID", flex: 1 },
+    { field: "fullName", headerName: "Full Name", flex: 1 },
+    { field: "cnicNumber", headerName: "CNIC Number", flex: 1 },
+    { field: "phoneNumber", headerName: "Contact Number", flex: 1 },
     {
       field: "actions",
       headerName: "Actions",
       flex: 1,
-      minWidth: 200,
-      renderCell: (params: { row: DriverType }) => (
+      renderCell: (params) => (
         <>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            sx={{ marginRight: 1 }}
-            onClick={() => handleEdit(params.row)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => handleDelete(params.row.id)}
-          >
-            Delete
-          </Button>
+          <IconButton onClick={() => handleEditDriver(params.row)}>
+            <Edit sx={{ color: indigo[500] }} />
+          </IconButton>
+          <IconButton onClick={() => handleDeleteDriver(params.row.id)}>
+            <Delete sx={{ color: "red" }} />
+          </IconButton>
         </>
       ),
     },
   ];
 
-  const formik = useFormik({
-    initialValues: {
-      id: 0,
-      fullName: "",
-      cnicNumber: "",
-      busNumber: "",
-      routeNumber: "",
-      contactNumber: "",
-    },
-    validationSchema: driverSchema,
-    onSubmit: (values) => {
-      if (editDriver) {
-        setDrivers((prevDrivers) =>
-          prevDrivers.map((driver) =>
-            driver.id === values.id ? values : driver
-          )
-        );
-      } else {
-        setDrivers((prevDrivers) => [
-          ...prevDrivers,
-          { ...values, id: prevDrivers.length + 1 },
-        ]);
-      }
-      handleCloseDialog();
-    },
-  });
-
-  const handleAddDriver = (): void => {
-    setEditDriver(null);
-    formik.resetForm();
-    setOpenDialog(true);
-  };
-
-  const handleEdit = (driver: DriverType): void => {
-    setEditDriver(driver);
-    formik.setValues(driver);
-    setOpenDialog(true);
-  };
-
-  const handleDelete = (id: number): void => {
-    setDrivers((prevDrivers) =>
-      prevDrivers.filter((driver) => driver.id !== id)
-    );
-  };
-
-  const handleCloseDialog = (): void => {
-    setOpenDialog(false);
-    formik.resetForm();
-  };
-
   return (
-    <Box m={4}>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ mb: 2 }}
-        onClick={handleAddDriver}
-      >
-        Add New Driver
-      </Button>
-
-      <DataGrid
-        rows={drivers}
-        columns={columns}
-        autoHeight
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: indigo[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
+    <Box>
+      <Typography variant="h4" sx={{ mb: 2, color: indigo[700] }}>
+        Manage Drivers
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={handleAddDriver}
+          sx={{
             backgroundColor: indigo[500],
+            "&:hover": { backgroundColor: indigo[900] },
+            minWidth: isMobile ? "20%" : "auto",
+          }}
+        >
+          Add Driver
+        </Button>
+      </Box>
+      <TextField
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        placeholder="Search by Full name, CNIC, or Contact Number..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ mb: 2 }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search sx={{ color: indigo[500] }} />
+              </InputAdornment>
+            ),
           },
         }}
       />
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <form onSubmit={formik.handleSubmit}>
-          <DialogTitle>
-            {editDriver ? "Edit Driver" : "Add New Driver"}
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Driver Name"
-              name="fullName"
-              value={formik.values.fullName}
-              onChange={formik.handleChange}
-              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
-              helperText={formik.touched.fullName && formik.errors.fullName}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Bus Number"
-              name="busNumber"
-              value={formik.values.busNumber}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.busNumber && Boolean(formik.errors.busNumber)
-              }
-              helperText={formik.touched.busNumber && formik.errors.busNumber}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Route Number"
-              name="routeNumber"
-              value={formik.values.routeNumber}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.routeNumber && Boolean(formik.errors.routeNumber)
-              }
-              helperText={
-                formik.touched.routeNumber && formik.errors.routeNumber
-              }
-              fullWidth
-              margin="normal"
-              select
-            >
-              {Array.from({ length: 15 }, (_, i) => (
-                <MenuItem key={i + 1} value={(i + 1).toString()}>
-                  {i + 1}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              label="Contact Number"
-              name="contactNumber"
-              value={formik.values.contactNumber}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.contactNumber &&
-                Boolean(formik.errors.contactNumber)
-              }
-              helperText={
-                formik.touched.contactNumber && formik.errors.contactNumber
-              }
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="CNIC Number"
-              name="cnicNumber"
-              value={formik.values.cnicNumber}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.cnicNumber && Boolean(formik.errors.cnicNumber)
-              }
-              helperText={formik.touched.cnicNumber && formik.errors.cnicNumber}
-              fullWidth
-              margin="normal"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button type="submit" color="primary">
-              Save
-            </Button>
-          </DialogActions>
-        </form>
+      <Box sx={{ overflowX: "auto", mb: 2 }}>
+        <DataGrid
+          rows={filteredDrivers}
+          columns={columns}
+          getRowId={(row) => row.id}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
+            },
+          }}
+          sx={{
+            "& .MuiDataGrid-cell": {
+              fontSize: isMobile ? "12px" : "14px",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              fontSize: isMobile ? "12px" : "14px",
+              backgroundColor: indigo[50],
+              color: indigo[900],
+            },
+            "& .MuiDataGrid-footerContainer": {
+              backgroundColor: indigo[500],
+              color: indigo[900],
+              padding: "10px",
+              fontSize: isMobile ? "12px" : "14px",
+            },
+          }}
+        />
+      </Box>
+
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<Refresh />}
+          onClick={() => dispatch(fetchAllDrivers())}
+          sx={{
+            backgroundColor: indigo[500],
+            "&:hover": { backgroundColor: indigo[900] },
+          }}
+        >
+          Refresh
+        </Button>
+      </Box>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle
+          sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
+        >
+          {isAddMode ? "Add New Driver" : "Update Driver"}
+        </DialogTitle>
+        <DialogContent sx={{ padding: "20px", fontSize: "16px" }}>
+          <TextField
+            label="Full Name"
+            value={selectedDriver?.fullName || ""}
+            onChange={(e) =>
+              setSelectedDriver({
+                ...selectedDriver!,
+                fullName: e.target.value,
+              })
+            }
+            fullWidth
+            margin="normal"
+            sx={{ fontSize: "16px" }}
+          />
+          <TextField
+            label="CNIC Number"
+            value={selectedDriver?.cnicNumber || ""}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              setSelectedDriver({
+                ...selectedDriver!,
+                cnicNumber: value,
+              });
+            }}
+            fullWidth
+            margin="normal"
+            sx={{ fontSize: "16px" }}
+            inputProps={{ maxLength: 13 }}
+          />
+          <TextField
+            label="Contact Number"
+            value={selectedDriver?.phoneNumber || ""}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              setSelectedDriver({
+                ...selectedDriver!,
+                phoneNumber: value,
+              });
+            }}
+            fullWidth
+            margin="normal"
+            sx={{ fontSize: "16px" }}
+            inputProps={{ maxLength: 11 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ backgroundColor: indigo[50], padding: "10px" }}>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            sx={{ color: indigo[900] }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={isAddMode ? handleAddNewDriver : handleUpdateDriver}
+            sx={{ color: indigo[700] }}
+          >
+            {isAddMode ? "Add" : "Save"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this driver?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

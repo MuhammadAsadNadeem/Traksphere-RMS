@@ -4,7 +4,7 @@ import {
   fetchAllUsers,
   editUserById,
   deleteUserById,
-} from "../../../store/thunks/adminThunk";
+} from "../../../store/user/adminThunk";
 import { UserResponse, UpdateUserType } from "../../../types/admin.types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
@@ -18,9 +18,12 @@ import {
   IconButton,
   Typography,
   InputAdornment,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Edit, Delete, Search } from "@mui/icons-material";
-import toaster from "../../../utils/toaster"; // Import the custom toaster utility
+import toaster from "../../../utils/toaster";
+import { indigo } from "@mui/material/colors";
 
 const ManageUser: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,46 +34,42 @@ const ManageUser: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch users on component mount
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
-    dispatch(fetchAllUsers({})); // Pass any filters if needed
+    dispatch(fetchAllUsers({}));
   }, [dispatch]);
 
-  // Add displayId to each user
   const usersWithDisplayId = (users || []).map((user, index) => ({
     ...user,
     displayId: index + 1,
   }));
 
-  // Handle edit user
   const handleEditUser = (user: UserResponse) => {
     setSelectedUser(user);
     setOpenDialog(true);
   };
 
-  // Handle delete user
   const handleDeleteUser = (userId: string) => {
     setUserToDelete(userId);
     setDeleteDialogOpen(true);
   };
 
-  // Confirm delete
   const confirmDelete = () => {
     if (userToDelete) {
       dispatch(deleteUserById(userToDelete))
         .unwrap()
         .then(() => {
-          toaster.success("User deleted successfully!"); // Show success toast
+          toaster.success("User deleted successfully!");
           setDeleteDialogOpen(false);
-          dispatch(fetchAllUsers({})); // Refresh the list
+          dispatch(fetchAllUsers({}));
         })
         .catch(() => {
-          toaster.error("Failed to delete user."); // Show error toast
+          toaster.error("Failed to delete user.");
         });
     }
   };
 
-  // Handle update user
   const handleUpdateUser = () => {
     if (selectedUser) {
       const updatedUser: UpdateUserType = {
@@ -88,17 +87,16 @@ const ManageUser: React.FC = () => {
       dispatch(editUserById({ userId: selectedUser.id, values: updatedUser }))
         .unwrap()
         .then(() => {
-          toaster.success("User updated successfully!"); // Show success toast
+          toaster.success("User updated successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllUsers({})); // Refresh the list
+          dispatch(fetchAllUsers({}));
         })
         .catch(() => {
-          toaster.error("Failed to update user."); // Show error toast
+          toaster.error("Failed to update user.");
         });
     }
   };
 
-  // Filter users based on search query
   const filteredUsers = usersWithDisplayId.filter((user) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
     return (
@@ -109,14 +107,13 @@ const ManageUser: React.FC = () => {
     );
   });
 
-  // Columns for DataGrid
   const columns: GridColDef[] = [
-    { field: "displayId", headerName: "ID", flex: 1 }, // Use displayId for the ID column
+    { field: "displayId", headerName: "ID", flex: 0.5 },
     { field: "fullName", headerName: "Full Name", flex: 1 },
     { field: "email", headerName: "Email", flex: 1 },
     { field: "registrationNumber", headerName: "Registration No", flex: 1 },
     { field: "departmentName", headerName: "Department", flex: 1 },
-    { field: "phoneNumber", headerName: "Phone No", flex: 1 },
+    { field: "phoneNumber", headerName: "Contact No", flex: 1 },
     { field: "routeNumber", headerName: "Route No", flex: 1 },
     { field: "stopArea", headerName: "Stop Area", flex: 1 },
     {
@@ -126,7 +123,7 @@ const ManageUser: React.FC = () => {
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleEditUser(params.row)}>
-            <Edit sx={{ color: "blue" }} />
+            <Edit sx={{ color: indigo[500] }} />
           </IconButton>
           <IconButton onClick={() => handleDeleteUser(params.row.id)}>
             <Delete sx={{ color: "red" }} />
@@ -138,12 +135,10 @@ const ManageUser: React.FC = () => {
 
   return (
     <Box>
-      {/* Heading */}
-      <Typography variant="h4" sx={{ mb: 2 }}>
+      <Typography variant="h4" sx={{ mb: 2, color: indigo[700] }}>
         Manage Users
       </Typography>
 
-      {/* Search Bar with Icon */}
       <TextField
         fullWidth
         margin="normal"
@@ -152,30 +147,53 @@ const ManageUser: React.FC = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      <DataGrid
-        rows={filteredUsers}
-        columns={columns}
-        getRowId={(row) => row.id} // Use the actual database ID for row identification
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: 10, page: 0 },
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search sx={{ color: indigo[500] }} />
+              </InputAdornment>
+            ),
           },
         }}
       />
 
-      {/* Edit Dialog */}
+      <Box sx={{ overflowX: "auto" }}>
+        <DataGrid
+          rows={filteredUsers}
+          columns={columns}
+          getRowId={(row) => row.id}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
+            },
+          }}
+          sx={{
+            "& .MuiDataGrid-cell": {
+              fontSize: isMobile ? "12px" : "14px",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              fontSize: isMobile ? "12px" : "14px",
+              backgroundColor: indigo[50],
+              color: indigo[900],
+            },
+            "& .MuiDataGrid-footerContainer": {
+              backgroundColor: indigo[500],
+              color: indigo[900],
+              padding: "10px",
+              fontSize: isMobile ? "12px" : "14px",
+            },
+          }}
+        />
+      </Box>
+
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
+        <DialogTitle
+          sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
+        >
+          Update User
+        </DialogTitle>
+        <DialogContent sx={{ padding: "20px", fontSize: "16px" }}>
           <TextField
             label="Full Name"
             value={selectedUser?.fullName || ""}
@@ -184,6 +202,7 @@ const ManageUser: React.FC = () => {
             }
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
           />
           <TextField
             label="Email"
@@ -193,6 +212,7 @@ const ManageUser: React.FC = () => {
             }
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
           />
           <TextField
             label="Registration Number"
@@ -205,6 +225,7 @@ const ManageUser: React.FC = () => {
             }
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
           />
           <TextField
             label="Department Name"
@@ -217,25 +238,63 @@ const ManageUser: React.FC = () => {
             }
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
           />
           <TextField
             label="Phone Number"
             value={selectedUser?.phoneNumber || ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser!, phoneNumber: e.target.value })
-            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d{0,11}$/.test(value)) {
+                setSelectedUser({ ...selectedUser!, phoneNumber: value });
+              }
+            }}
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
+            error={
+              !!(
+                selectedUser?.phoneNumber &&
+                !/^\d{11}$/.test(selectedUser.phoneNumber)
+              )
+            }
+            helperText={
+              selectedUser?.phoneNumber &&
+              !/^\d{11}$/.test(selectedUser.phoneNumber)
+                ? "Phone number must be exactly 11 digits."
+                : ""
+            }
           />
           <TextField
             label="Route Number"
             value={selectedUser?.routeNumber || ""}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser!, routeNumber: e.target.value })
-            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (
+                /^\d{0,2}$/.test(value) &&
+                (value === "" ||
+                  (parseInt(value, 10) >= 1 && parseInt(value, 10) <= 15))
+              ) {
+                setSelectedUser({ ...selectedUser!, routeNumber: value });
+              }
+            }}
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
+            error={
+              !!(
+                selectedUser?.routeNumber &&
+                !/^\d{1,2}$/.test(selectedUser.routeNumber)
+              )
+            }
+            helperText={
+              selectedUser?.routeNumber &&
+              !/^\d{1,2}$/.test(selectedUser.routeNumber)
+                ? "Route number must be between 1 and 15."
+                : ""
+            }
           />
+
           <TextField
             label="Stop Area"
             value={selectedUser?.stopArea || ""}
@@ -244,15 +303,22 @@ const ManageUser: React.FC = () => {
             }
             fullWidth
             margin="normal"
+            sx={{ fontSize: "16px" }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleUpdateUser}>Save</Button>
+        <DialogActions sx={{ backgroundColor: indigo[50], padding: "10px" }}>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            sx={{ color: indigo[900] }}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateUser} sx={{ color: indigo[700] }}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Delete Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

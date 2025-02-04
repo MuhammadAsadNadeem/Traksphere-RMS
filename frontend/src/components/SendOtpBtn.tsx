@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import React, { useState } from "react";
 import { useAppDispatch } from "../store/hooks";
 import toaster from "../utils/toaster";
-import authThunk from "../store/thunks/authThunk";
+import authThunk from "../store/user/authThunk";
 
 type SendOtpBtnProps = {
   email: string;

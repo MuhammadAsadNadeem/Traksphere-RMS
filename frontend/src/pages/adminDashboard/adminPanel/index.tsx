@@ -26,8 +26,8 @@ import AdminDashboard from "../Dashboard";
 import ManageUser from "../../adminDashboard/manageUser";
 import RouteManagement from "../../adminDashboard/viewRoutes";
 import ManageDriver from "../../adminDashboard/manageDriver";
-//import AddStops from "../../adminDashboard/addStops";
 import ChangePassword from "../../changePassword";
+import ManageStop from "../manageStops";
 
 const AdminPanel = () => {
   const [selectedView, setSelectedView] = useState("dashboard");
@@ -67,11 +67,10 @@ const AdminPanel = () => {
       icon: <PersonAddIcon />,
       view: "manage-drivers",
     },
-
     {
       label: "Stops",
       icon: <TrafficOutlinedIcon />,
-      view: "add-stops",
+      view: "manage-stops",
     },
     {
       label: "Routes",
@@ -91,7 +90,9 @@ const AdminPanel = () => {
   ];
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box
+      sx={{ display: "flex", height: "calc(100vh - 70px)", overflow: "hidden" }}
+    >
       <CssBaseline />
 
       <Drawer
@@ -204,6 +205,7 @@ const AdminPanel = () => {
           p: 2,
           mt: 1,
           overflowY: "auto",
+          height: "calc(100vh - 64px)", // Adjusted height to fit within the viewport
         }}
       >
         <Container>
@@ -216,7 +218,7 @@ const AdminPanel = () => {
             {selectedView === "admin-dashboard" && <AdminDashboard />}
             {selectedView === "view-users" && <ManageUser />}
             {selectedView === "manage-drivers" && <ManageDriver />}
-            {selectedView === "add-stops" && <ManageDriver />}
+            {selectedView === "manage-stops" && <ManageStop />}
             {selectedView === "add-routes" && <RouteManagement />}
             {selectedView === "account-settings" && <ChangePassword />}
             {/* {selectedView === "logout" && <LogOut />} */}

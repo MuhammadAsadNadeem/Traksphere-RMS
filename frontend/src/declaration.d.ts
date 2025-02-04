@@ -41,4 +41,5 @@ declare module "*.svg" {
     export default value;
 }
 
-
+declare module 'react-leaflet-geosearch';
+declare module 'lodash.debounce';

@@ -1,9 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  fetchCounts,
-  fetchBusStops,
-} from "../../../store/thunks/adminThunk.ts";
+import { fetchCounts, fetchBusStops } from "../../../store/user/adminThunk.ts";
 import {
   Box,
   Card,
@@ -103,7 +100,7 @@ const AdminDashboard: React.FC = () => {
           mb: 3,
         }}
       >
-        <Card sx={{ boxShadow: 3, ...cardStyles[0], color: "white" }}>
+        <Card sx={{ boxShadow: 3 }}>
           <CardContent>
             <People sx={{ fontSize: 40 }} />
             <Typography variant="h5">Total Users</Typography>

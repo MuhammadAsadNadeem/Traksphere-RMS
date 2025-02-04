@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { signUpSchema } from "../../validationSchema";
 import SendOtpBtn from "../../components/SendOtpBtn";
 import { SignupType } from "../../types/auth.types";
-import authThunk from "../../store/thunks/authThunk";
+import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { useAppDispatch } from "../../store/hooks";
 

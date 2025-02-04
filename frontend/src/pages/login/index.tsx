@@ -14,7 +14,7 @@ import MDLink from "../../components/MDLink";
 import { routes } from "../../routes";
 import { FormikHelpers, useFormik } from "formik";
 import { loginSchema } from "../../validationSchema";
-import authThunk from "../../store/thunks/authThunk";
+import authThunk from "../../store/user/authThunk";
 import { useAppDispatch } from "../../store/hooks";
 import { LoginType } from "../../types/auth.types";
 import toaster from "../../utils/toaster";

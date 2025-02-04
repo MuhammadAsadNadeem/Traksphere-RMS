@@ -70,7 +70,7 @@ const UserPanel = () => {
   ];
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <CssBaseline />
 
       <Drawer
@@ -103,7 +103,7 @@ const UserPanel = () => {
                 <IconButton size="medium" sx={{ color: "#fff" }}>
                   <motion.div
                     initial={{ rotate: 0 }}
-                    animate={{ rotate: isSidebarExpanded ? 0 : 90 }}
+                    animate={{ rotate: isSidebarExpanded ? 0 : 180 }}
                     transition={{ duration: 0.3 }}
                   >
                     <MenuIcon fontSize="medium" />
