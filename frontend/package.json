@@ -10,11 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@maptiler/geocoder": "^1.1.0",
-    "@mui/icons-material": "^6.1.6",
-    "@mui/material": "^6.1.10",
+    "@mui/icons-material": "^6.4.3",
+    "@mui/material": "^6.4.3",
     "@mui/styles": "^6.4.2",
     "@mui/x-data-grid": "^7.22.3",
     "@react-google-maps/api": "^2.20.5",

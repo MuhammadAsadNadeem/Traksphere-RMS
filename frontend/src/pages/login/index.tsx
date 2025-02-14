@@ -33,7 +33,7 @@ const Login = () => {
       setSubmitting(true);
       await dispatch(authThunk.login(values)).unwrap();
       resetForm();
-      navigate(routes.userPanel);
+      navigate(routes.Dashboard);
     } catch (error) {
       toaster.error(error as string);
     } finally {

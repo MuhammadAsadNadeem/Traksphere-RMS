@@ -4,7 +4,7 @@ export const AppDataSource = new DataSource({
   type: "postgres",
   host: config.db.host,
   port: config.db.port,
-  username: config.db.username,
+  username: config.db.username || "postgres",
   password: config.db.password,
   database: config.db.database,
   entities: ['src/**/*.entity{.ts,.js}'],

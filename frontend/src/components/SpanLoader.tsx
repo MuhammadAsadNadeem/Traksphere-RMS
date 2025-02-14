@@ -48,7 +48,7 @@ const SpanLoader: React.FC = () => {
 };
 
 const getColor = (index: number) => {
-  const colors = ["#4c86f9", "#49a84c", "#f6bb02", "#f6bb02", "#2196f3"];
+  const colors = [" #4c86f9", " #49a84c", " #f6bb02", " #a902f6", " #2196f3"];
   return colors[index];
 };
 

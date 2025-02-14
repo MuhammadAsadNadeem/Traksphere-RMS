@@ -6,8 +6,7 @@ import { HttpError } from '../utils/errorHandler';
 import redisService from "../utils/redisService";
 import mailerService from '../utils/mailerService';
 import userService from '../services/user.service';
-import bcrypt from "bcrypt";
-
+import bcrypt from 'bcryptjs';
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {

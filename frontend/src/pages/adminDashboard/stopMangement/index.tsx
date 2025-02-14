@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -13,6 +13,7 @@ import { Search, AddLocation, Delete } from "@mui/icons-material";
 import axios from "axios";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import debounce from "lodash.debounce";
+import toaster from "../../../utils/toaster";
 
 // Define the structure of a location object
 interface Location {
@@ -29,7 +30,56 @@ interface NominatimResult {
   lon: string;
 }
 
-const ManageStop: React.FC = () => {
+// Custom component to handle map zoom and events
+const MapComponent: React.FC<{
+  searchedLocation: Location | null;
+  stops: Location[];
+  handleLocationSelect: (location: Location) => void;
+}> = ({ searchedLocation, stops, handleLocationSelect }) => {
+  const map = useMap();
+
+  useMapEvents({
+    click(e) {
+      const confirmAdd = window.confirm("Do you want to add a stop here?");
+      if (confirmAdd) {
+        handleLocationSelect({
+          name: "New Stop",
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+        });
+        map.flyTo(e.latlng, map.getZoom()); // Zoom into the clicked location
+        toaster.success("Location selected for a new stop.");
+      }
+    },
+  });
+
+  return (
+    <>
+      <TileLayer
+        url="https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+        subdomains={["mt0", "mt1", "mt2", "mt3"]}
+      />
+      {searchedLocation && (
+        <Marker position={[searchedLocation.lat, searchedLocation.lng]}>
+          <Popup>{searchedLocation.name}</Popup>
+        </Marker>
+      )}
+      {stops.map((stop) => (
+        <Marker
+          key={stop.id}
+          position={[stop.lat, stop.lng]}
+          eventHandlers={{
+            click: () => handleLocationSelect(stop),
+          }}
+        >
+          <Popup>{stop.name}</Popup>
+        </Marker>
+      ))}
+    </>
+  );
+};
+
+const StopManagement: React.FC = () => {
   const [stopName, setStopName] = useState<string>("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -60,8 +110,8 @@ const ManageStop: React.FC = () => {
               lng: parseFloat(result.lon),
             }))
           );
-        } catch (error) {
-          console.error("Error searching location:", error);
+        } catch {
+          toaster.error("Failed to search location. Please try again.");
         }
       }, 500),
     [] // No dependencies needed since axios and setSearchResults are stable
@@ -79,10 +129,6 @@ const ManageStop: React.FC = () => {
     setStopName(name);
     setSearchedLocation({ lat, lng, name });
     setSearchResults([]); // Clear search results after selection
-
-    // Zoom the map to the selected location
-    const map = useMap();
-    map.flyTo([lat, lng], 15); // Zoom level 15
   };
 
   const addStop = () => {
@@ -91,7 +137,7 @@ const ManageStop: React.FC = () => {
         (stop) => stop.lat === latitude && stop.lng === longitude
       );
       if (exists) {
-        alert("Stop already exists at this location!");
+        toaster.warning("Stop already exists at this location!");
         return;
       }
       const newStop: Location = {
@@ -104,28 +150,15 @@ const ManageStop: React.FC = () => {
       setStopName("");
       setLatitude(null);
       setLongitude(null);
+      toaster.success("Stop added successfully!");
+    } else {
+      toaster.error("Please fill in all fields to add a stop.");
     }
   };
 
   const deleteStop = (id: number) => {
     setStops(stops.filter((stop) => stop.id !== id));
-  };
-
-  const MapEvents = () => {
-    const map = useMap();
-
-    useMapEvents({
-      click(e) {
-        const confirmAdd = window.confirm("Do you want to add a stop here?");
-        if (confirmAdd) {
-          setLatitude(e.latlng.lat);
-          setLongitude(e.latlng.lng);
-          setStopName("New Stop");
-          map.flyTo(e.latlng, map.getZoom()); // Zoom into the clicked location
-        }
-      },
-    });
-    return null;
+    toaster.info("Stop deleted successfully!");
   };
 
   const columns: GridColDef[] = [
@@ -147,6 +180,7 @@ const ManageStop: React.FC = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <h2>Stop Map</h2>
+
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <TextField
           label="Search for a location"
@@ -185,25 +219,11 @@ const ManageStop: React.FC = () => {
         zoom={5}
         style={{ width: "100%", height: "400px" }}
       >
-        <TileLayer
-          url="https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-          subdomains={["mt0", "mt1", "mt2", "mt3"]}
+        <MapComponent
+          searchedLocation={searchedLocation}
+          stops={stops}
+          handleLocationSelect={handleLocationSelect}
         />
-        <MapEvents />
-        {searchedLocation && (
-          <Marker position={[searchedLocation.lat, searchedLocation.lng]}>
-            <Popup>{searchedLocation.name}</Popup>
-          </Marker>
-        )}
-        {stops.map((stop) => (
-          <Marker
-            key={stop.id}
-            position={[stop.lat, stop.lng]}
-            eventHandlers={{ click: () => handleLocationSelect(stop) }}
-          >
-            <Popup>{stop.name}</Popup>
-          </Marker>
-        ))}
       </MapContainer>
       <Box sx={{ mt: 2 }}>
         <TextField
@@ -229,4 +249,4 @@ const ManageStop: React.FC = () => {
   );
 };
 
-export default ManageStop;
+export default StopManagement;

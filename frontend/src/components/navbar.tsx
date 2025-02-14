@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const islogin = useAppSelector((state) => state.userSlice.token);
+  const isLogin = useAppSelector((state) => state.userSlice.token);
 
   const handleLogout = async () => {
     localStorage.clear();
@@ -83,17 +83,17 @@ const Navbar: React.FC = () => {
           alignItems="center"
           gap={3}
         >
-          {!islogin &&
+          {!isLogin &&
             links.map((item, index) => (
               <Link
                 sx={{ color: "white" }}
                 key={index}
-                href={routes.homePage + item.url}
+                href={routes.landingPage + item.url}
               >
                 {item.name}
               </Link>
             ))}
-          {islogin ? (
+          {isLogin ? (
             <Button
               variant="outlined"
               sx={{ color: "white", borderColor: "white" }}
@@ -137,13 +137,13 @@ const Navbar: React.FC = () => {
           onClose={handleMenuClose}
           sx={{ display: { xs: "block", sm: "none" }, padding: 4 }}
         >
-          {!islogin &&
+          {!isLogin &&
             links.map((item, index) => (
               <MenuItem
                 onClick={handleMenuClose}
                 component={Link}
                 key={index}
-                href={routes.homePage + item.url}
+                href={routes.landingPage + item.url}
               >
                 {item.name}
               </MenuItem>
@@ -155,7 +155,7 @@ const Navbar: React.FC = () => {
             gap={2}
             padding={2}
           >
-            {islogin ? (
+            {isLogin ? (
               <Button variant="outlined" onClick={handleLogout}>
                 Logout
               </Button>

@@ -2,7 +2,7 @@ import db from "../db";
 import { Repository } from "typeorm";
 import { SignUpDto } from "../dto/user.dto";
 import config from "../config";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/user.entity";
 import { HttpError } from "../utils/errorHandler";
@@ -60,8 +60,13 @@ export class authService {
 
         const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: config.jwt.exp });
 
-        return { token, userId: user.id };
+        const { password: _, ...userData } = user;
+        return { token };
+        // return { token, user: userData };
     }
+
+
+
 }
 
 export default new authService();

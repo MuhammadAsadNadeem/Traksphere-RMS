@@ -17,7 +17,7 @@ import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { routes } from "../../routes";
 
-const UserProfile: React.FC = () => {
+const Profile: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -241,4 +241,4 @@ const UserProfile: React.FC = () => {
   );
 };
 
-export default UserProfile;
+export default Profile;

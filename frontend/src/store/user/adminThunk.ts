@@ -6,6 +6,7 @@ import { setCounts, setBusStops, setLoading, setUsers } from "./adminSlice";
 import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import { DriverType, UpdateDriverType } from "../../types/driver.types";
+import { BusStopType } from "../../types/stop.types";
 
 
 export enum AdminApiPathEnum {
@@ -18,6 +19,8 @@ export enum AdminApiPathEnum {
     FETCH_DRIVERS = "api/admin/get-drivers",
     UPDATE_DRIVER = "api/admin/update-driver",
     DElETE_DRIVER = "api/admin/delete-driver",
+    ADD_STOP = "api/admin/add-stop",
+    DElETE_STOP = "api/admin/delete-stop",
 }
 
 
@@ -191,6 +194,37 @@ export const deleteDriverById = createAsyncThunk(
     }
 );
 
+export const addNewStop = createAsyncThunk(AdminApiPathEnum.ADD_Driver,
+    async (values: BusStopType, { rejectWithValue }) => {
+        try {
+            const res = await instance.post(AdminApiPathEnum.ADD_Driver, values);
+            if (res.status === HttpStatusCode.Ok) {
+                toaster.success(res.data.message);
+                return res.data.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+
+export const deleteStopById = createAsyncThunk(
+    AdminApiPathEnum.DElETE_STOP,
+    async (userId: string, { rejectWithValue }) => {
+        try {
+            const res = await instance.delete(AdminApiPathEnum.DElETE_STOP, {
+                params: { id: userId },
+            });
+            if (res.status === HttpStatusCode.Ok) {
+                return userId;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
 export default {
     fetchCounts,
     fetchBusStops,
@@ -201,5 +235,8 @@ export default {
     fetchAllDrivers,
     editDriverById,
     deleteDriverById,
+    addNewStop,
+    deleteStopById,
+
 
 }

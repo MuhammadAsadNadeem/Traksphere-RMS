@@ -1,23 +1,17 @@
-# Base image
-FROM node:20.18.0-alpine
+FROM node:18-alpine
 
-# Set working directory
+# Install build tools for native modules
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the application (if required, e.g., TypeScript)
-# RUN npm run build
-
-# Expose the application port (replace 3000 with your actual application port)
 EXPOSE 5000
 
-# Specify the command to run your application
 CMD ["npm", "run", "dev"]

@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import { Box } from "@mui/material";
 
-const User: React.FC = () => {
+const LiveTracking: React.FC = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
@@ -51,4 +51,4 @@ const User: React.FC = () => {
   );
 };
 
-export default User;
+export default LiveTracking;

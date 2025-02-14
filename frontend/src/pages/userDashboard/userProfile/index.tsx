@@ -7,7 +7,6 @@ import {
   Paper,
   Grid,
   Avatar,
-  CircularProgress,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -15,8 +14,9 @@ import userThunk from "../../../store/user/userThunk";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import toaster from "../../../utils/toaster";
 import { UpdateProfileType } from "../../../types/user.types";
+import SpanLoader from "../../../components/SpanLoader";
 
-const Profile: React.FC = () => {
+const UserProfile: React.FC = () => {
   const userProfile = useAppSelector((state) => state.userSlice.profile);
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UpdateProfileType | null>(null);
@@ -100,19 +100,7 @@ const Profile: React.FC = () => {
   }
 
   if (!profile) {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          height: "80vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CircularProgress size="3rem" />;
-      </Box>
-    );
+    return <SpanLoader></SpanLoader>;
   }
 
   return (
@@ -165,7 +153,7 @@ const Profile: React.FC = () => {
             <TextField
               fullWidth
               label="Department"
-              name="department"
+              name="departmentName"
               value={profile.departmentName}
               onChange={handleChange}
               disabled={!isEditing}
@@ -198,7 +186,7 @@ const Profile: React.FC = () => {
             <TextField
               fullWidth
               label="Bus Number"
-              name="busNumber"
+              name="routeNumber"
               value={profile.routeNumber}
               onChange={handleChange}
               disabled={!isEditing}
@@ -233,4 +221,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default UserProfile;

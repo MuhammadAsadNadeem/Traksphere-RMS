@@ -1,65 +1,74 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchAllRoutes } from "../../../store/user/userThunk";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
+  Card,
+  IconButton,
   Collapse,
+  CardContent,
   List,
   ListItem,
   ListItemText,
-  IconButton,
 } from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
-
-// Dummy Data
-interface Stop {
-  value: string;
-  label: string;
-}
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import SpanLoader from "../../../components/SpanLoader";
 
 interface Route {
   id: string;
-  route_no: string;
-  driver: {
-    label: string;
-    phone: string;
-  };
-  vehicle_no: string;
-  stops: Stop[];
+  routeName: string;
+  routeNumber: string;
+  driver?: { fullName: string };
+  vehicleNumber: string;
+  busStopIds?: { id: string; stopName: string }[];
 }
 
-const dummyRoutes: Route[] = [
-  {
-    id: "1",
-    route_no: "01",
-    driver: { label: "John Doe", phone: "123-456-7890" },
-    vehicle_no: "B123",
-    stops: [
-      { value: "A", label: "Stop A" },
-      { value: "B", label: "Stop B" },
-      { value: "C", label: "Stop C" },
-    ],
-  },
-  {
-    id: "2",
-    route_no: "02",
-    driver: { label: "Jane Smith", phone: "987-654-3210" },
-    vehicle_no: "B456",
-    stops: [
-      { value: "D", label: "Stop D" },
-      { value: "E", label: "Stop E" },
-      { value: "F", label: "Stop F" },
-    ],
-  },
-];
-
 const RouteDetails: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const routes = useAppSelector((state) => state.userSlice.routes);
+  const isLoading = useAppSelector((state) => state.userSlice.isLoading);
+  const error = useAppSelector((state) => state.userSlice.error); // Add error state
   const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(fetchAllRoutes());
+  }, [dispatch]);
 
   const toggleRoute = (routeId: string) => {
     setExpandedRoute((prev) => (prev === routeId ? null : routeId));
   };
+
+  // Handle loading state
+  if (isLoading) {
+    return <SpanLoader />;
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Available Routes
+        </Typography>
+        <Typography variant="body1" color="error">
+          Error loading routes: {error}
+        </Typography>
+      </Box>
+    );
+  }
+
+  // Handle empty state
+  if (!routes || routes.length === 0) {
+    return (
+      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Available Routes
+        </Typography>
+        <Typography variant="body1">No routes available.</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
@@ -67,7 +76,7 @@ const RouteDetails: React.FC = () => {
         Available Routes
       </Typography>
       <Box display="flex" flexDirection="column" gap={2}>
-        {dummyRoutes.map((route) => (
+        {routes.map((route: Route) => (
           <Card
             key={route.id}
             sx={{
@@ -89,27 +98,27 @@ const RouteDetails: React.FC = () => {
             >
               <Box>
                 <Typography variant="h6" fontWeight="bold">
-                  Route No:{" "}
+                  Route Name:{" "}
                   <Typography component="span" fontWeight="light">
-                    {route.route_no}
+                    {route.routeName}
+                  </Typography>
+                </Typography>
+                <Typography>
+                  Route Number:{" "}
+                  <Typography component="span" fontWeight="light">
+                    {route.routeNumber}
                   </Typography>
                 </Typography>
                 <Typography>
                   Driver Name:{" "}
                   <Typography component="span" fontWeight="light">
-                    {route.driver.label}
+                    {route.driver?.fullName || "N/A"}
                   </Typography>
                 </Typography>
                 <Typography>
-                  Driver Ph_no:{" "}
+                  Bus No:{" "}
                   <Typography component="span" fontWeight="light">
-                    {route.driver.phone}
-                  </Typography>
-                </Typography>
-                <Typography>
-                  Bus #:{" "}
-                  <Typography component="span" fontWeight="light">
-                    {route.vehicle_no}
+                    {route.vehicleNumber}
                   </Typography>
                 </Typography>
               </Box>
@@ -118,7 +127,7 @@ const RouteDetails: React.FC = () => {
               </IconButton>
             </Box>
 
-            {/* Expanded Details */}
+            {/* Expanded Bus Stops List */}
             <Collapse
               in={expandedRoute === route.id}
               timeout="auto"
@@ -130,12 +139,12 @@ const RouteDetails: React.FC = () => {
                   fontWeight="medium"
                   sx={{ borderBottom: "1px solid #ddd", pb: 1, mb: 2 }}
                 >
-                  All Stops
+                  Bus Stops
                 </Typography>
                 <List>
-                  {route.stops.map((stop) => (
-                    <ListItem key={stop.value} sx={{ pl: 2 }}>
-                      <ListItemText primary={stop.label} />
+                  {route.busStopIds?.map((stop) => (
+                    <ListItem key={stop.id}>
+                      <ListItemText primary={stop.stopName} />
                     </ListItem>
                   ))}
                 </List>

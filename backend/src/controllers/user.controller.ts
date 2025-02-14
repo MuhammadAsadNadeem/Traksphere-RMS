@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import userService from "../services/user.service";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { UpdateProfileDto } from '../dto/user.dto';
 import { HttpError } from "../utils/errorHandler";
+import adminService from "../services/admin.service";
 
 
 
@@ -61,13 +62,30 @@ const updateProfile = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const userRole = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = (req as any).user;
+    const data = await userService.userRole(user.id);
+    res.status(StatusCodes.OK).json({ ...data });
+  } catch (error) {
+    next(error);
+  }
+};
 
-
-
+const getAllRoutes = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const routes = await adminService.getAllRoutes();
+    res.status(StatusCodes.OK).json(routes);
+  } catch (error) {
+    next(error);
+  }
+};
 export default {
 
   changePassword,
   getProfile,
   updateProfile,
+  getAllRoutes,
+  userRole,
 
 };

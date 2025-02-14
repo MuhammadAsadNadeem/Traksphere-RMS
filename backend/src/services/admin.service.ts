@@ -37,9 +37,9 @@ export class AdminService {
                 "routeNumber",
                 "gender",
                 "stopArea",
-                "isSuperuser",
+                "isSuperUser",
             ],
-            where: { isSuperuser: false },
+            where: { isSuperUser: false },
         });
         return users
 
@@ -315,7 +315,7 @@ export class AdminService {
     async getCounts() {
         try {
             const userCount = await this.userRepository.count({
-                where: { isSuperuser: false }
+                where: { isSuperUser: false }
             });
             const busStopCount = await this.busStopRepository.count();
             const routeCount = await this.routeRepository.count();

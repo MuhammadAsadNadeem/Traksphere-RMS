@@ -8,6 +8,7 @@ import { UpdateRouteDto, RouteDto } from "../dto/route.dto";
 import { UpdateUserDto } from "../dto/user.dto";
 
 
+
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await adminService.findAllUser();
@@ -31,6 +32,11 @@ const updateUserById = async (req: Request, res: Response, next: NextFunction) =
         if (!email && !fullName && !registrationNumber && !departmentName && !phoneNumber && !routeNumber && !gender && !stopArea) {
             throw new HttpError("At least one field is required for update", StatusCodes.BAD_REQUEST);
         }
+
+        // const existingUserByRegNo = await authService.findByRegistrationNumber(registrationNumber);
+        // if (existingUserByRegNo) {
+        //     throw new HttpError("Registration number already in use.", StatusCodes.BAD_REQUEST);
+        // }
 
         const userData: UpdateUserDto = {
             id: id as string,
@@ -142,6 +148,7 @@ const updateDriverById = async (req: Request, res: Response, next: NextFunction)
             throw new HttpError("At least one field (fullName, phoneNumber, cnicNumber) is required", StatusCodes.BAD_REQUEST);
         }
 
+        // const updatedDriver = 
         await adminService.updateDriverById(id as string, {
             fullName,
             phoneNumber,
@@ -150,7 +157,7 @@ const updateDriverById = async (req: Request, res: Response, next: NextFunction)
 
         res.status(StatusCodes.OK).json({
             message: "Driver updated successfully",
-            //updatedDriver,
+            // updatedDriver,
         });
     } catch (error) {
         next(error);

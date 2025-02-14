@@ -33,7 +33,7 @@ export class User {
   stopArea: string;
 
   @Column({ default: false })
-  isSuperuser: boolean;
+  isSuperUser: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

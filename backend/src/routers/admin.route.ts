@@ -4,13 +4,13 @@ import authMiddleware from "../middelware/auth.middleware";
 import adminMiddleware from "../middelware/admin.middleware";
 
 const router = Router()
-    // .use(authMiddleware)
-    // .use(adminMiddleware)
+    .use(authMiddleware)
+    .use(adminMiddleware)
     .get("/get-users", controller.getAllUsers)
     .put("/update-user", controller.updateUserById)
     .delete("/delete-user", controller.deleteUserById)
     .post("/add-driver", controller.addDriver)
-    .get("/get-driver", controller.getAllDrivers)
+    .get("/get-drivers", controller.getAllDrivers)
     .put("/update-driver", controller.updateDriverById)
     .delete("/delete-driver", controller.deleteDriverById)
     .post("/add-stop", controller.addStop)

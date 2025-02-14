@@ -12,6 +12,7 @@ export enum AuthApiPathEnum {
     SIGNUP_PART2 = "api/auth/complete-signup",
     OTP = "api/auth/send-otp",
     FORGOT_PASSWORD = "api/auth/forgot-password",
+    USER_ROLE = "api/user/user-role",
 }
 
 const login = createAsyncThunk(AuthApiPathEnum.LOGIN, async (values: LoginType, { rejectWithValue }) => {
@@ -84,10 +85,26 @@ const forgotPassword = createAsyncThunk(AuthApiPathEnum.FORGOT_PASSWORD, async (
     }
 })
 
+export const checkUserRole = createAsyncThunk(
+    AuthApiPathEnum.USER_ROLE,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get(AuthApiPathEnum.USER_ROLE);
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data.isSuperUser;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+
 export default {
     login,
     signup,
     sendOtp,
     completeSignup,
     forgotPassword,
+    checkUserRole,
 }

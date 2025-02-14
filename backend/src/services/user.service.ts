@@ -52,6 +52,17 @@ class UserService {
     }
   }
 
+  async userRole(userId: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      select: [
+        "id",
+        "isSuperUser",
+      ],
+    });
+
+  }
+
 }
 
 export default new UserService();

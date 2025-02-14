@@ -1,38 +1,21 @@
-# Ignore node_modules (both frontend and backend)
-**/node_modules
-**/dist
+# Ignore node_modules
+node_modules
 
-# Ignore log files
-*.log
-**/*.log
-
-# Ignore environment files (for security reasons, add these during build or runtime)
+# Ignore environment files
 .env
-.env.local
 
-# Ignore build and cache directories
-**/.next
-**/.cache
-**/build
-**/coverage
-**/.turbo
-**/vite
+# Ignore logs and cache
+*.log
+.cache
 
-# Ignore editor and OS-specific files
-.DS_Store
-Thumbs.db
-.idea
+# Ignore build artifacts
+dist
+build
+
+# Ignore Git
+.git
+.gitignore
+
+# Ignore IDE files
 .vscode
-*.swp
-*.swo
-
-# Ignore Docker files
-Dockerfile*
-docker-compose.yml
-
-# Ignore test files
-**/__tests__
-**/*.spec.js
-**/*.test.js
-**/*.spec.ts
-**/*.test.ts
+.idea

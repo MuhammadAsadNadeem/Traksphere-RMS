@@ -10,6 +10,9 @@ export enum UserApiPathEnum {
     CHANGE_PASSWORD = "api/user/change-password",
     GET_PROFILE = "api/user/get-profile",
     UPDATE_PROFILE = "api/user/update-profile",
+    GET_ROUTES = "api/user/get-routes",
+
+
 }
 
 const changePassword = createAsyncThunk(UserApiPathEnum.CHANGE_PASSWORD,
@@ -52,8 +55,27 @@ const getProfile = createAsyncThunk(UserApiPathEnum.GET_PROFILE,
     }
 );
 
+export const fetchAllRoutes = createAsyncThunk(UserApiPathEnum.GET_ROUTES,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get(UserApiPathEnum.GET_ROUTES)
+            console.log(res);
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+
+
+
 export default {
     changePassword,
     getProfile,
     updateProfile,
+    fetchAllRoutes,
+
 };

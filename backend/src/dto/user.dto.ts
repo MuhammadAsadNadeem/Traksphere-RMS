@@ -8,7 +8,7 @@ export interface UserDto {
     routeNumber: string,
     gender: string,
     stopArea: string;
-    isSuperuser: boolean;
+    isSuperUser: boolean;
 };
 
 export interface SignUpDto {
@@ -26,7 +26,7 @@ export interface completeSignUpDto {
     routeNumber: string,
     gender: string,
     stopArea: string;
-    isSuperuser: boolean;
+    isSuperUser: boolean;
 };
 
 export interface UpdateProfileDto {
