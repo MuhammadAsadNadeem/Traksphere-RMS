@@ -1,7 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
-import { PublicRoutes } from "./routes";
+import { PublicRoutes, PrivateRoutes } from "./routes";
 import Public from "./layouts/public";
+import Private from "./layouts/private";
 import { theme } from "./config/theme";
 
 const router = createBrowserRouter([
@@ -9,6 +10,11 @@ const router = createBrowserRouter([
     path: "/",
     element: <Public />,
     children: PublicRoutes,
+  },
+  {
+    path: "/",
+    element: <Private />,
+    children: PrivateRoutes,
   },
 ]);
 

@@ -64,6 +64,7 @@ const ChangePassword = () => {
     <Container maxWidth="xs">
       <Card
         sx={{
+          mt: 10,
           p: 4,
           display: "flex",
           flexDirection: "column",

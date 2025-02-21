@@ -5,8 +5,9 @@ import { ProfileType, RouteType } from "../../types/user.types";
 
 type useSliceType = {
     token: string | null;
+    user: [],
     profile: ProfileType | null;
-    isSuperUser: boolean | null;
+    isSuperUser: boolean;
     isLoading: boolean,
     routes: RouteType[],
     error: string | null;
@@ -16,7 +17,8 @@ type useSliceType = {
 const initialState: useSliceType = {
     token: localStorage.getItem("token") || null,
     profile: null,
-    isSuperUser: null,
+    user: [],
+    isSuperUser: false,
     routes: [],
     isLoading: false,
     error: null,
@@ -39,7 +41,7 @@ export const userSlice = createSlice({
                 return;
             }
             state.token = payload.token;
-            // state.user = payload.user;
+            state.user = payload.user;
         });
 
         builder.addCase(userThunk.updateProfile.fulfilled, (state, { payload }) => {
@@ -56,7 +58,7 @@ export const userSlice = createSlice({
             state.profile = payload;
         })
         builder.addCase(authThunk.checkUserRole.fulfilled, (state, action) => {
-            state.isLoading = false;
+            // state.isLoading = false;
             state.isSuperUser = action.payload;
         })
 

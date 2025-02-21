@@ -148,4 +148,5 @@ export default {
     signIn,
     sendOtp,
     forgotPassword,
+
 }

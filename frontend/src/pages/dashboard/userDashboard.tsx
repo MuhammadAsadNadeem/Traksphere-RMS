@@ -18,6 +18,7 @@ const UserDashboard = () => {
   return (
     <Box
       sx={{
+        mt: 7,
         minHeight: "100vh",
         background:
           "linear-gradient(to right,rgb(11, 47, 104),rgb(67, 28, 210),rgb(55, 126, 206))",
@@ -63,7 +64,6 @@ const UserDashboard = () => {
           </Typography>
 
           <Grid container spacing={4} justifyContent="center">
-            {/* Feature 1 - View Routes */}
             <Grid item xs={12} md={3}>
               <Paper
                 sx={{
@@ -88,7 +88,6 @@ const UserDashboard = () => {
               </Paper>
             </Grid>
 
-            {/* Feature 2 - Check Schedule */}
             <Grid item xs={12} md={3}>
               <Paper
                 sx={{
@@ -113,7 +112,6 @@ const UserDashboard = () => {
               </Paper>
             </Grid>
 
-            {/* Feature 3 - View Bus Location */}
             <Grid item xs={12} md={3}>
               <Paper
                 sx={{
@@ -128,7 +126,7 @@ const UserDashboard = () => {
                   <FaMapMarkedAlt />
                 </IconButton>
                 <Typography variant="h6" fontWeight="bold">
-                  Real-Time Bus Location
+                  Real-Time Location
                 </Typography>
                 <Divider sx={{ my: 2, borderColor: "grey.300" }} />
                 <Typography variant="body2" mt={2}>

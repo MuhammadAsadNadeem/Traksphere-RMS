@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks.ts";
-import { fetchCounts, fetchBusStops } from "../../../store/user/adminThunk.ts";
 import { Box, Typography, CardContent, Card } from "@mui/material";
 import { People, DirectionsBus, Place, Route } from "@mui/icons-material";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import "leaflet.gridlayer.googlemutant";
-import CardComponent from "../../../components/Cards.tsx";
-import SpanLoader from "../../../components/SpanLoader.tsx";
-import MapIcon from "../../../components/MapIcon.tsx";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchAllBusStops, fetchCounts } from "../../store/user/adminThunk";
+import SpanLoader from "../../components/SpanLoader";
+import CardComponent from "../../components/Cards";
+import MapIcon from "../../components/MapIcon";
 
 const DEFAULT_CENTER: L.LatLngTuple = [31.5497, 74.3436];
 const DEFAULT_ZOOM = 10;
@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchCounts()).unwrap();
-    dispatch(fetchBusStops()).unwrap();
+    dispatch(fetchAllBusStops()).unwrap();
   }, [dispatch]);
 
   const cardData = [
@@ -53,16 +53,17 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flexGrow: 1, p: 2 }}>
+    <Box sx={{ flexGrow: 1, mr: 2, mb: 2 }}>
       <Box
         sx={{
+          mt: 5,
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
             sm: "repeat(2, 1fr)",
             md: "repeat(4, 1fr)",
           },
-          gap: 3,
+          gap: 2,
           mb: 3,
         }}
       >
@@ -78,14 +79,14 @@ const AdminDashboard: React.FC = () => {
 
       <Card sx={{ boxShadow: 3 }}>
         <CardContent>
-          <Typography variant="h5" gutterBottom color=" #3f51b5">
+          <Typography variant="h5" gutterBottom color=" #0b2097">
             Bus Stops
           </Typography>
           <Box sx={{ height: "400px", width: "100%", position: "relative" }}>
             {loading ? (
               <Box
                 sx={{
-                  position: "absolute",
+                  position: "fixed",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",

@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  fetchAllDrivers,
-  editDriverById,
-  deleteDriverById,
-  addNewDriver,
-} from "../../../store/user/adminThunk";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
@@ -13,20 +6,27 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
-  TextField,
   IconButton,
   Typography,
-  InputAdornment,
   useMediaQuery,
   useTheme,
+  Paper,
 } from "@mui/material";
-import { Edit, Delete, Search, Add } from "@mui/icons-material";
-import toaster from "../../../utils/toaster";
+import { Edit, Delete, Add } from "@mui/icons-material";
 import { indigo } from "@mui/material/colors";
-import DriverForm from "../../../components/forms/DriverForm";
-import DeleteConfirmationDialog from "../../../components/DeleteDialogBox";
-import { UpdateDriverType } from "../../../types/driver.types";
-import { DriverResponse } from "../../../types/admin.types";
+import { DriverResponse } from "../../types/admin.types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
+import DriverForm from "../../components/forms/DriverForm";
+import {
+  fetchAllDrivers,
+  deleteDriverById,
+  addNewDriver,
+  editDriverById,
+} from "../../store/user/adminThunk";
+import { UpdateDriverType } from "../../types/driver.types";
+import toaster from "../../utils/toaster";
+import SearchBar from "../../components/SearchBar";
 
 const DriverManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -161,15 +161,18 @@ const DriverManagement: React.FC = () => {
   });
 
   const columns: GridColDef[] = [
-    { field: "displayId", headerName: "ID", flex: 1, width: 70 },
-    { field: "fullName", headerName: "Full Name", flex: 1 },
-    { field: "cnicNumber", headerName: "CNIC Number", flex: 1 },
-    { field: "phoneNumber", headerName: "Contact Number", flex: 1 },
+    { field: "displayId", headerName: "ID", width: 100 },
+    { field: "fullName", headerName: "Full Name", width: 200 },
+    { field: "cnicNumber", headerName: "CNIC Number", width: 200 },
+    {
+      field: "phoneNumber",
+      headerName: "Contact Number",
+      width: 200,
+    },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
-      width: 100,
+      width: 150,
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleEditDriver(params.row)}>
@@ -184,70 +187,93 @@ const DriverManagement: React.FC = () => {
   ];
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 2, color: indigo[700] }}>
-        Manage Drivers
-      </Typography>
-
-      <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleAddDriver}
+    <Box sx={{ ml: 1, height: "80vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: "95%",
+        }}
+      >
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          placeholder="Search By CNIC"
+          isMobile={isMobile}
+        />
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Typography
+          variant="h4"
           sx={{
-            backgroundColor: indigo[500],
-            "&:hover": { backgroundColor: indigo[900] },
-            minWidth: isMobile ? "20%" : "auto",
+            mb: 2,
+            mt: 2,
+            color: indigo[700],
+            width: "95%",
           }}
         >
-          Add Driver
-        </Button>
-      </Box>
+          Manage Drivers
+        </Typography>
 
-      <TextField
-        fullWidth
-        margin="normal"
-        variant="outlined"
-        placeholder="Search by Full name, CNIC, or Contact Number..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{ mb: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search sx={{ color: indigo[500] }} />
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      <Box sx={{ overflowX: "auto", mb: 2 }}>
-        <DataGrid
-          rows={filteredDrivers}
-          columns={columns}
-          getRowId={(row) => row.id}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10, page: 0 },
-            },
-          }}
+        <Box
           sx={{
-            "& .MuiDataGrid-cell": {
-              fontSize: isMobile ? "12px" : "14px",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              fontSize: isMobile ? "12px" : "14px",
-              backgroundColor: indigo[50],
-              color: indigo[900],
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: indigo[500],
-              color: indigo[900],
-              padding: "10px",
-              fontSize: isMobile ? "12px" : "14px",
-            },
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "95%",
+            mb: 2,
           }}
-        />
+        >
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleAddDriver}
+            sx={{
+              backgroundColor: indigo[500],
+              "&:hover": { backgroundColor: indigo[900] },
+              minWidth: isMobile ? "20%" : "auto",
+            }}
+          >
+            Add Driver
+          </Button>
+        </Box>
+
+        <Paper
+          sx={{
+            height: 300,
+            mt: 2,
+            width: "95%",
+          }}
+        >
+          <DataGrid
+            rows={filteredDrivers}
+            columns={columns}
+            getRowId={(row) => row.id}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
+            sx={{
+              "& .MuiDataGrid-cell": {},
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: indigo[50],
+                color: indigo[900],
+              },
+              "& .MuiDataGrid-footerContainer": {
+                backgroundColor: indigo[50],
+                color: indigo[900],
+              },
+            }}
+          />
+        </Paper>
       </Box>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>

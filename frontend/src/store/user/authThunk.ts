@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../axios";
-import { ForgotPasswordType, LoginType, SignupType } from "../../types/auth.types";
+import { ForgotPasswordType, LoginType, SignUpPart1Type, SignUpPart2Type } from "../../types/auth.types";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
-import { SignUpPart2 } from "../../types/user.types";
+
 
 export enum AuthApiPathEnum {
     LOGIN = "api/auth/signin",
@@ -30,7 +30,7 @@ const login = createAsyncThunk(AuthApiPathEnum.LOGIN, async (values: LoginType, 
     }
 })
 
-const signup = createAsyncThunk(AuthApiPathEnum.SIGNUP, async (values: SignupType, { rejectWithValue }) => {
+const signup = createAsyncThunk(AuthApiPathEnum.SIGNUP, async (values: SignUpPart1Type, { rejectWithValue }) => {
     try {
         const res = await instance.post(AuthApiPathEnum.SIGNUP, values)
         if (res.status === HttpStatusCode.Ok) {
@@ -43,7 +43,7 @@ const signup = createAsyncThunk(AuthApiPathEnum.SIGNUP, async (values: SignupTyp
 })
 
 const completeSignup = createAsyncThunk(AuthApiPathEnum.SIGNUP_PART2,
-    async (values: SignUpPart2, { rejectWithValue }) => {
+    async (values: SignUpPart2Type, { rejectWithValue }) => {
         try {
             const res = await instance.post(AuthApiPathEnum.SIGNUP_PART2, values);
             if (res.status === HttpStatusCode.Ok) {

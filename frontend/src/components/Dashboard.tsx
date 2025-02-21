@@ -1,22 +1,19 @@
 import { useState, useEffect } from "react";
-import { Box, CssBaseline } from "@mui/material";
-import SideBar from "./sideBar";
 import ChangePassword from "../pages/changePassword";
-import RouteDetails from "../pages/userDashboard/routeDetails";
-import LiveTracking from "../pages/userDashboard/routeMap/user";
 import { checkUserRole } from "../store/user/authThunk";
 import SpanLoader from "./SpanLoader";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import AdminDashboard from "../pages/adminDashboard/dashboard";
-import UserManagement from "../pages/adminDashboard/userManagement";
-import DriverManagement from "../pages/adminDashboard/driverMangement";
-import StopManagement from "../pages/adminDashboard/stopMangement";
-import UserDashboard from "../pages/userDashboard/dashboard";
-import UserProfile from "../pages/userDashboard/userProfile";
+import UserManagement from "../pages/userManagement";
+import DriverManagement from "../pages/driverMangement";
+import StopManagement from "../pages/stopMangement";
+import UserDashboard from "../pages/dashboard/userDashboard";
+import LiveTracking from "../pages/liveTracking";
+import RouteDetails from "../pages/routeDetails";
+import UserProfile from "../pages/userProfile";
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const [selectedView, setSelectedView] = useState("user-dashboard");
+  const [selectedView, setSelectedView] = useState("dashboard");
   const checkRole = useAppSelector((state) => state.userSlice.isSuperUser);
   const isLoading = useAppSelector((state) => state.userSlice.isLoading);
 
@@ -33,8 +30,8 @@ const Dashboard = () => {
   const renderContent = () => {
     switch (selectedView) {
       // Admin views
-      case "admin-dashboard":
-        return <AdminDashboard />;
+      // case "dashboard":
+      //   return <AdminDashboard />;
       case "user-management":
         return <UserManagement />;
       case "driver-management":
@@ -47,7 +44,7 @@ const Dashboard = () => {
         return <ChangePassword />;
 
       // User views
-      case "user-dashboard":
+      case "dashboard":
         return <UserDashboard />;
       case "live-tracking":
         return <LiveTracking />;
@@ -67,27 +64,7 @@ const Dashboard = () => {
     return <SpanLoader />;
   }
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <SideBar
-        selectedView={selectedView}
-        setSelectedView={setSelectedView}
-        isSuperUser={checkRole || false}
-      />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 2,
-          height: "100vh",
-          backgroundColor: "rgb(57, 158, 48)",
-        }}
-      >
-        {renderContent()}
-      </Box>
-    </Box>
-  );
+  return renderContent();
 };
 
 export default Dashboard;

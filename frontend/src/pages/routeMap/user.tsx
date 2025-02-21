@@ -35,6 +35,7 @@ const LiveTracking: React.FC = () => {
   return (
     <Box
       sx={{
+        mt: 10,
         height: { xs: "50vh", sm: "60vh", md: "85vh" }, // Adjust height as needed
         width: "100%",
         overflow: "hidden",

@@ -1,17 +1,16 @@
 import LoginPage from "./pages/logIn/index";
 import ForgotPassword from "./pages/forgotPassword/index";
 import SignUp from "./pages/signUp/signupPart1";
-// import UpdateProfile from "./pages/signUp/signupPart2";
 import LandingPage from "./pages/landingPage/index";
-// import RouteDetails from "./pages/userDashboard/routeDetails";
-// import ViewUsers from "./pages/adminDashboard/viewUsers";
-// import ManageUser from "./pages/adminDashboard/manageUser";
-// import Drivers from "./pages/adminDashboard/drivers";
-// import AddDriver from "./pages/adminDashboard/addDriver";
-// import ManageDriver from "./pages/adminDashboard/manageDriver";
-// import User from "./pages/userDashboard/routeMap/user";
-// import ChangePassword from "./pages/changePassword";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./pages/dashboard";
+import UserManagement from "./pages/userManagement";
+import DriverManagement from "./pages/driverMangement";
+import StopManagement from "./pages/stopMangement";
+import LiveTracking from "./pages/routeMap/user";
+import ChangePassword from "./pages/changePassword";
+import RouteManagement from "./pages/routeManagement/routes";
+import RouteDetails from "./pages/routeDetails";
+import UserProfile from "./pages/userProfile";
 
 export const routes = {
   login: "/login",
@@ -21,18 +20,54 @@ export const routes = {
   landingPage: "/",
   Dashboard: "/dashboard",
   sideBar: "/sidebar",
-  // adminPanel: "/admin-panel",
-  // viewusers: "/view-users",
-  // manageuser: "/manage-user",
-  // drivers: "/drivers",
-  // addDriver: "/add-driver",
-  // manageDriver: "/manage-driver",
-  // userPanel: "/user-panel",
-  // settings: "/settings",
-  // changePassword: "/change-password",
-  // leaflet: "/user",
-  // routedetails: "/viewroutes",
+  userManagement: "/user-management",
+  driverManagement: "/driver-management",
+  stopManagement: "/stop-mangement",
+  routeManagement: "/route-mangement",
+  liveTracking: "/live-tracking",
+  routesDetails: "/routes-details",
+  userProfile: "/user-profile",
+  changePassword: "/change-password",
 };
+
+export const PrivateRoutes = [
+  {
+    path: routes.Dashboard,
+    element: <Dashboard />,
+  },
+  {
+    path: routes.userManagement,
+    element: <UserManagement />,
+  },
+  {
+    path: routes.driverManagement,
+    element: <DriverManagement />,
+  },
+  {
+    path: routes.stopManagement,
+    element: <StopManagement />,
+  },
+  {
+    path: routes.routeManagement,
+    element: <RouteManagement />,
+  },
+  {
+    path: routes.liveTracking,
+    element: <LiveTracking />,
+  },
+  {
+    path: routes.routesDetails,
+    element: <RouteDetails />,
+  },
+  {
+    path: routes.userProfile,
+    element: <UserProfile />,
+  },
+  {
+    path: routes.changePassword,
+    element: <ChangePassword />,
+  },
+];
 
 export const PublicRoutes = [
   {
@@ -52,41 +87,4 @@ export const PublicRoutes = [
     path: routes.landingPage,
     element: <LandingPage />,
   },
-  {
-    path: routes.Dashboard,
-    element: <Dashboard />,
-  },
-
-  // {
-  //   path: routes.profile,
-  //   element: <UpdateProfile />,
-  // },
-  // {
-  //   path: routes.viewusers,
-  //   element: <ViewUsers />,
-  // },
-  // {
-  //   path: routes.manageuser,
-  //   element: <ManageUser />,
-  // },
-  // {
-  //   path: routes.drivers,
-  //   element: <Drivers />,
-  // },
-  // {
-  //   path: routes.addDriver,
-  //   element: <AddDriver />,
-  // },
-  // {
-  //   path: routes.manageDriver,
-  //   element: <ManageDriver />,
-  // },
-  // {
-  //   path: routes.changePassword,
-  //   element: <ChangePassword />,
-  // },
-  // {
-  //   path: routes.leaflet,
-  //   element: <User />,
-  // },
 ];

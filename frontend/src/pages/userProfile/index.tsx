@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import userThunk from "../../../store/user/userThunk";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import toaster from "../../../utils/toaster";
-import { UpdateProfileType } from "../../../types/user.types";
-import SpanLoader from "../../../components/SpanLoader";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { UpdateProfileType } from "../../types/user.types";
+import userThunk from "../../store/user/userThunk";
+import toaster from "../../utils/toaster";
+import SpanLoader from "../../components/SpanLoader";
 
 const UserProfile: React.FC = () => {
   const userProfile = useAppSelector((state) => state.userSlice.profile);

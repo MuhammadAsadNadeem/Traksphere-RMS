@@ -1,10 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchCounts, fetchBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById } from "./adminThunk";
+import {
+    fetchCounts, fetchAllBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop,
+    editStopById,
+    deleteStopById,
+} from "./adminThunk";
 import { CountsResponse, BusStopResponse, UserResponse, DriverResponse } from "../../types/admin.types";
 
 interface AdminState {
     counts: CountsResponse | null | undefined;
-    busStops: BusStopResponse[] | undefined;
+    busStops: BusStopResponse[];
     users: UserResponse[] | undefined;
     drivers: DriverResponse[];
     loading: boolean;
@@ -57,18 +61,7 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(fetchBusStops.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchBusStops.fulfilled, (state, action) => {
-                state.loading = false;
-                state.busStops = action.payload;
-            })
-            .addCase(fetchBusStops.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
+
             .addCase(fetchAllUsers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -81,12 +74,13 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(fetchAllDrivers.fulfilled, (state, action) => {
-                state.drivers = action.payload
-                state.loading = false;
-            })
             .addCase(fetchAllDrivers.pending, (state) => {
                 state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllDrivers.fulfilled, (state, action) => {
+                state.drivers = action.payload;
+                state.loading = false;
             })
             .addCase(fetchAllDrivers.rejected, (state, action) => {
                 state.error = action.payload as string;
@@ -109,14 +103,12 @@ const adminSlice = createSlice({
                 state.error = null;
             })
             .addCase(editDriverById.fulfilled, (state, action) => {
-                if (!action.payload || !action.payload.id) {
-                    return;
+                if (!action.payload?.id) return;
+                const index = state.drivers.findIndex(d => d.id === action.payload.id);
+                if (index !== -1) {
+                    state.drivers[index] = action.payload;
                 }
-
-                const updatedDriver = action.payload;
-                state.drivers = state.drivers.map(driver =>
-                    driver.id === updatedDriver.id ? updatedDriver : driver
-                );
+                state.loading = false;
             })
             .addCase(editDriverById.rejected, (state, action) => {
                 state.loading = false;
@@ -127,10 +119,65 @@ const adminSlice = createSlice({
                 state.error = null;
             })
             .addCase(deleteDriverById.fulfilled, (state, action) => {
-                state.loading = false;
                 state.drivers = state.drivers.filter(driver => driver.id !== action.payload);
+                state.loading = false;
             })
             .addCase(deleteDriverById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(fetchAllBusStops.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllBusStops.fulfilled, (state, action: PayloadAction<BusStopResponse[]>) => {
+                state.loading = false;
+                state.busStops = action.payload;
+            })
+
+            .addCase(fetchAllBusStops.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(addNewStop.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addNewStop.fulfilled, (state, action) => {
+                state.busStops.push(action.payload);
+                state.loading = false;
+            })
+            .addCase(addNewStop.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(editStopById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(editStopById.fulfilled, (state, action) => {
+                if (!action.payload?.id) return;
+                const index = state.busStops.findIndex(d => d.id === action.payload.id);
+                if (index !== -1) {
+                    state.drivers[index] = action.payload;
+                }
+                state.loading = false;
+            })
+            .addCase(editStopById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(deleteStopById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteStopById.fulfilled, (state, action) => {
+                state.busStops = state.busStops.filter(stop => stop.id !== action.payload);
+                state.loading = false;
+            })
+            .addCase(deleteStopById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

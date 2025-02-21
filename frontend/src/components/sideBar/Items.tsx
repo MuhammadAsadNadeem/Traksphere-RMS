@@ -7,49 +7,45 @@ import TrafficOutlinedIcon from "@mui/icons-material/TrafficOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import { routes } from "../../routes";
 
 export const adminMenu = [
   {
     label: "Dashboard",
     icon: <DashboardOutlinedIcon />,
-    view: "admin-dashboard",
-    group: "general",
+    view: routes.Dashboard,
   },
   {
     label: "User Management",
     icon: <GroupsOutlinedIcon />,
-    view: "user-management",
-    group: "management",
+    view: routes.userManagement,
   },
   {
     label: "Driver Management",
     icon: <PersonAddAltOutlinedIcon />,
-    view: "driver-management",
-    group: "management",
-  },
-  {
-    label: "Route Management",
-    icon: <RouteOutlinedIcon />,
-    view: "route-management",
-    group: "operations",
+    view: routes.driverManagement,
   },
   {
     label: "Stops Management",
     icon: <TrafficOutlinedIcon />,
-    view: "stop-management",
-    group: "operations",
+    view: routes.stopManagement,
   },
+  {
+    label: "Route Management",
+    icon: <RouteOutlinedIcon />,
+    view: routes.routeManagement,
+  },
+
   {
     label: "Account Settings",
     icon: <SettingsOutlinedIcon />,
-    view: "account-settings",
-    group: "preferences",
+    view: routes.changePassword,
   },
   // {
   //   label: "Logout",
   //   icon: <LogoutOutlinedIcon />,
   //   view: "logout",
-  //   group: "system",
+
   // },
 ];
 
@@ -57,37 +53,32 @@ export const userMenu = [
   {
     label: "Dashboard",
     icon: <DashboardOutlinedIcon />,
-    view: "user-dashboard",
-    group: "general",
+    view: routes.Dashboard,
   },
   {
     label: "Live Tracking",
     icon: <LocationOnOutlinedIcon />,
-    view: "live-tracking",
-    group: "navigation",
+    view: routes.liveTracking,
   },
   {
     label: "Routes",
     icon: <RouteOutlinedIcon />,
-    view: "routes",
-    group: "navigation",
+    view: routes.routesDetails,
   },
   {
     label: "Profile",
     icon: <PersonIcon />,
-    view: "user-profile",
-    group: "preferences",
+    view: routes.userProfile,
   },
   {
-    label: "Settings",
+    label: "Account Settings",
     icon: <SettingsOutlinedIcon />,
-    view: "user-settings",
-    group: "preferences",
+    view: routes.changePassword,
   },
   // {
   //   label: "Logout",
   //   icon: <LogoutOutlinedIcon />,
   //   view: "logout",
-  //   group: "system",
+
   // },
 ];

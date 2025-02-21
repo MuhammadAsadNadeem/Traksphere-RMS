@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchAllRoutes } from "../../../store/user/userThunk";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+
 import {
   Box,
   Typography,
@@ -13,7 +12,9 @@ import {
   ListItemText,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import SpanLoader from "../../../components/SpanLoader";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchAllRoutes } from "../../store/user/userThunk";
+import SpanLoader from "../../components/SpanLoader";
 
 interface Route {
   id: string;
@@ -39,12 +40,10 @@ const RouteDetails: React.FC = () => {
     setExpandedRoute((prev) => (prev === routeId ? null : routeId));
   };
 
-  // Handle loading state
   if (isLoading) {
     return <SpanLoader />;
   }
 
-  // Handle error state
   if (error) {
     return (
       <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
@@ -58,7 +57,6 @@ const RouteDetails: React.FC = () => {
     );
   }
 
-  // Handle empty state
   if (!routes || routes.length === 0) {
     return (
       <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
@@ -87,7 +85,6 @@ const RouteDetails: React.FC = () => {
               "&:hover": { backgroundColor: "primary.dark" },
             }}
           >
-            {/* Route Header */}
             <Box
               onClick={() => toggleRoute(route.id)}
               display="flex"
@@ -127,7 +124,6 @@ const RouteDetails: React.FC = () => {
               </IconButton>
             </Box>
 
-            {/* Expanded Bus Stops List */}
             <Collapse
               in={expandedRoute === route.id}
               timeout="auto"

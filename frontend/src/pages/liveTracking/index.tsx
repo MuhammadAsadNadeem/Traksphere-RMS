@@ -4,10 +4,6 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Box, TextField, Modal, Typography } from "@mui/material";
 
-import markerPng from "../../../assets/images/marker.png";
-import stopMarker from "../../../assets/images/stop-marker.png";
-
-// Define the types
 interface Stop {
   _id: string;
   name: string;
@@ -34,7 +30,6 @@ const TrackRoute = () => {
 
   useEffect(() => {
     try {
-      // Load dummy data
       const dummyStops: Stop[] = [
         { _id: "1", name: "Stop A", latitude: 31.694, longitude: 74.248 },
         { _id: "2", name: "Stop B", latitude: 31.695, longitude: 74.249 },

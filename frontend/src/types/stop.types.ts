@@ -1,7 +1,7 @@
-export type BusStopType = {
+export type UpdateBusStopType = {
     id: string,
-    stopName: string,
-    latitude: number,
-    longitude: number,
+    stopName?: string,
+    latitude?: number,
+    longitude?: number,
 
 }

@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {
-  fetchAllUsers,
-  editUserById,
-  deleteUserById,
-} from "../../../store/user/adminThunk";
-import { UserResponse } from "../../../types/admin.types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
@@ -13,18 +6,25 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
-  TextField,
-  IconButton,
   Typography,
-  InputAdornment,
-  useMediaQuery,
+  Paper,
   useTheme,
+  useMediaQuery,
+  IconButton,
 } from "@mui/material";
-import { Edit, Delete, Search } from "@mui/icons-material";
-import toaster from "../../../utils/toaster";
+import { Edit, Delete } from "@mui/icons-material";
 import { indigo } from "@mui/material/colors";
-import UserForm from "../../../components/forms/UserForm";
-import DeleteConfirmationDialog from "../../../components/DeleteDialogBox";
+import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
+import UserForm from "../../components/forms/UserForm";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  fetchAllUsers,
+  deleteUserById,
+  editUserById,
+} from "../../store/user/adminThunk";
+import { UserResponse } from "../../types/admin.types";
+import toaster from "../../utils/toaster";
+import SearchBar from "../../components/SearchBar";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,17 +35,9 @@ const UserManagement: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   useEffect(() => {
     dispatch(fetchAllUsers({}));
   }, [dispatch]);
-
-  const usersWithDisplayId = (users || []).map((user, index) => ({
-    ...user,
-    displayId: index + 1,
-  }));
 
   const handleEditUser = (user: UserResponse) => {
     setSelectedUser(user);
@@ -86,36 +78,40 @@ const UserManagement: React.FC = () => {
         });
     }
   };
-
-  const filteredUsers = usersWithDisplayId.filter((user) => {
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return (
-      user.fullName.toLowerCase().includes(lowerCaseQuery) ||
-      user.email.toLowerCase().includes(lowerCaseQuery) ||
-      user.phoneNumber.toLowerCase().includes(lowerCaseQuery) ||
-      user.registrationNumber.toLowerCase().includes(lowerCaseQuery)
-    );
-  });
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const filteredUsers = (users || [])
+    .map((user, index) => ({
+      ...user,
+      displayId: index + 1,
+    }))
+    .filter((user) => {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      return (
+        user.fullName.toLowerCase().includes(lowerCaseQuery) ||
+        user.email.toLowerCase().includes(lowerCaseQuery) ||
+        user.phoneNumber.toLowerCase().includes(lowerCaseQuery) ||
+        user.registrationNumber.toLowerCase().includes(lowerCaseQuery)
+      );
+    });
 
   const columns: GridColDef[] = [
-    { field: "displayId", headerName: "ID", flex: 0.5, width: 70 },
-    { field: "fullName", headerName: "Full Name", flex: 1, width: 130 },
-    { field: "email", headerName: "Email", flex: 1 },
+    { field: "displayId", headerName: "ID", width: 100 },
+    { field: "fullName", headerName: "Full Name", width: 150 },
+    { field: "email", headerName: "Email", width: 170 },
     {
       field: "registrationNumber",
       headerName: "Registration No",
-      flex: 1,
-      width: 130,
+      width: 150,
     },
-    { field: "departmentName", headerName: "Department", flex: 1, width: 130 },
-    { field: "phoneNumber", headerName: "Contact No", flex: 1, width: 130 },
-    { field: "routeNumber", headerName: "Route No", flex: 1, width: 130 },
-    { field: "stopArea", headerName: "Stop Area", flex: 1, width: 130 },
+    { field: "departmentName", headerName: "Department", width: 150 },
+    { field: "phoneNumber", headerName: "Contact No", width: 150 },
+    { field: "routeNumber", headerName: "Route No", width: 150 },
+    { field: "stopArea", headerName: "Stop Area", width: 150 },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
-      width: 130,
+      width: 150,
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleEditUser(params.row)}>
@@ -130,57 +126,72 @@ const UserManagement: React.FC = () => {
   ];
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 2, color: indigo[700] }}>
-        Manage Users
-      </Typography>
-
-      <TextField
-        fullWidth
-        margin="normal"
-        variant="outlined"
-        placeholder="Search by full name, email, phone number, or registration number..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{ mb: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search sx={{ color: indigo[500] }} />
-            </InputAdornment>
-          ),
+    <Box sx={{ ml: 1, height: "80vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: "95%",
         }}
-      />
-
-      <Box sx={{ overflowX: "auto" }}>
-        <DataGrid
-          rows={filteredUsers}
-          columns={columns}
-          getRowId={(row) => row.id}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10, page: 0 },
-            },
-          }}
-          sx={{
-            "& .MuiDataGrid-cell": {
-              fontSize: isMobile ? "12px" : "14px",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              fontSize: isMobile ? "12px" : "14px",
-              backgroundColor: indigo[50],
-              color: indigo[900],
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: indigo[500],
-              color: indigo[900],
-              padding: "10px",
-              fontSize: isMobile ? "12px" : "14px",
-            },
-          }}
+      >
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          placeholder="Search By Name, Email, Contact Number"
+          isMobile={isMobile}
         />
       </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 2,
+            mt: 2,
+            color: indigo[700],
+            width: "95%",
+            textAlign: "left",
+          }}
+        >
+          Manage Users
+        </Typography>
 
+        <Paper
+          sx={{
+            height: 300,
+            mt: 3,
+            width: "95%",
+          }}
+        >
+          <DataGrid
+            rows={filteredUsers}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+            sx={{
+              "& .MuiDataGrid-cell": {},
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: indigo[50],
+                color: indigo[900],
+              },
+              "& .MuiDataGrid-footerContainer": {
+                backgroundColor: indigo[50],
+                color: indigo[900],
+              },
+            }}
+          />
+        </Paper>
+      </Box>
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle
           sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
@@ -205,7 +216,6 @@ const UserManagement: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
