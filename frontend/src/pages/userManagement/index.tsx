@@ -98,7 +98,7 @@ const UserManagement: React.FC = () => {
   const columns: GridColDef[] = [
     { field: "displayId", headerName: "ID", width: 100 },
     { field: "fullName", headerName: "Full Name", width: 150 },
-    { field: "email", headerName: "Email", width: 170 },
+    { field: "email", headerName: "Email", width: 150 },
     {
       field: "registrationNumber",
       headerName: "Registration No",

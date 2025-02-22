@@ -11,6 +11,7 @@ import ChangePassword from "./pages/changePassword";
 import RouteManagement from "./pages/routeManagement/routes";
 import RouteDetails from "./pages/routeDetails";
 import UserProfile from "./pages/userProfile";
+import Profile from "./pages/signUp/signupPart2";
 
 export const routes = {
   login: "/login",
@@ -86,5 +87,9 @@ export const PublicRoutes = [
   {
     path: routes.landingPage,
     element: <LandingPage />,
+  },
+  {
+    path: routes.profile,
+    element: <Profile />,
   },
 ];

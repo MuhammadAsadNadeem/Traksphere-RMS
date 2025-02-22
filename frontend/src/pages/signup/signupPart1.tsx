@@ -16,10 +16,11 @@ import { routes } from "../../routes";
 import { useNavigate } from "react-router-dom";
 import { signUpSchema } from "../../validationSchema";
 import SendOtpBtn from "../../components/SendOtpBtn";
-import { SignupType } from "../../types/auth.types";
+
 import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { useAppDispatch } from "../../store/hooks";
+import { SignUpPart1Type } from "../../types/auth.types";
 
 const SignUp: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,8 +36,8 @@ const SignUp: React.FC = () => {
   };
 
   const onSubmit = async (
-    values: SignupType,
-    { setSubmitting, resetForm }: FormikHelpers<SignupType>
+    values: SignUpPart1Type,
+    { setSubmitting, resetForm }: FormikHelpers<SignUpPart1Type>
   ) => {
     try {
       setSubmitting(true);

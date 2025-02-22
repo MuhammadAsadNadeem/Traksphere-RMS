@@ -12,10 +12,11 @@ import { useFormik, FormikHelpers } from "formik";
 import { userProfileSchema } from "../../validationSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
-import { SignUpPart2 } from "../../types/user.types";
+
 import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { routes } from "../../routes";
+import { SignUpPart2Type } from "../../types/auth.types";
 
 const Profile: React.FC = () => {
   const location = useLocation();
@@ -25,8 +26,8 @@ const Profile: React.FC = () => {
   const email = location.state?.email;
 
   const onSubmit = async (
-    values: SignUpPart2,
-    { setSubmitting, resetForm }: FormikHelpers<SignUpPart2>
+    values: SignUpPart2Type,
+    { setSubmitting, resetForm }: FormikHelpers<SignUpPart2Type>
   ) => {
     try {
       setSubmitting(true);
