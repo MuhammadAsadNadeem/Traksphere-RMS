@@ -1,11 +1,12 @@
 import {
   Box,
   Container,
-  Grid,
   Typography,
   Paper,
   Divider,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   FaBus,
@@ -15,16 +16,20 @@ import {
 } from "react-icons/fa";
 
 const UserDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Box
       sx={{
-        mt: 7,
-        minHeight: "100vh",
-        background:
-          "linear-gradient(to right,rgb(11, 47, 104),rgb(67, 28, 210),rgb(55, 126, 206))",
+        mt: 6,
+        ml: 2,
+        mr: 2,
+        mb: 2,
+        minHeight: "95vh",
+        background: "linear-gradient(to right, #0b2f68, #431cd2, #377ece)",
         borderRadius: "8px",
         color: "white",
-        overflow: "hidden",
       }}
     >
       <Container
@@ -63,101 +68,66 @@ const UserDashboard = () => {
             It's your go-to tool for a smooth and reliable journey.
           </Typography>
 
-          <Grid container spacing={4} justifyContent="center">
-            <Grid item xs={12} md={3}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              justifyContent: "center",
+              gap: 4,
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              {
+                icon: <FaBus />,
+                title: "View Routes",
+                description:
+                  "Access all available bus routes and view details like stops and schedules.",
+              },
+              {
+                icon: <FaRegClock />,
+                title: "Check Schedule",
+                description:
+                  "Know exactly when your bus will arrive and plan your day ahead.",
+              },
+              {
+                icon: <FaMapMarkedAlt />,
+                title: "Real-Time Location",
+                description:
+                  "Track buses in real-time and never miss your ride again.",
+              },
+              {
+                icon: <FaExclamationTriangle />,
+                title: "Report Complaints",
+                description:
+                  "Have an issue? Log complaints to help improve bus services.",
+              },
+            ].map((item, index) => (
               <Paper
+                key={index}
                 sx={{
                   padding: 4,
                   backgroundColor: "primary.main",
                   color: "white",
                   borderRadius: 2,
                   textAlign: "center",
+                  flex: isMobile ? "1 1 100%" : "1 1 calc(25% - 32px)",
+                  minWidth: "250px",
                 }}
               >
                 <IconButton sx={{ fontSize: 40, mb: 2 }}>
-                  <FaBus />
+                  {item.icon}
                 </IconButton>
                 <Typography variant="h6" fontWeight="bold">
-                  View Routes
+                  {item.title}
                 </Typography>
                 <Divider sx={{ my: 2, borderColor: "grey.300" }} />
                 <Typography variant="body2" mt={2}>
-                  Access all available bus routes and view details like stops
-                  and schedules.
+                  {item.description}
                 </Typography>
               </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Paper
-                sx={{
-                  padding: 4,
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  borderRadius: 2,
-                  textAlign: "center",
-                }}
-              >
-                <IconButton sx={{ fontSize: 40, mb: 2 }}>
-                  <FaRegClock />
-                </IconButton>
-                <Typography variant="h6" fontWeight="bold">
-                  Check Schedule
-                </Typography>
-                <Divider sx={{ my: 2, borderColor: "grey.300" }} />
-                <Typography variant="body2" mt={2}>
-                  Know exactly when your bus will arrive and plan your day
-                  ahead.
-                </Typography>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Paper
-                sx={{
-                  padding: 4,
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  borderRadius: 2,
-                  textAlign: "center",
-                }}
-              >
-                <IconButton sx={{ fontSize: 40, mb: 2 }}>
-                  <FaMapMarkedAlt />
-                </IconButton>
-                <Typography variant="h6" fontWeight="bold">
-                  Real-Time Location
-                </Typography>
-                <Divider sx={{ my: 2, borderColor: "grey.300" }} />
-                <Typography variant="body2" mt={2}>
-                  Track buses in real-time and never miss your ride again.
-                </Typography>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Paper
-                sx={{
-                  padding: 4,
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  borderRadius: 2,
-                  textAlign: "center",
-                }}
-              >
-                <IconButton sx={{ fontSize: 40, mb: 2 }}>
-                  <FaExclamationTriangle />
-                </IconButton>
-                <Typography variant="h6" fontWeight="bold">
-                  Report Complaints
-                </Typography>
-                <Divider sx={{ my: 2, borderColor: "grey.300" }} />
-                <Typography variant="body2" mt={2}>
-                  Have an issue? Log complaints to help improve bus services.
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
+            ))}
+          </Box>
         </Paper>
       </Container>
     </Box>

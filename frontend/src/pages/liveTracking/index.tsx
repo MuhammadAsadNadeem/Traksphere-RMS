@@ -1,164 +1,110 @@
-import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
-import { Box, TextField, Modal, Typography } from "@mui/material";
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-routing-machine";
+import { Box } from "@mui/material";
 
-interface Stop {
-  _id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-}
+const busIcon = new L.Icon({
+  iconUrl: "../../../src/assets/images/bus-stop.png",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
 
-interface Route {
-  id: string;
-  name: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-}
+const START_POINT = L.latLng(31.5799417, 74.35464377811556);
+const END_POINT = L.latLng(31.694468449462903, 74.24724019481333);
 
-const TrackRoute = () => {
-  const [stopsArray, setStopsArray] = useState<Stop[]>([]);
-  const [routeArray, setRouteArray] = useState<Route[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [routesPassingThrough, setRoutesPassingThrough] = useState<Route[]>([]);
-  const [selectedStop, setSelectedStop] = useState<Stop | null>(null);
+const LiveTracking: React.FC = () => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
+  const routingControl = useRef<L.Routing.Control | null>(null);
+  const busMarker = useRef<L.Marker | null>(null);
+  const routePolyline = useRef<L.Polyline | null>(null);
+  const [routeCoordinates, setRouteCoordinates] = useState<L.LatLng[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    try {
-      const dummyStops: Stop[] = [
-        { _id: "1", name: "Stop A", latitude: 31.694, longitude: 74.248 },
-        { _id: "2", name: "Stop B", latitude: 31.695, longitude: 74.249 },
-        { _id: "3", name: "Stop C", latitude: 31.696, longitude: 74.25 },
-      ];
+    if (!mapInstance.current && mapRef.current) {
+      const map = L.map(mapRef.current).setView(START_POINT, 13);
+      mapInstance.current = map;
 
-      const dummyRoutes: Route[] = [
-        {
-          id: "1",
-          name: "Route 1",
-          location: { latitude: 31.693, longitude: 74.247 },
-        },
-        {
-          id: "2",
-          name: "Route 2",
-          location: { latitude: 31.692, longitude: 74.246 },
-        },
-      ];
+      L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+        maxZoom: 20,
+        subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      }).addTo(map);
 
-      setStopsArray(dummyStops);
-      setRouteArray(dummyRoutes);
-    } catch (error) {
-      console.error("Error loading data:", error);
+      busMarker.current = L.marker(START_POINT, { icon: busIcon })
+        .addTo(map)
+        .bindPopup("Route 1");
+
+      routingControl.current = L.Routing.control({
+        waypoints: [START_POINT, END_POINT],
+        routeWhileDragging: false,
+        show: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        fitSelectedRoutes: true,
+
+        lineOptions: {
+          styles: [{ color: "transparent", weight: 4 }],
+          extendToWaypoints: true,
+          missingRouteTolerance: 10,
+        } as L.Routing.LineOptions,
+      }).addTo(map);
+
+      routingControl.current.on("routesfound", (e) => {
+        const coordinates = e.routes[0].coordinates;
+        setRouteCoordinates(coordinates);
+
+        routePolyline.current = L.polyline(coordinates, {
+          color: "blue",
+          weight: 4,
+        }).addTo(map);
+      });
     }
+
+    return () => {
+      mapInstance.current?.remove();
+      mapInstance.current = null;
+    };
   }, []);
 
-  const filteredStops = stopsArray.filter((stop) =>
-    stop.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    if (!routeCoordinates.length || currentIndex >= routeCoordinates.length)
+      return;
 
-  const handleSuggestionClick = (stop: Stop) => {
-    try {
-      const dummyRoutesPassingThrough: Route[] = [
-        {
-          id: "1",
-          name: "Route 1",
-          location: { latitude: 31.693, longitude: 74.247 },
-        },
-        {
-          id: "2",
-          name: "Route 2",
-          location: { latitude: 31.692, longitude: 74.246 },
-        },
-      ];
-      setRoutesPassingThrough(dummyRoutesPassingThrough);
-      setSelectedStop(stop); // Save the selected stop to state
-      setIsModalOpen(true); // Show modal when a stop is clicked
-    } catch (error) {
-      console.error("Error handling suggestion click:", error);
-    }
-  };
+    const interval = setInterval(() => {
+      if (busMarker.current && routePolyline.current) {
+        busMarker.current.setLatLng(routeCoordinates[currentIndex]);
 
-  const handleCloseModal = () => setIsModalOpen(false);
+        const remainingCoordinates = routeCoordinates.slice(currentIndex);
+        routePolyline.current.setLatLngs(remainingCoordinates);
+
+        setCurrentIndex((prev) => prev + 1);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [routeCoordinates, currentIndex]);
 
   return (
-    <Box sx={{ position: "relative", height: "89vh", width: "90.2vw" }}>
-      {/* Search Bar */}
-      <TextField
-        label="Search Stops"
-        variant="outlined"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        fullWidth
-        sx={{ marginBottom: 2 }}
+    <Box
+      sx={{
+        mt: 8,
+        ml: 2,
+        height: { xs: "50vh", sm: "60vh", md: "85vh" },
+        width: "95%",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+      }}
+    >
+      <div
+        ref={mapRef}
+        style={{ width: "100%", height: "100%", cursor: "pointer" }}
       />
-
-      {/* Map */}
-      <MapContainer
-        center={[31.6935, 74.2472]}
-        zoom={13}
-        scrollWheelZoom
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-        {/* Stop Markers */}
-        {filteredStops.map((stop: Stop) => (
-          <Marker
-            key={stop._id}
-            position={[stop.latitude, stop.longitude]}
-            icon={new L.Icon({ iconUrl: stopMarker, iconSize: [60, 60] })}
-            eventHandlers={{
-              click: () => handleSuggestionClick(stop), // Trigger modal when stop is clicked
-            }}
-          >
-            <Popup>{stop.name}</Popup>
-          </Marker>
-        ))}
-
-        {/* Route Markers */}
-        {routeArray.map((route: Route) => (
-          <Marker
-            key={route.id}
-            position={[route.location.latitude, route.location.longitude]}
-            icon={new L.Icon({ iconUrl: markerPng, iconSize: [60, 60] })}
-          >
-            <Popup>{route.name}</Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-
-      {/* Modal for routes passing through selected stop */}
-      <Modal open={isModalOpen} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "white",
-            p: 4,
-            width: "300px",
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Routes Passing Through Stop: {selectedStop?.name}
-          </Typography>
-          {routesPassingThrough.length > 0 ? (
-            routesPassingThrough.map((route) => (
-              <div key={route.id}>{route.name}</div>
-            ))
-          ) : (
-            <div>No routes available</div>
-          )}
-        </Box>
-      </Modal>
     </Box>
   );
 };
 
-export default TrackRoute;
+export default LiveTracking;

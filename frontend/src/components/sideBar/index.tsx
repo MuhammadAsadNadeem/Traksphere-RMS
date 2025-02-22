@@ -10,6 +10,7 @@ import {
   CssBaseline,
   useMediaQuery,
   IconButton,
+  useTheme,
 } from "@mui/material";
 import { indigo } from "@mui/material/colors";
 import { motion } from "framer-motion";
@@ -20,74 +21,55 @@ import { useAppSelector } from "../../store/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const SideBar = () => {
+  const theme = useTheme();
   const isSuperUser = useAppSelector((state) => state.userSlice.isSuperUser);
   const location = useLocation();
   const navigate = useNavigate();
   const menuItems = isSuperUser ? adminMenu : userMenu;
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleSidebarClick = (view: string) => {
-    navigate(view);
-  };
-
-  const handleSidebarToggle = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
-  };
+  const handleSidebarClick = (view: string) => navigate(view);
+  const handleSidebarToggle = () => setIsSidebarExpanded(!isSidebarExpanded);
 
   useEffect(() => {
     setIsSidebarExpanded(!isMobile);
   }, [isMobile]);
 
   return (
-    <Box sx={{ height: "calc(100vh - 64px)" }}>
+    <Box sx={{ height: "100vh" }}>
       <CssBaseline />
-
-      {isMobile && !isSidebarExpanded && (
-        <IconButton
-          onClick={handleSidebarToggle}
-          sx={{
-            zIndex: 1201,
-            color: indigo[700],
-            backgroundColor: "rgba(253, 253, 253, 0.55)",
-            "&:hover": { backgroundColor: " #ffffff" },
-          }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
-      )}
 
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
         open={isSidebarExpanded}
         onClose={handleSidebarToggle}
         sx={{
-          width: isSidebarExpanded ? 240 : 64,
+          width: isMobile ? "100vw" : isSidebarExpanded ? 240 : 64,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: isSidebarExpanded ? 240 : 64,
-            boxSizing: "border-box",
+            width: isMobile ? "40vw" : isSidebarExpanded ? 240 : 64,
+
             bgcolor: indigo[700],
-            color: " #fff",
-            height: "calc(100vh-64px)",
-            top: 60,
-            transition: "width 0.3s ease, transform 0.3s ease",
+            color: "#fff",
+            height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+            top: theme.mixins.toolbar.minHeight,
+
+            transition: theme.transitions.create(["width", "transform"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
           },
         }}
       >
-        <List>
-          <ListItem>
+        <List sx={{ overflow: "hidden" }}>
+          <ListItem sx={{ p: 0 }}>
             <ListItemButton onClick={handleSidebarToggle}>
-              <ListItemIcon
-                sx={{
-                  minWidth: "auto",
-                  color: " #fff",
-                  mr: isSidebarExpanded ? 1 : 0,
-                }}
-              >
-                {isSidebarExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-              </ListItemIcon>
-              {isSidebarExpanded && <ListItemText />}
+              {isSidebarExpanded ? (
+                <ChevronLeftIcon sx={{ color: "#fff" }} />
+              ) : (
+                <ChevronRightIcon sx={{ color: "#fff" }} />
+              )}
             </ListItemButton>
           </ListItem>
 
@@ -96,9 +78,9 @@ const SideBar = () => {
               key={item.view}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
-              <ListItem>
+              <ListItem sx={{ p: 0 }}>
                 <ListItemButton
                   onClick={() => handleSidebarClick(item.view)}
                   sx={{
@@ -106,18 +88,18 @@ const SideBar = () => {
                       location.pathname === item.view
                         ? "rgba(255, 255, 255, 0.32)"
                         : "inherit",
-                    "&:hover": {
-                      backgroundColor: "rgba(255, 255, 255, 0.32)",
-                    },
-                    px: isSidebarExpanded ? 2 : 1,
+                    "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.32)" },
+                    mx: 1,
                     borderRadius: 1,
+                    minHeight: 48,
+                    justifyContent: isSidebarExpanded ? "initial" : "center",
                   }}
                 >
                   <ListItemIcon
                     sx={{
-                      minWidth: "auto",
-                      color: " #fff",
-                      mr: isSidebarExpanded ? 2 : 0,
+                      minWidth: 0,
+                      color: "#fff",
+                      mr: isSidebarExpanded ? 2 : "auto",
                     }}
                   >
                     {item.icon}
@@ -131,9 +113,11 @@ const SideBar = () => {
                       <ListItemText
                         primary={item.label}
                         sx={{
-                          fontSize: "1rem",
-                          fontWeight: 500,
                           whiteSpace: "nowrap",
+                          "& span": {
+                            fontWeight: 500,
+                            fontSize: "0.875rem",
+                          },
                         }}
                       />
                     </motion.div>
@@ -144,6 +128,29 @@ const SideBar = () => {
           ))}
         </List>
       </Drawer>
+
+      {isMobile && (
+        <IconButton
+          onClick={handleSidebarToggle}
+          sx={{
+            position: "fixed",
+            left: 0,
+            top: "9%",
+            transform: "translateY(-50%)",
+            zIndex: theme.zIndex.drawer + 1,
+            color: indigo[700],
+            backgroundColor: "rgba(255, 255, 255, 0.59)",
+            borderRadius: "0 8px 8px 0",
+            boxShadow: 2,
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 1)",
+            },
+            visibility: isSidebarExpanded ? "hidden" : "visible",
+          }}
+        >
+          <ChevronRightIcon />
+        </IconButton>
+      )}
     </Box>
   );
 };

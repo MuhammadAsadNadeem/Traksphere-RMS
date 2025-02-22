@@ -1,2 +1,2 @@
 node_modules/
-\src\db\migrations/
+/src/db/migrations/
