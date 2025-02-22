@@ -59,7 +59,7 @@ export const fetchAllRoutes = createAsyncThunk(UserApiPathEnum.GET_ROUTES,
     async (_, { rejectWithValue }) => {
         try {
             const res = await instance.get(UserApiPathEnum.GET_ROUTES)
-            console.log(res);
+
             if (res.status === HttpStatusCode.Ok) {
                 return res.data;
             }

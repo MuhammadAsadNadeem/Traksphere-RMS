@@ -48,7 +48,7 @@ const SideBar = () => {
           width: isMobile ? "100vw" : isSidebarExpanded ? 240 : 64,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: isMobile ? "40vw" : isSidebarExpanded ? 240 : 64,
+            width: isMobile ? "55vw" : isSidebarExpanded ? 240 : 64,
 
             bgcolor: indigo[700],
             color: "#fff",

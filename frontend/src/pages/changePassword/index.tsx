@@ -61,129 +61,139 @@ const ChangePassword = () => {
   });
 
   return (
-    <Container maxWidth="xs">
-      <Card
-        sx={{
-          mt: 10,
-          p: 4,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          boxShadow: 5,
-          borderRadius: 2,
-          gap: 2,
-        }}
-      >
-        <Typography variant="h4" align="center" fontWeight="bold">
-          Change Password
-        </Typography>
-        <Box component="form" onSubmit={formik.handleSubmit}>
-          <TextField
-            fullWidth
-            label="Current Password"
-            type={showCurrentPassword ? "text" : "password"}
-            name="currentPassword"
-            placeholder="Enter your current password"
-            variant="outlined"
-            margin="normal"
-            required
-            value={formik.values.currentPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.currentPassword &&
-              Boolean(formik.errors.currentPassword)
-            }
-            helperText={
-              formik.touched.currentPassword && formik.errors.currentPassword
-            }
-            InputProps={{
-              endAdornment: (
-                <IconButton
-                  onClick={() => handleTogglePassword("current")}
-                  edge="end"
-                >
-                  {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              ),
-            }}
-          />
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <Container maxWidth="xs">
+        <Card
+          sx={{
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            boxShadow: 5,
+            borderRadius: 2,
+            gap: 2,
+          }}
+        >
+          <Typography variant="h4" align="center" fontWeight="bold">
+            Change Password
+          </Typography>
+          <Box component="form" onSubmit={formik.handleSubmit}>
+            <TextField
+              fullWidth
+              label="Current Password"
+              type={showCurrentPassword ? "text" : "password"}
+              name="currentPassword"
+              placeholder="Enter your current password"
+              variant="outlined"
+              margin="normal"
+              required
+              value={formik.values.currentPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.currentPassword &&
+                Boolean(formik.errors.currentPassword)
+              }
+              helperText={
+                formik.touched.currentPassword && formik.errors.currentPassword
+              }
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => handleTogglePassword("current")}
+                    edge="end"
+                  >
+                    {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                ),
+              }}
+            />
 
-          <TextField
-            fullWidth
-            label="New Password"
-            type={showNewPassword ? "text" : "password"}
-            name="newPassword"
-            placeholder="Enter your new password"
-            variant="outlined"
-            margin="normal"
-            required
-            value={formik.values.newPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.newPassword && Boolean(formik.errors.newPassword)
-            }
-            helperText={formik.touched.newPassword && formik.errors.newPassword}
-            InputProps={{
-              endAdornment: (
-                <IconButton
-                  onClick={() => handleTogglePassword("new")}
-                  edge="end"
-                >
-                  {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              ),
-            }}
-          />
+            <TextField
+              fullWidth
+              label="New Password"
+              type={showNewPassword ? "text" : "password"}
+              name="newPassword"
+              placeholder="Enter your new password"
+              variant="outlined"
+              margin="normal"
+              required
+              value={formik.values.newPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.newPassword && Boolean(formik.errors.newPassword)
+              }
+              helperText={
+                formik.touched.newPassword && formik.errors.newPassword
+              }
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => handleTogglePassword("new")}
+                    edge="end"
+                  >
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                ),
+              }}
+            />
 
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            placeholder="Confirm your new password"
-            variant="outlined"
-            margin="normal"
-            required
-            value={formik.values.confirmPassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.confirmPassword &&
-              Boolean(formik.errors.confirmPassword)
-            }
-            helperText={
-              formik.touched.confirmPassword && formik.errors.confirmPassword
-            }
-            InputProps={{
-              endAdornment: (
-                <IconButton
-                  onClick={() => handleTogglePassword("confirm")}
-                  edge="end"
-                >
-                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              ),
-            }}
-          />
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm your new password"
+              variant="outlined"
+              margin="normal"
+              required
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.confirmPassword &&
+                Boolean(formik.errors.confirmPassword)
+              }
+              helperText={
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+              }
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => handleTogglePassword("confirm")}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                ),
+              }}
+            />
 
-          <Button
-            fullWidth
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              mt: 2,
-              p: 1.5,
-            }}
-            disabled={formik.isSubmitting}
-          >
-            {formik.isSubmitting ? "Changing..." : "Change Password"}
-          </Button>
-        </Box>
-      </Card>
-    </Container>
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{
+                mt: 2,
+                p: 1.5,
+              }}
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? "Changing..." : "Change Password"}
+            </Button>
+          </Box>
+        </Card>
+      </Container>
+    </Box>
   );
 };
 

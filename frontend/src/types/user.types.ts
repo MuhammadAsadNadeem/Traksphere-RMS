@@ -49,5 +49,5 @@ export type RouteType = {
     vehicleNumber: string;
     driverId: string;
     driver: DriverType;
-    busStopIds: BusStopType[];
+    busStops: BusStopType[];
 };

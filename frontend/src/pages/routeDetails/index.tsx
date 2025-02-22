@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import {
   Box,
   Typography,
@@ -15,21 +14,12 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchAllRoutes } from "../../store/user/userThunk";
 import SpanLoader from "../../components/SpanLoader";
-
-interface Route {
-  id: string;
-  routeName: string;
-  routeNumber: string;
-  driver?: { fullName: string };
-  vehicleNumber: string;
-  busStopIds?: { id: string; stopName: string }[];
-}
+import { RouteType } from "../../types/user.types";
+import { indigo } from "@mui/material/colors";
 
 const RouteDetails: React.FC = () => {
   const dispatch = useAppDispatch();
-  const routes = useAppSelector((state) => state.userSlice.routes);
-  const isLoading = useAppSelector((state) => state.userSlice.isLoading);
-  const error = useAppSelector((state) => state.userSlice.error); // Add error state
+  const { routes, isLoading } = useAppSelector((state) => state.userSlice);
   const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,37 +34,18 @@ const RouteDetails: React.FC = () => {
     return <SpanLoader />;
   }
 
-  if (error) {
-    return (
-      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Available Routes
-        </Typography>
-        <Typography variant="body1" color="error">
-          Error loading routes: {error}
-        </Typography>
-      </Box>
-    );
-  }
-
-  if (!routes || routes.length === 0) {
-    return (
-      <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Available Routes
-        </Typography>
-        <Typography variant="body1">No routes available.</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        sx={{ mt: 3, color: indigo[700] }}
+        gutterBottom
+      >
         Available Routes
       </Typography>
       <Box display="flex" flexDirection="column" gap={2}>
-        {routes.map((route: Route) => (
+        {routes.map((route: RouteType) => (
           <Card
             key={route.id}
             sx={{
@@ -109,7 +80,7 @@ const RouteDetails: React.FC = () => {
                 <Typography>
                   Driver Name:{" "}
                   <Typography component="span" fontWeight="light">
-                    {route.driver?.fullName || "N/A"}
+                    {route.driver?.fullName}
                   </Typography>
                 </Typography>
                 <Typography>
@@ -138,7 +109,7 @@ const RouteDetails: React.FC = () => {
                   Bus Stops
                 </Typography>
                 <List>
-                  {route.busStopIds?.map((stop) => (
+                  {(route.busStops ?? []).map((stop) => (
                     <ListItem key={stop.id}>
                       <ListItemText primary={stop.stopName} />
                     </ListItem>
