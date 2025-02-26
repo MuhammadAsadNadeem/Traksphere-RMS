@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import {
   Box,
@@ -16,12 +15,10 @@ import {
   Paper,
 } from "@mui/material";
 import { Delete, Search, AddLocation } from "@mui/icons-material";
-
 import { indigo } from "@mui/material/colors";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import debounce from "lodash.debounce";
-
 import axios from "axios";
 import toaster from "../../utils/toaster";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
@@ -46,6 +43,7 @@ interface NominatimResult {
   latitude: string;
   longitude: string;
 }
+
 const StopManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const stops = useAppSelector((state) => state.adminSlice.busStops);
@@ -80,8 +78,8 @@ const StopManagement: React.FC = () => {
     setSelectedStop({
       id: Date.now().toString(), // Ensure id is a string
       stopName: "",
-      latitude: 0,
-      longitude: 0,
+      latitude: 0, // Default latitude
+      longitude: 0, // Default longitude
     });
     setIsAddMode(true);
     setOpenDialog(true);
@@ -115,10 +113,10 @@ const StopManagement: React.FC = () => {
 
     if (
       !selectedStop.stopName ||
-      !selectedStop.latitude ||
-      !selectedStop.longitude
+      isNaN(selectedStop.latitude) ||
+      isNaN(selectedStop.longitude)
     ) {
-      toaster.error("All fields are required.");
+      toaster.error("All fields are required and must be valid.");
       return;
     }
 
@@ -172,9 +170,13 @@ const StopManagement: React.FC = () => {
 
   const handleLocationSelect = (location: Location) => {
     const { latitude, longitude, stopName } = location;
-    setSelectedStop({ ...selectedStop!, latitude, longitude, stopName });
-    setSearchedLocation({ latitude, longitude, stopName });
-    setSearchResults([]);
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      setSelectedStop({ ...selectedStop!, latitude, longitude, stopName });
+      setSearchedLocation({ latitude, longitude, stopName });
+      setSearchResults([]);
+    } else {
+      toaster.error("Invalid latitude or longitude values.");
+    }
   };
 
   const filteredStops = stopsWithDisplayId.filter((stop) => {
@@ -311,7 +313,7 @@ const StopManagement: React.FC = () => {
             </Paper>
           )}
           <MapContainer
-            center={[30.3753, 69.3451]}
+            center={[30.3753, 69.3451]} // Default center for Pakistan
             zoom={5}
             style={{ width: "100%", height: "300px", marginBottom: "16px" }}
           >
@@ -319,16 +321,18 @@ const StopManagement: React.FC = () => {
               url="https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
               subdomains={["mt0", "mt1", "mt2", "mt3"]}
             />
-            {searchedLocation && (
-              <Marker
-                position={[
-                  searchedLocation.latitude,
-                  searchedLocation.longitude,
-                ]}
-              >
-                <Popup>{searchedLocation.stopName}</Popup>
-              </Marker>
-            )}
+            {searchedLocation &&
+              !isNaN(searchedLocation.latitude) &&
+              !isNaN(searchedLocation.longitude) && (
+                <Marker
+                  position={[
+                    searchedLocation.latitude,
+                    searchedLocation.longitude,
+                  ]}
+                >
+                  <Popup>{searchedLocation.stopName}</Popup>
+                </Marker>
+              )}
           </MapContainer>
           <TextField
             label="Stop Name"

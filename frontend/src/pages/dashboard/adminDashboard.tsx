@@ -53,10 +53,10 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flexGrow: 1, mr: 2, mb: 2 }}>
+    <Box sx={{ flexGrow: 1, ml: 2, mr: 2, mt: 6, mb: 2 }}>
       <Box
         sx={{
-          mt: 5,
+          mt: 2,
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",

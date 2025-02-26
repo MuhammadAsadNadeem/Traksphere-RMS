@@ -25,7 +25,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       value={searchQuery}
       onChange={(e) => onSearchChange(e.target.value)}
       sx={{
-        width: isMobile ? "60%" : "40%",
+        width: isMobile ? "40%" : "20%",
         ml: 2,
       }}
       InputProps={{

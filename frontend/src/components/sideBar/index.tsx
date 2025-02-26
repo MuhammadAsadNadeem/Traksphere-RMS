@@ -135,7 +135,7 @@ const SideBar = () => {
           sx={{
             position: "fixed",
             left: 0,
-            top: "9%",
+            top: "8%",
             transform: "translateY(-50%)",
             zIndex: theme.zIndex.drawer + 1,
             color: indigo[700],

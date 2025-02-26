@@ -35,20 +35,27 @@ const UserManagement: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Fetch users on component mount
   useEffect(() => {
     dispatch(fetchAllUsers({}));
   }, [dispatch]);
 
+  // Handle user edit
   const handleEditUser = (user: UserResponse) => {
     setSelectedUser(user);
     setOpenDialog(true);
   };
 
+  // Handle user delete
   const handleDeleteUser = (userId: string) => {
     setUserToDelete(userId);
     setDeleteDialogOpen(true);
   };
 
+  // Confirm delete action
   const confirmDelete = () => {
     if (userToDelete) {
       dispatch(deleteUserById(userToDelete))
@@ -64,6 +71,7 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  // Handle user update
   const handleUpdateUser = () => {
     if (selectedUser) {
       dispatch(editUserById({ userId: selectedUser.id, values: selectedUser }))
@@ -78,8 +86,8 @@ const UserManagement: React.FC = () => {
         });
     }
   };
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Filter users based on search query
   const filteredUsers = (users || [])
     .map((user, index) => ({
       ...user,
@@ -95,15 +103,12 @@ const UserManagement: React.FC = () => {
       );
     });
 
+  // Define columns for the DataGrid
   const columns: GridColDef[] = [
     { field: "displayId", headerName: "ID", width: 100 },
     { field: "fullName", headerName: "Full Name", width: 150 },
     { field: "email", headerName: "Email", width: 150 },
-    {
-      field: "registrationNumber",
-      headerName: "Registration No",
-      width: 150,
-    },
+    { field: "registrationNumber", headerName: "Registration No", width: 150 },
     { field: "departmentName", headerName: "Department", width: 150 },
     { field: "phoneNumber", headerName: "Contact No", width: 150 },
     { field: "routeNumber", headerName: "Route No", width: 150 },
@@ -126,12 +131,15 @@ const UserManagement: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ ml: 1, height: "80vh" }}>
+    <Box sx={{ height: "90vh", p: isMobile ? 1 : 3 }}>
+      {/* Search Bar */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          width: "95%",
+          width: "100%",
+          mt: 3,
+          mb: 2,
         }}
       >
         <SearchBar
@@ -141,57 +149,45 @@ const UserManagement: React.FC = () => {
           isMobile={isMobile}
         />
       </Box>
-      <Box
+
+      {/* Page Title */}
+      <Typography
+        variant="h4"
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
+          mb: 2,
+          color: indigo[700],
+          textAlign: "left",
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            mt: 2,
-            color: indigo[700],
-            width: "95%",
-            textAlign: "left",
-          }}
-        >
-          Manage Users
-        </Typography>
+        Manage Users
+      </Typography>
 
-        <Paper
-          sx={{
-            height: 300,
-            mt: 3,
-            width: "95%",
+      {/* DataGrid */}
+      <Paper sx={{ height: 400, width: "100%" }}>
+        <DataGrid
+          rows={filteredUsers}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
+            },
           }}
-        >
-          <DataGrid
-            rows={filteredUsers}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 10, page: 0 },
-              },
-            }}
-            pageSizeOptions={[5, 10]}
-            sx={{
-              "& .MuiDataGrid-cell": {},
-              "& .MuiDataGrid-columnHeader": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
-              },
-              "& .MuiDataGrid-footerContainer": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
-              },
-            }}
-          />
-        </Paper>
-      </Box>
+          pageSizeOptions={[5, 10]}
+          sx={{
+            "& .MuiDataGrid-cell": {},
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: indigo[50],
+              color: indigo[900],
+            },
+            "& .MuiDataGrid-footerContainer": {
+              backgroundColor: indigo[50],
+              color: indigo[900],
+            },
+          }}
+        />
+      </Paper>
+
+      {/* Edit User Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle
           sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
@@ -216,6 +212,8 @@ const UserManagement: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
