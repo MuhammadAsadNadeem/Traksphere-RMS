@@ -67,10 +67,18 @@ const SignUp: React.FC = () => {
   });
 
   return (
-    <Container maxWidth="xs">
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+      }}
+    >
       <Card
         sx={{
-          my: 4,
+          width: "100%",
           p: 4,
           display: "flex",
           flexDirection: "column",

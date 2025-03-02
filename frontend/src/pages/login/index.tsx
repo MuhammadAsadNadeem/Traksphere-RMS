@@ -55,9 +55,18 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="xs">
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh", // Ensure the container takes the full viewport height
+      }}
+    >
       <Card
         sx={{
+          width: "100%", // Ensure the card takes the full width of the container
           p: 4,
           display: "flex",
           flexDirection: "column",
@@ -70,7 +79,15 @@ const Login = () => {
         <Typography variant="h4" align="center" fontWeight="bold">
           Login
         </Typography>
-        <Box component="form" onSubmit={formik.handleSubmit}>
+        <Box
+          component="form"
+          onSubmit={formik.handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           <TextField
             fullWidth
             label="Email"

@@ -1,32 +1,56 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Button,
-  Typography,
   AppBar,
   Toolbar,
   IconButton,
   Menu,
   MenuItem,
+  Button,
+  Box,
+  Typography,
+  Avatar,
+  useScrollTrigger,
+  Slide,
+  Fade,
   Link,
 } from "@mui/material";
-import logo from "../assets/images/logo.svg";
-import MenuIcon from "@mui/icons-material/Menu";
+import {
+  Menu as MenuIcon,
+  Home as HomeIcon,
+  Stars as FeaturesIcon,
+  Info as InfoIcon,
+  ContactSupport as ContactIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
+  PersonAdd as PersonAddIcon,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../routes";
-import { logout } from "../store/user/userSlice";
+import { useTheme } from "@mui/material/styles";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { logout } from "../store/user/userSlice";
+import { routes } from "../routes";
+import logo from "../assets/images/logo.svg";
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{ window?: Window }> = ({ window }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const isLogin = useAppSelector((state) => state.userSlice.token);
+  const theme = useTheme();
+  const trigger = useScrollTrigger({ target: window });
+
+  const links = [
+    { name: "Home", url: "#home", icon: <HomeIcon /> },
+    { name: "Features", url: "#features", icon: <FeaturesIcon /> },
+    { name: "About", url: "#about", icon: <InfoIcon /> },
+    { name: "Contact", url: "#contact", icon: <ContactIcon /> },
+  ];
 
   const handleLogout = async () => {
     localStorage.clear();
     navigate(routes.login);
     await dispatch(logout());
+    handleMenuClose();
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -37,148 +61,146 @@ const Navbar: React.FC = () => {
     setAnchorEl(null);
   };
 
-  type Links = {
-    name: string;
-    url: string;
-  };
-
-  const links: Links[] = [
-    {
-      name: "Home",
-      url: "#home",
-    },
-    {
-      name: "Features",
-      url: "#features",
-    },
-    {
-      name: "About",
-      url: "#about",
-    },
-    {
-      name: "Contact",
-      url: "#contact",
-    },
-  ];
-
   return (
-    <AppBar position="sticky">
-      <Toolbar
+    <Slide appear={false} direction="down" in={!trigger}>
+      <AppBar
+        position="fixed"
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          background: theme.palette.primary.main,
+          boxShadow: theme.shadows[3],
         }}
       >
-        <Box display="flex" alignItems="center">
-          <img src={logo} alt="Website Logo" style={{ height: 60 }} />
-          <Typography variant="h6" fontWeight="bold" ml={2}>
-            TRAKSPHERE
-          </Typography>
-        </Box>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Fade in timeout={1000}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Avatar
+                src={logo}
+                alt="TrakSphere"
+                sx={{ width: 40, height: 40 }}
+              />
 
-        <Box
-          display={{ xs: "none", sm: "flex" }}
-          justifyContent="center"
-          alignItems="center"
-          gap={3}
-        >
-          {!isLogin &&
-            links.map((item, index) => (
-              <Link
-                sx={{ color: "white" }}
-                key={index}
-                href={routes.landingPage + item.url}
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: theme.palette.primary.contrastText,
+                  cursor: "pointer",
+                }}
+                onClick={() => navigate(0)}
               >
-                {item.name}
-              </Link>
-            ))}
-          {isLogin ? (
-            <Button
-              variant="outlined"
-              sx={{ color: "white", borderColor: "white" }}
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outlined"
-                sx={{ color: "white", borderColor: "white" }}
-                onClick={() => navigate(routes.login)}
-              >
-                Login
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ color: "white", borderColor: "white" }}
-                onClick={() => navigate(routes.signup)}
-              >
-                Sign Up
-              </Button>
-            </>
-          )}
-        </Box>
+                TRAKSPHERE
+              </Typography>
+            </Box>
+          </Fade>
 
-        <IconButton
-          size="large"
-          edge="end"
-          color="inherit"
-          aria-label="menu"
-          onClick={handleMenuClick}
-          sx={{ display: { xs: "flex", sm: "none" } }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          sx={{ display: { xs: "block", sm: "none" }, padding: 4 }}
-        >
-          {!isLogin &&
-            links.map((item, index) => (
-              <MenuItem
-                onClick={handleMenuClose}
-                component={Link}
-                key={index}
-                href={routes.landingPage + item.url}
-              >
-                {item.name}
-              </MenuItem>
-            ))}
-          <Box
-            display="flex"
-            justifyContent="center"
-            flexDirection="column"
-            gap={2}
-            padding={2}
-          >
+          <Box display={{ xs: "none", md: "flex" }} alignItems="center" gap={3}>
+            {!isLogin &&
+              links.map(({ name, url, icon }) => (
+                <Button
+                  key={name}
+                  component={Link}
+                  href={routes.landingPage + url}
+                  color="inherit"
+                  startIcon={icon}
+                >
+                  {name}
+                </Button>
+              ))}
             {isLogin ? (
-              <Button variant="outlined" onClick={handleLogout}>
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<LogoutIcon />}
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             ) : (
-              <>
+              <Box display="flex" gap={2}>
                 <Button
                   variant="outlined"
+                  color="inherit"
+                  startIcon={<LoginIcon />}
                   onClick={() => navigate(routes.login)}
                 >
                   Login
                 </Button>
                 <Button
-                  variant="outlined"
+                  variant="contained"
+                  startIcon={<PersonAddIcon />}
                   onClick={() => navigate(routes.signup)}
                 >
                   Sign Up
                 </Button>
-              </>
+              </Box>
             )}
           </Box>
-        </Menu>
-      </Toolbar>
-    </AppBar>
+
+          <IconButton
+            size="large"
+            edge="end"
+            color="inherit"
+            onClick={handleMenuClick}
+            sx={{ display: { xs: "flex", md: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            {!isLogin &&
+              links.map(({ name, url, icon }) => (
+                <MenuItem
+                  key={name}
+                  onClick={handleMenuClose}
+                  component={Link}
+                  href={routes.landingPage + url}
+                >
+                  {icon} {name}
+                </MenuItem>
+              ))}
+            <Box
+              sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}
+            >
+              {isLogin ? (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  color="inherit"
+                  startIcon={<LogoutIcon />}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<LoginIcon />}
+                    onClick={() => navigate(routes.login)}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<PersonAddIcon />}
+                    onClick={() => navigate(routes.signup)}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+    </Slide>
   );
 };
 

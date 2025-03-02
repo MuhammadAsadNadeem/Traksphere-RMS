@@ -192,7 +192,10 @@ const DriverManagement: React.FC = () => {
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          width: "95%",
+          width: "100%",
+          p: 3,
+          mt: 3,
+          mb: 2,
         }}
       >
         <SearchBar

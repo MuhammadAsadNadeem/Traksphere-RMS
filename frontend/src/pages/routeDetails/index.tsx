@@ -9,18 +9,19 @@ import {
   List,
   ListItem,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchAllRoutes } from "../../store/user/userThunk";
 import SpanLoader from "../../components/SpanLoader";
 import { RouteType } from "../../types/user.types";
-import { indigo } from "@mui/material/colors";
 
 const RouteDetails: React.FC = () => {
   const dispatch = useAppDispatch();
   const { routes, isLoading } = useAppSelector((state) => state.userSlice);
   const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     dispatch(fetchAllRoutes());
@@ -35,25 +36,33 @@ const RouteDetails: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3, bgcolor: "grey.100", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: theme.spacing(3),
+        bgcolor: theme.palette.background.default,
+        minHeight: "100vh",
+        mt: { xs: theme.spacing(8), sm: theme.spacing(10) },
+      }}
+    >
       <Typography
         variant="h4"
         fontWeight="bold"
-        sx={{ mt: 3, color: indigo[700] }}
+        sx={{ mt: theme.spacing(3), color: theme.palette.primary.main }}
         gutterBottom
       >
         Available Routes
       </Typography>
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box display="flex" flexDirection="column" gap={theme.spacing(2)}>
+        {" "}
         {routes.map((route: RouteType) => (
           <Card
             key={route.id}
             sx={{
-              backgroundColor: "primary.main",
-              color: "white",
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
               borderRadius: 2,
               transition: "0.3s",
-              "&:hover": { backgroundColor: "primary.dark" },
+              "&:hover": { backgroundColor: theme.palette.primary.dark },
             }}
           >
             <Box
@@ -61,7 +70,7 @@ const RouteDetails: React.FC = () => {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              p={2}
+              p={theme.spacing(2)}
               sx={{ cursor: "pointer" }}
             >
               <Box>
@@ -90,7 +99,8 @@ const RouteDetails: React.FC = () => {
                   </Typography>
                 </Typography>
               </Box>
-              <IconButton sx={{ color: "white" }}>
+              <IconButton sx={{ color: theme.palette.primary.contrastText }}>
+                {" "}
                 {expandedRoute === route.id ? <ExpandLess /> : <ExpandMore />}
               </IconButton>
             </Box>
@@ -100,7 +110,12 @@ const RouteDetails: React.FC = () => {
               timeout="auto"
               unmountOnExit
             >
-              <CardContent sx={{ bgcolor: "white", color: "black" }}>
+              <CardContent
+                sx={{
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                }}
+              >
                 <Typography
                   variant="subtitle1"
                   fontWeight="medium"

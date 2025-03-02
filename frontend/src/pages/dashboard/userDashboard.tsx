@@ -15,6 +15,31 @@ import {
   FaExclamationTriangle,
 } from "react-icons/fa";
 
+const features = [
+  {
+    icon: <FaBus />,
+    title: "View Routes",
+    description:
+      "Access all available bus routes and view details like stops and schedules.",
+  },
+  {
+    icon: <FaRegClock />,
+    title: "Check Schedule",
+    description:
+      "Know exactly when your bus will arrive and plan your day ahead.",
+  },
+  {
+    icon: <FaMapMarkedAlt />,
+    title: "Real-Time Location",
+    description: "Track buses in real-time and never miss your ride again.",
+  },
+  {
+    icon: <FaExclamationTriangle />,
+    title: "Report Complaints",
+    description: "Have an issue? Log complaints to help improve bus services.",
+  },
+];
+
 const UserDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -22,14 +47,13 @@ const UserDashboard = () => {
   return (
     <Box
       sx={{
-        mt: 6,
-        ml: 2,
-        mr: 2,
-        mb: 2,
         minHeight: "95vh",
-        background: "linear-gradient(to right, #0b2f68, #431cd2, #377ece)",
+        background: theme.palette.background.default,
         borderRadius: "8px",
-        color: "white",
+        color: theme.palette.text.primary,
+        p: theme.spacing(2),
+
+        mt: { xs: "56px", sm: "64px" },
       }}
     >
       <Container
@@ -37,10 +61,11 @@ const UserDashboard = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          py: 4,
+          py: theme.spacing(4),
         }}
       >
-        <Box sx={{ textAlign: "center", mb: 6 }}>
+        {/* Header Section */}
+        <Box sx={{ textAlign: "center", mb: theme.spacing(6) }}>
           <Typography variant="h4" fontWeight="bold" gutterBottom>
             Welcome here
           </Typography>
@@ -50,13 +75,15 @@ const UserDashboard = () => {
           </Typography>
         </Box>
 
+        {/* Features Section */}
         <Paper
           sx={{
             width: "100%",
             maxWidth: "95%",
-            padding: 4,
+            p: theme.spacing(4),
             borderRadius: 2,
             boxShadow: 3,
+            backgroundColor: theme.palette.background.paper,
           }}
         >
           <Typography variant="h5" fontWeight="bold" color="primary" mb={4}>
@@ -68,54 +95,34 @@ const UserDashboard = () => {
             It's your go-to tool for a smooth and reliable journey.
           </Typography>
 
+          {/* Feature Cards */}
           <Box
             sx={{
               display: "flex",
               flexDirection: isMobile ? "column" : "row",
               justifyContent: "center",
-              gap: 4,
+              gap: theme.spacing(4),
               flexWrap: "wrap",
             }}
           >
-            {[
-              {
-                icon: <FaBus />,
-                title: "View Routes",
-                description:
-                  "Access all available bus routes and view details like stops and schedules.",
-              },
-              {
-                icon: <FaRegClock />,
-                title: "Check Schedule",
-                description:
-                  "Know exactly when your bus will arrive and plan your day ahead.",
-              },
-              {
-                icon: <FaMapMarkedAlt />,
-                title: "Real-Time Location",
-                description:
-                  "Track buses in real-time and never miss your ride again.",
-              },
-              {
-                icon: <FaExclamationTriangle />,
-                title: "Report Complaints",
-                description:
-                  "Have an issue? Log complaints to help improve bus services.",
-              },
-            ].map((item, index) => (
+            {features.map((item, index) => (
               <Paper
                 key={index}
                 sx={{
-                  padding: 4,
-                  backgroundColor: "primary.main",
-                  color: "white",
+                  p: theme.spacing(4),
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   borderRadius: 2,
                   textAlign: "center",
                   flex: isMobile ? "1 1 100%" : "1 1 calc(25% - 32px)",
                   minWidth: "250px",
+                  transition: "transform 0.3s ease-in-out",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
                 }}
               >
-                <IconButton sx={{ fontSize: 40, mb: 2 }}>
+                <IconButton sx={{ fontSize: 40, mb: 2, color: "inherit" }}>
                   {item.icon}
                 </IconButton>
                 <Typography variant="h6" fontWeight="bold">

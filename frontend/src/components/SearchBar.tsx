@@ -1,7 +1,6 @@
 import React from "react";
-import { TextField, InputAdornment } from "@mui/material";
+import { TextField, InputAdornment, useTheme } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { indigo } from "@mui/material/colors";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -16,6 +15,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search...",
   isMobile = false,
 }) => {
+  const theme = useTheme();
+
   return (
     <TextField
       fullWidth
@@ -31,7 +32,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
-            <Search sx={{ color: indigo[500] }} />
+            <Search sx={{ color: theme.palette.secondary.main }} />
           </InputAdornment>
         ),
       }}

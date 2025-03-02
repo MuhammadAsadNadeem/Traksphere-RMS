@@ -7,9 +7,9 @@ import {
   InputAdornment,
   SxProps,
   Theme,
+  useTheme,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { indigo } from "@mui/material/colors";
 
 interface TableProps {
   title: string;
@@ -32,6 +32,8 @@ const Table = ({
   searchPlaceholder = "Search...",
   height = 300,
 }: TableProps) => {
+  const theme = useTheme();
+
   return (
     <Box sx={{ mt: 6, p: 2, ...sx }}>
       <Box
@@ -44,7 +46,12 @@ const Table = ({
       >
         <Typography
           variant="h4"
-          sx={{ mb: 2, color: indigo[700], width: "90%", textAlign: "left" }}
+          sx={{
+            mb: 2,
+            color: theme.palette.secondary[700],
+            width: "90%",
+            textAlign: "left",
+          }}
         >
           {title}
         </Typography>
@@ -63,7 +70,7 @@ const Table = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ color: indigo[500] }} />
+                <Search sx={{ color: theme.palette.secondary[500] }} />
               </InputAdornment>
             ),
           }}
@@ -86,12 +93,12 @@ const Table = ({
             pageSizeOptions={[5, 10]}
             sx={{
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
+                backgroundColor: theme.palette.secondary[50],
+                color: theme.palette.secondary[900],
               },
               "& .MuiDataGrid-footerContainer": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
+                backgroundColor: theme.palette.secondary[50],
+                color: theme.palette.secondary.main,
               },
             }}
           />

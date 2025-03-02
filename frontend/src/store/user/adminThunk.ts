@@ -197,6 +197,7 @@ export const addNewStop = createAsyncThunk(AdminApiPathEnum.ADD_STOP,
     async (values: UpdateBusStopType, { rejectWithValue }) => {
         try {
             const res = await instance.post(AdminApiPathEnum.ADD_STOP, values);
+            console.log(res);
             if (res.status === HttpStatusCode.Ok) {
                 toaster.success(res.data.message);
                 return res.data.data;

@@ -12,7 +12,6 @@ import {
   IconButton,
   useTheme,
 } from "@mui/material";
-import { indigo } from "@mui/material/colors";
 import { motion } from "framer-motion";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -48,13 +47,11 @@ const SideBar = () => {
           width: isMobile ? "100vw" : isSidebarExpanded ? 240 : 64,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: isMobile ? "55vw" : isSidebarExpanded ? 240 : 64,
-
-            bgcolor: indigo[700],
+            width: isMobile ? "64vw" : isSidebarExpanded ? 240 : 64,
+            bgcolor: theme.palette.primary.main,
             color: "#fff",
             height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
-            top: theme.mixins.toolbar.minHeight,
-
+            top: "63px",
             transition: theme.transitions.create(["width", "transform"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
@@ -135,10 +132,10 @@ const SideBar = () => {
           sx={{
             position: "fixed",
             left: 0,
-            top: "8%",
+            top: "9%",
             transform: "translateY(-50%)",
             zIndex: theme.zIndex.drawer + 1,
-            color: indigo[700],
+            color: theme.palette.primary.main,
             backgroundColor: "rgba(255, 255, 255, 0.59)",
             borderRadius: "0 8px 8px 0",
             boxShadow: 2,

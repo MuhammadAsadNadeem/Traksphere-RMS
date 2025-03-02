@@ -1,17 +1,17 @@
 import LoginPage from "./pages/logIn/index";
 import ForgotPassword from "./pages/forgotPassword/index";
 import SignUp from "./pages/signUp/signupPart1";
-import LandingPage from "./pages/landingPage/index";
 import Dashboard from "./pages/dashboard";
 import UserManagement from "./pages/userManagement";
 import DriverManagement from "./pages/driverMangement";
 import StopManagement from "./pages/stopMangement";
 import ChangePassword from "./pages/changePassword";
-import RouteManagement from "./pages/routeManagement/routes";
+import RouteManagement from "./pages/routeManagement";
 import RouteDetails from "./pages/routeDetails";
 import UserProfile from "./pages/userProfile";
 import Profile from "./pages/signUp/signupPart2";
 import LiveTracking from "./pages/liveTracking";
+import LandingPage from "./pages/landingPage";
 
 export const routes = {
   login: "/login",
