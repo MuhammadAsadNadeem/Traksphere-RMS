@@ -3,7 +3,7 @@ import { ThemeProvider } from "@mui/material";
 import { PublicRoutes, PrivateRoutes } from "./routes";
 import Public from "./layouts/public";
 import Private from "./layouts/private";
-import { theme } from "./config/theme";
+import { theme } from "./theme";
 
 const router = createBrowserRouter([
   {

@@ -127,7 +127,7 @@ const ContactSection = () => {
                 sx={{
                   fontWeight: 800,
                   fontSize: { xs: "2.5rem", md: "3.5rem" },
-                  color: theme.palette.text.primary,
+                  color: theme.palette.primary.main,
                   mb: 3,
                 }}
               >
@@ -236,7 +236,7 @@ const ContactSection = () => {
                           variant="h6"
                           sx={{ color: theme.palette.text.primary }}
                         >
-                          contact@traksphere.com
+                          traksphere@gmail.com
                         </Typography>
                       </Box>
                     </InfoItem>

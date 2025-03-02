@@ -13,7 +13,6 @@ import {
   IconButton,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import { indigo } from "@mui/material/colors";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
 import UserForm from "../../components/forms/UserForm";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -38,12 +37,10 @@ const UserManagement: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch users when component mounts
   useEffect(() => {
     dispatch(fetchAllUsers({}));
   }, [dispatch]);
 
-  // Handlers
   const handleEditUser = useCallback((user: UserResponse) => {
     setSelectedUser(user);
     setOpenDialog(true);
@@ -84,7 +81,6 @@ const UserManagement: React.FC = () => {
     }
   }, [selectedUser, dispatch]);
 
-  // Memoized filtering of users based on search query
   const filteredUsers = useMemo(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
     return (users || [])
@@ -101,7 +97,6 @@ const UserManagement: React.FC = () => {
       );
   }, [users, searchQuery]);
 
-  // Define DataGrid columns and adjust for mobile view
   const columns: GridColDef[] = useMemo(() => {
     const commonColumns: GridColDef[] = [
       { field: "displayId", headerName: "ID", width: 80 },
@@ -110,7 +105,6 @@ const UserManagement: React.FC = () => {
       { field: "phoneNumber", headerName: "Contact No", width: 120 },
     ];
 
-    // Show extra columns on larger screens
     if (!isMobile) {
       commonColumns.push(
         {
@@ -124,7 +118,6 @@ const UserManagement: React.FC = () => {
       );
     }
 
-    // Action column with edit and delete buttons
     commonColumns.push({
       field: "actions",
       headerName: "Actions",
@@ -132,7 +125,7 @@ const UserManagement: React.FC = () => {
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleEditUser(params.row)}>
-            <Edit sx={{ color: indigo[500] }} />
+            <Edit sx={{ color: theme.palette.primary.main }} />
           </IconButton>
           <IconButton onClick={() => handleDeleteUser(params.row.id)}>
             <Delete sx={{ color: "red" }} />
@@ -142,7 +135,7 @@ const UserManagement: React.FC = () => {
     });
 
     return commonColumns;
-  }, [handleEditUser, handleDeleteUser, isMobile]);
+  }, [handleEditUser, handleDeleteUser, isMobile, theme.palette.primary.main]);
 
   return (
     <Box sx={{ height: "90vh", p: isMobile ? 1 : 3 }}>
@@ -152,20 +145,20 @@ const UserManagement: React.FC = () => {
           justifyContent: "flex-end",
           width: "100%",
           p: 3,
-          mt: 3,
+          mt: 7,
           mb: 2,
         }}
       >
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="Search By Name, Email, Contact Number"
+          placeholder="Search User..."
           isMobile={isMobile}
         />
       </Box>
       <Typography
         variant="h4"
-        sx={{ mb: 2, mt: 2, color: indigo[700], width: "95%" }}
+        sx={{ mb: 2, mt: 2, color: theme.palette.primary.main, width: "95%" }}
       >
         Manage Users
       </Typography>
@@ -179,12 +172,12 @@ const UserManagement: React.FC = () => {
           pageSizeOptions={[5, 10]}
           sx={{
             "& .MuiDataGrid-columnHeader": {
-              backgroundColor: indigo[50],
-              color: indigo[900],
+              backgroundColor: theme.table.backgroundColor,
+              color: theme.table.color,
             },
             "& .MuiDataGrid-footerContainer": {
-              backgroundColor: indigo[50],
-              color: indigo[900],
+              backgroundColor: theme.table.backgroundColor,
+              color: theme.table.color,
             },
           }}
         />
@@ -196,7 +189,11 @@ const UserManagement: React.FC = () => {
         maxWidth="sm"
       >
         <DialogTitle
-          sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
+          sx={{
+            backgroundColor: theme.palette.secondary.main,
+            color: "#fff",
+            fontSize: "20px",
+          }}
         >
           Update User
         </DialogTitle>
@@ -208,14 +205,25 @@ const UserManagement: React.FC = () => {
             )
           }
         />
-        <DialogActions sx={{ backgroundColor: indigo[50], p: "10px" }}>
+        <DialogActions
+          sx={{ backgroundColor: theme.table.backgroundColor, p: "10px" }}
+        >
           <Button
             onClick={() => setOpenDialog(false)}
-            sx={{ color: indigo[900] }}
+            sx={{ color: theme.button.backgroundColor }}
           >
             Cancel
           </Button>
-          <Button onClick={handleUpdateUser} sx={{ color: indigo[700] }}>
+          <Button
+            onClick={handleUpdateUser}
+            sx={{
+              backgroundColor: theme.button.backgroundColor,
+              color: theme.button.color,
+              "&:hover": {
+                backgroundColor: theme.button.hoverBackgroundColor,
+              },
+            }}
+          >
             Save
           </Button>
         </DialogActions>

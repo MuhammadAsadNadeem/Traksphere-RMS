@@ -1,6 +1,7 @@
 import React from "react";
-import { TextField, InputAdornment, useTheme } from "@mui/material";
+import { TextField, InputAdornment } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import { grey } from "@mui/material/colors";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -14,30 +15,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearchChange,
   placeholder = "Search...",
   isMobile = false,
-}) => {
-  const theme = useTheme();
-
-  return (
-    <TextField
-      fullWidth
-      margin="normal"
-      variant="outlined"
-      placeholder={placeholder}
-      value={searchQuery}
-      onChange={(e) => onSearchChange(e.target.value)}
-      sx={{
-        width: isMobile ? "40%" : "20%",
-        ml: 2,
-      }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <Search sx={{ color: theme.palette.secondary.main }} />
-          </InputAdornment>
-        ),
-      }}
-    />
-  );
-};
+}) => (
+  <TextField
+    value={searchQuery}
+    onChange={(e) => onSearchChange(e.target.value)}
+    placeholder={placeholder}
+    variant="outlined"
+    size="small"
+    sx={{
+      width: isMobile ? "100%" : "300px",
+      backgroundColor: "#fff",
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+        "&:hover fieldset": {
+          borderColor: grey[400],
+        },
+      },
+    }}
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <Search sx={{ color: grey[500] }} />
+        </InputAdornment>
+      ),
+    }}
+  />
+);
 
 export default SearchBar;

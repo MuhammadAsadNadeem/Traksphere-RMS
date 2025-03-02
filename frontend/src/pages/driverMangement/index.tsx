@@ -13,7 +13,6 @@ import {
   Paper,
 } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
-import { indigo } from "@mui/material/colors";
 import { DriverResponse } from "../../types/admin.types";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
@@ -176,10 +175,10 @@ const DriverManagement: React.FC = () => {
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleEditDriver(params.row)}>
-            <Edit sx={{ color: indigo[500] }} />
+            <Edit sx={{ color: theme.palette.primary.main }} />
           </IconButton>
           <IconButton onClick={() => handleDeleteDriver(params.row.id)}>
-            <Delete sx={{ color: "red" }} />
+            <Delete sx={{ color: theme.palette.error.main }} />
           </IconButton>
         </>
       ),
@@ -194,14 +193,14 @@ const DriverManagement: React.FC = () => {
           justifyContent: "flex-end",
           width: "100%",
           p: 3,
-          mt: 3,
+          mt: 10,
           mb: 2,
         }}
       >
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="Search By CNIC"
+          placeholder="Search Driver..."
           isMobile={isMobile}
         />
       </Box>
@@ -218,7 +217,7 @@ const DriverManagement: React.FC = () => {
           sx={{
             mb: 2,
             mt: 2,
-            color: indigo[700],
+            color: theme.palette.primary.dark,
             width: "95%",
           }}
         >
@@ -239,8 +238,11 @@ const DriverManagement: React.FC = () => {
             startIcon={<Add />}
             onClick={handleAddDriver}
             sx={{
-              backgroundColor: indigo[500],
-              "&:hover": { backgroundColor: indigo[900] },
+              backgroundColor: theme.button.backgroundColor,
+              color: theme.button.color,
+              "&:hover": {
+                backgroundColor: theme.button.hoverBackgroundColor,
+              },
               minWidth: isMobile ? "20%" : "auto",
             }}
           >
@@ -250,7 +252,7 @@ const DriverManagement: React.FC = () => {
 
         <Paper
           sx={{
-            height: 300,
+            height: 400,
             mt: 2,
             width: "95%",
           }}
@@ -267,12 +269,12 @@ const DriverManagement: React.FC = () => {
             sx={{
               "& .MuiDataGrid-cell": {},
               "& .MuiDataGrid-columnHeader": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
+                backgroundColor: theme.table.backgroundColor,
+                color: theme.table.color,
               },
               "& .MuiDataGrid-footerContainer": {
-                backgroundColor: indigo[50],
-                color: indigo[900],
+                backgroundColor: theme.table.backgroundColor,
+                color: theme.table.color,
               },
             }}
           />
@@ -281,7 +283,11 @@ const DriverManagement: React.FC = () => {
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle
-          sx={{ backgroundColor: indigo[500], color: "#fff", fontSize: "20px" }}
+          sx={{
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            fontSize: "20px",
+          }}
         >
           {isAddMode ? "Add New Driver" : "Update Driver"}
         </DialogTitle>
@@ -291,14 +297,28 @@ const DriverManagement: React.FC = () => {
             setSelectedDriver({ ...selectedDriver!, [field]: value })
           }
         />
-        <DialogActions sx={{ backgroundColor: indigo[50], padding: "10px" }}>
+        <DialogActions
+          sx={{
+            backgroundColor: theme.table.backgroundColor,
+            padding: "10px",
+          }}
+        >
           <Button
             onClick={() => setOpenDialog(false)}
-            sx={{ color: indigo[900] }}
+            sx={{ color: theme.button.backgroundColor }}
           >
             Cancel
           </Button>
-          <Button onClick={handleSaveDriver} sx={{ color: indigo[700] }}>
+          <Button
+            onClick={handleSaveDriver}
+            sx={{
+              backgroundColor: theme.button.backgroundColor,
+              color: theme.button.color,
+              "&:hover": {
+                backgroundColor: theme.button.hoverBackgroundColor,
+              },
+            }}
+          >
             {isAddMode ? "Add" : "Save"}
           </Button>
         </DialogActions>
