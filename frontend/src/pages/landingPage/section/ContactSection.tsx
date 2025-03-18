@@ -274,7 +274,8 @@ const ContactSection = () => {
                           variant="h6"
                           sx={{ color: theme.palette.text.primary }}
                         >
-                          University of Engineering and Technology, Lahore
+                          University of Engineering and Technology, Lahore{" "}
+                          <br /> (New Campus)
                           <br />
                           Electrical Engineering Department
                         </Typography>

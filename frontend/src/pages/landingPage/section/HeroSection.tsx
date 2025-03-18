@@ -1,231 +1,227 @@
-import { Typography, useTheme, IconButton, Box } from "@mui/material";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-
-import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PeopleIcon from "@mui/icons-material/People";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import SecurityIcon from "@mui/icons-material/Security";
-import SpeedIcon from "@mui/icons-material/Speed";
-
+import React from "react";
 import {
-  HeroContainer,
-  HeroContent,
-  CTAButton,
-  StatsContainer,
-  StatCard,
-  FeatureGrid,
-  FeatureCard,
-  ScrollDownButton,
-} from "./StyledComponents";
+  Box,
+  Container,
+  Typography,
+  Button,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { routes } from "../../../routes";
 
-const stats = [
-  {
-    icon: <DirectionsBusIcon />,
-    value: "100+",
-    label: "Active Buses",
-    description: "Serving your campus daily",
-  },
-  {
-    icon: <PeopleIcon />,
-    value: "10K+",
-    label: "Daily Users",
-    description: "Students trust our service",
-  },
-  {
-    icon: <AccessTimeIcon />,
-    value: "99.9%",
-    label: "On-Time Rate",
-    description: "Reliable transportation",
-  },
-];
-
-const features = [
-  {
-    icon: <LocationOnIcon />,
-    title: "Real-time Tracking",
-    description: "Track your bus location live",
-  },
-  {
-    icon: <NotificationsActiveIcon />,
-    title: "Smart Alerts",
-    description: "Never miss your bus again",
-  },
-  {
-    icon: <SecurityIcon />,
-    title: "Enhanced Safety",
-    description: "Your security is our priority",
-  },
-  {
-    icon: <SpeedIcon />,
-    title: "Route Optimization",
-    description: "Fastest routes guaranteed",
-  },
-];
-
-const titleVariants = {
-  hidden: { opacity: 0, y: -50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
-};
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
-
-const HeroSection = () => {
+const HeroSection: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
-  const scrollToFeatures = () => {
-    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <HeroContainer id="home">
-      <HeroContent
-        style={{ opacity, y }}
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+    <Box
+      component="section"
+      sx={{
+        position: "relative",
+        minHeight: { xs: "calc(100vh - 64px)", md: "calc(100vh - 80px)" },
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
+        pt: { xs: 8, sm: 12, md: 16 },
+        pb: { xs: 12, sm: 16, md: 20 },
+      }}
+    >
+      {/* Background Gradient */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}15 100%)`,
+          zIndex: -1,
         }}
-      >
-        <Box component={motion.div} variants={titleVariants}>
-          <Typography
-            variant="h1"
-            sx={{
-              mt: 8,
-              fontSize: { xs: "2.5rem", md: "4.5rem" },
-              fontWeight: 800,
-              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 2,
-            }}
-          >
-            TrakSphere
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: "1.5rem", md: "2.5rem" },
-              fontWeight: 600,
-              color: theme.palette.text.primary,
-              mb: 2,
-            }}
-          >
-            Smart Bus Route Management System
-          </Typography>
-        </Box>
+      />
 
-        <motion.div variants={fadeInUp}>
-          <Typography
-            variant="h6"
+      {/* Content Container */}
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: { xs: 6, md: 8 },
+          }}
+        >
+          {/* Left Content */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
             sx={{
-              fontSize: { xs: "1rem", md: "1.25rem" },
-              fontWeight: 300,
-              color: theme.palette.text.secondary,
-              maxWidth: "800px",
-              mx: "auto",
-              mb: 4,
+              flex: "1 1 auto",
+              maxWidth: { xs: "100%", md: "60%" },
+              textAlign: { xs: "center", md: "left" },
             }}
           >
-            Experience the future of campus transportation with real-time
-            tracking, optimized routes, and enhanced student safety—all in one
-            powerful platform.
-          </Typography>
-        </motion.div>
-
-        <motion.div variants={fadeInUp}>
-          <CTAButton
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            variant="contained"
-            onClick={() => navigate(routes.signup)}
-          >
-            Get Started Now
-          </CTAButton>
-        </motion.div>
-
-        <StatsContainer>
-          {stats.map((stat, index) => (
-            <StatCard
-              key={index}
-              variants={fadeInUp}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            <Typography
+              variant="h1"
+              component={motion.h1}
+              sx={{
+                fontSize: {
+                  xs: "2.5rem",
+                  sm: "3.5rem",
+                  md: "4rem",
+                  lg: "4.5rem",
+                },
+                fontWeight: 800,
+                lineHeight: 1.1,
+                mb: { xs: 2, md: 3 },
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+              }}
             >
-              {stat.icon}
-              <Typography
-                variant="h3"
+              Traksphere Smart Transit Solutions for Modern Campus
+            </Typography>
+
+            <Typography
+              variant="h2"
+              sx={{
+                fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
+                color: theme.palette.text.secondary,
+                fontWeight: 400,
+                lineHeight: 1.5,
+                mb: { xs: 4, md: 5 },
+                maxWidth: "600px",
+                mx: { xs: "auto", md: 0 },
+              }}
+            >
+              Experience seamless campus transportation with real-time tracking
+              and smart notifications
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 2, sm: 3 },
+                justifyContent: { xs: "center", md: "flex-start" },
+              }}
+            >
+              <Button
+                component={motion.button}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                variant="contained"
+                size={isMobile ? "large" : "large"}
+                onClick={() => navigate(routes.signup)}
+                endIcon={<ArrowForwardIcon />}
                 sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: "2rem", md: "2.5rem" },
-                  my: 1,
+                  py: { xs: 1.5, md: 2 },
+                  px: { xs: 4, md: 6 },
+                  borderRadius: 2,
+                  fontSize: { xs: "1rem", md: "1.125rem" },
+                  fontWeight: 600,
+                  textTransform: "none",
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+                  "&:hover": {
+                    background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
+                  },
                 }}
               >
-                {stat.value}
-              </Typography>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {stat.label}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: theme.palette.text.secondary, opacity: 0.8 }}
-              >
-                {stat.description}
-              </Typography>
-            </StatCard>
-          ))}
-        </StatsContainer>
+                Get Started Free
+              </Button>
+            </Box>
 
-        <FeatureGrid>
-          {features.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              variants={fadeInUp}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            {/* Stats */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(3, 1fr)",
+                },
+                gap: { xs: 3, sm: 4 },
+                mt: { xs: 6, md: 8 },
+              }}
             >
-              <Box>{feature.icon}</Box>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {feature.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.text.secondary }}
+              {[
+                { value: "50+", label: "Active Routes" },
+                { value: "1000+", label: "Daily Riders" },
+                { value: "99.9%", label: "On-time Rate" },
+              ].map((stat, index) => (
+                <Box
+                  key={index}
+                  component={motion.div}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 }}
+                  sx={{
+                    textAlign: "center",
+                    p: 2,
+                  }}
                 >
-                  {feature.description}
-                </Typography>
-              </Box>
-            </FeatureCard>
-          ))}
-        </FeatureGrid>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontSize: { xs: "2rem", md: "2.5rem" },
+                      fontWeight: 700,
+                      mb: 1,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      fontSize: { xs: "1rem", md: "1.125rem" },
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
 
-        <ScrollDownButton
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          onClick={scrollToFeatures}
-        >
-          <IconButton>
-            <KeyboardArrowDownIcon
-              sx={{ fontSize: 40, color: theme.palette.primary.main }}
+          {/* Right Content - Image */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            sx={{
+              flex: "0 0 auto",
+              width: { xs: "100%", md: "40%" },
+              display: { xs: "none", md: "block" },
+            }}
+          >
+            <Box
+              component="img"
+              src="src/assets/images/hero-illustration.svg"
+              alt="Smart Transit"
+              sx={{
+                width: "100%",
+                height: "auto",
+                maxWidth: "500px",
+                mx: "auto",
+                filter: "drop-shadow(0 8px 24px rgba(0, 0, 0, 0.1))",
+              }}
             />
-          </IconButton>
-        </ScrollDownButton>
-      </HeroContent>
-    </HeroContainer>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

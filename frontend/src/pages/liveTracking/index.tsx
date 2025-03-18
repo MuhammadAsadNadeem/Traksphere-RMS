@@ -95,7 +95,7 @@ const LiveTracking: React.FC = () => {
         // Move to the next coordinate
         setCurrentIndex((prev) => prev + 1);
       }
-    }, 1000);
+    }, 500);
 
     // Clear interval on cleanup
     return () => clearInterval(interval);

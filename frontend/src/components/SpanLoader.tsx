@@ -1,53 +1,60 @@
 import React from "react";
-import { Box, keyframes } from "@mui/material";
+import { Box, keyframes, Typography } from "@mui/material";
 
-const scaleAnimation = keyframes`
-  0%, 40%, 100% {
-    transform: scaleY(0.2);
-    opacity: 0.6;
-  }
-  20% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
+// Keyframe animation for rotating effect
+const rotate = keyframes`
+  0% { transform: rotate(0deg); opacity: 0.6; }
+  50% { transform: rotate(180deg); opacity: 1; }
+  100% { transform: rotate(360deg); opacity: 0.6; }
 `;
 
-const colors = ["#4c86f9", "#49a84c", "#f6bb02", "#a902f6", "#2196f3"];
+interface SpanLoaderProps {
+  size?: number; // Customizable size
+  speed?: number; // Customizable animation speed
+  message?: string; // Customizable loading message
+}
 
-const SpanLoader: React.FC = () => {
+const SpanLoader: React.FC<SpanLoaderProps> = ({
+  size = 100,
+  speed = 2,
+  message = "Loading...",
+}) => {
   return (
     <Box
       sx={{
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        height: "80vh",
+        height: "100vh",
         backgroundColor: "#f4f4f4",
       }}
     >
       <Box
+        component="img"
+        src="/src/assets/images/logo.svg"
+        alt="TrakSphere Logo"
+        onError={(e) => {
+          // Fallback in case the image fails to load
+          (e.target as HTMLImageElement).src = "/path/to/fallback-image.svg";
+        }}
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "120px",
-          gap: "8px",
+          width: size,
+          height: size,
+          animation: `${rotate} ${speed}s ease-in-out infinite`,
+        }}
+      />
+      <Typography
+        variant="body1"
+        sx={{
+          marginTop: 2,
+          color: "#333",
+          fontSize: "1.2rem",
+          fontWeight: "500",
         }}
       >
-        {colors.map((color, i) => (
-          <Box
-            key={i}
-            sx={{
-              width: "6px",
-              height: "50px",
-              backgroundColor: color,
-              borderRadius: "3px",
-              animation: `${scaleAnimation} 1s ease-in-out infinite`,
-              animationDelay: `${i * 0.15}s`,
-            }}
-          />
-        ))}
-      </Box>
+        {message}
+      </Typography>
     </Box>
   );
 };

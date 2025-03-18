@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
     fetchCounts, fetchAllBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop,
-    editStopById,
+    // editStopById,
     deleteStopById,
 } from "./adminThunk";
 import { CountsResponse, BusStopResponse, UserResponse, DriverResponse } from "../../types/admin.types";
@@ -153,22 +153,22 @@ const adminSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            .addCase(editStopById.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(editStopById.fulfilled, (state, action) => {
-                if (!action.payload?.id) return;
-                const index = state.busStops.findIndex(d => d.id === action.payload.id);
-                if (index !== -1) {
-                    state.drivers[index] = action.payload;
-                }
-                state.loading = false;
-            })
-            .addCase(editStopById.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
+            // .addCase(editStopById.pending, (state) => {
+            //     state.loading = true;
+            //     state.error = null;
+            // })
+            // .addCase(editStopById.fulfilled, (state, action) => {
+            //     if (!action.payload?.id) return;
+            //     const index = state.busStops.findIndex(d => d.id === action.payload.id);
+            //     if (index !== -1) {
+            //         state.drivers[index] = action.payload;
+            //     }
+            //     state.loading = false;
+            // })
+            // .addCase(editStopById.rejected, (state, action) => {
+            //     state.loading = false;
+            //     state.error = action.payload as string;
+            // })
             .addCase(deleteStopById.pending, (state) => {
                 state.loading = true;
                 state.error = null;

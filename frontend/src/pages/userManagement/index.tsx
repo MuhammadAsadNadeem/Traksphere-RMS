@@ -24,13 +24,14 @@ import {
 import { UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
+import SpanLoader from "../../components/SpanLoader";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const users = useAppSelector((state) => state.adminSlice.users);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,7 +39,12 @@ const UserManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    dispatch(fetchAllUsers({}));
+    setIsLoading(true);
+    dispatch(fetchAllUsers({}))
+      .catch(() => {
+        toaster.error("Failed to fetch users.");
+      })
+      .finally(() => setIsLoading(false));
   }, [dispatch]);
 
   const handleEditUser = useCallback((user: UserResponse) => {
@@ -99,7 +105,7 @@ const UserManagement: React.FC = () => {
 
   const columns: GridColDef[] = useMemo(() => {
     const commonColumns: GridColDef[] = [
-      { field: "displayId", headerName: "ID", width: 80 },
+      { field: "displayId", headerName: "ID", width: 100 },
       { field: "fullName", headerName: "Full Name", width: 150 },
       { field: "email", headerName: "Email", width: 150 },
       { field: "phoneNumber", headerName: "Contact No", width: 120 },
@@ -124,10 +130,16 @@ const UserManagement: React.FC = () => {
       width: 120,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleEditUser(params.row)}>
+          <IconButton
+            onClick={() => handleEditUser(params.row)}
+            aria-label="edit"
+          >
             <Edit sx={{ color: theme.palette.primary.main }} />
           </IconButton>
-          <IconButton onClick={() => handleDeleteUser(params.row.id)}>
+          <IconButton
+            onClick={() => handleDeleteUser(params.row.id)}
+            aria-label="delete"
+          >
             <Delete sx={{ color: "red" }} />
           </IconButton>
         </>
@@ -138,14 +150,14 @@ const UserManagement: React.FC = () => {
   }, [handleEditUser, handleDeleteUser, isMobile, theme.palette.primary.main]);
 
   return (
-    <Box sx={{ height: "90vh", p: isMobile ? 1 : 3 }}>
+    <Box sx={{ p: 4, ml: 2, height: "80vh" }}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
           width: "100%",
           p: 3,
-          mt: 7,
+          mt: 10,
           mb: 2,
         }}
       >
@@ -158,29 +170,57 @@ const UserManagement: React.FC = () => {
       </Box>
       <Typography
         variant="h4"
-        sx={{ mb: 2, mt: 2, color: theme.palette.primary.main, width: "95%" }}
+        sx={{
+          mb: 2,
+          mt: 2,
+          color: theme.palette.primary.dark,
+          width: "95%",
+        }}
       >
         Manage Users
       </Typography>
-      <Paper sx={{ height: 400, width: "90%" }}>
-        <DataGrid
-          rows={filteredUsers}
-          columns={columns}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10, page: 0 } },
-          }}
-          pageSizeOptions={[5, 10]}
-          sx={{
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: theme.table.backgroundColor,
-              color: theme.table.color,
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: theme.table.backgroundColor,
-              color: theme.table.color,
-            },
-          }}
-        />
+
+      <Paper
+        sx={{
+          height: 400,
+          mt: 2,
+          width: "95%",
+        }}
+      >
+        {isLoading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <SpanLoader />
+          </Box>
+        ) : (
+          <DataGrid
+            rows={filteredUsers}
+            columns={columns}
+            getRowId={(row) => row.id}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: theme.table.backgroundColor,
+                color: theme.table.color,
+              },
+              "& .MuiDataGrid-footerContainer": {
+                backgroundColor: theme.table.backgroundColor,
+                color: theme.table.color,
+              },
+            }}
+          />
+        )}
       </Paper>
       <Dialog
         open={openDialog}

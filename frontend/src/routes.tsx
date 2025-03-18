@@ -12,6 +12,7 @@ import UserProfile from "./pages/userProfile";
 import Profile from "./pages/signUp/signupPart2";
 import LiveTracking from "./pages/liveTracking";
 import LandingPage from "./pages/landingPage";
+import StopForm from "./pages/stopMangement/stopForm";
 
 export const routes = {
   login: "/login",
@@ -29,6 +30,7 @@ export const routes = {
   routesDetails: "/routes-details",
   userProfile: "/user-profile",
   changePassword: "/change-password",
+  stopform: "/stop-form",
 };
 
 export const PrivateRoutes = [
@@ -91,5 +93,9 @@ export const PublicRoutes = [
   {
     path: routes.profile,
     element: <Profile />,
+  },
+  {
+    path: routes.stopform,
+    element: <StopForm />,
   },
 ];

@@ -6,7 +6,7 @@ import { setCounts, setLoading, setUsers } from "./adminSlice";
 import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import { DriverType, UpdateDriverType } from "../../types/driver.types";
-import { UpdateBusStopType } from "../../types/stop.types";
+import { BusStopType } from "../../types/stop.types";
 
 
 
@@ -194,7 +194,9 @@ export const fetchAllBusStops = createAsyncThunk<BusStopResponse[]>(
 
 
 export const addNewStop = createAsyncThunk(AdminApiPathEnum.ADD_STOP,
-    async (values: UpdateBusStopType, { rejectWithValue }) => {
+    async (values:
+
+        BusStopType, { rejectWithValue }) => {
         try {
             const res = await instance.post(AdminApiPathEnum.ADD_STOP, values);
             console.log(res);
@@ -208,21 +210,21 @@ export const addNewStop = createAsyncThunk(AdminApiPathEnum.ADD_STOP,
     }
 );
 
-export const editStopById = createAsyncThunk(
-    AdminApiPathEnum.UPDATE_STOP,
-    async ({ userId, values }: { userId: string; values: UpdateBusStopType }, { rejectWithValue }) => {
-        try {
-            const res = await instance.put(AdminApiPathEnum.UPDATE_STOP, values, {
-                params: { id: userId },
-            });
-            if (res.status === HttpStatusCode.Ok) {
-                return res.data.data;
-            }
-        } catch (error) {
-            return rejectWithValue(errorReturn(error));
-        }
-    }
-);
+// export const editStopById = createAsyncThunk(
+//     AdminApiPathEnum.UPDATE_STOP,
+//     async ({ userId, values }: { userId: string; values: UpdateBusStopType }, { rejectWithValue }) => {
+//         try {
+//             const res = await instance.put(AdminApiPathEnum.UPDATE_STOP, values, {
+//                 params: { id: userId },
+//             });
+//             if (res.status === HttpStatusCode.Ok) {
+//                 return res.data.data;
+//             }
+//         } catch (error) {
+//             return rejectWithValue(errorReturn(error));
+//         }
+//     }
+// );
 
 export const deleteStopById = createAsyncThunk(
     AdminApiPathEnum.DElETE_STOP,
@@ -251,7 +253,7 @@ export default {
     deleteDriverById,
     fetchAllBusStops,
     addNewStop,
-    editStopById,
+    // editStopById,
     deleteStopById,
 
 
