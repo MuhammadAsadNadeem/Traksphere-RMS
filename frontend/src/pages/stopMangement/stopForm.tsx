@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Button,
   DialogActions,
+  CircularProgress,
 } from "@mui/material";
 
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -15,6 +16,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { theme } from "../../theme";
 
 interface Location {
   place_id: number;
@@ -127,6 +129,16 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
     }, 500);
   };
 
+  const handleMarkerDragEnd = (event: L.LeafletEvent) => {
+    const marker = event.target;
+    const newLatLng = marker.getLatLng();
+    setSelectedLocation({
+      ...selectedLocation!,
+      lat: newLatLng.lat.toString(),
+      lon: newLatLng.lng.toString(),
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -190,7 +202,25 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
             }}
             loading={loading}
             renderInput={(params) => (
-              <TextField {...params} label="Search Location" fullWidth />
+              <TextField
+                {...params}
+                label="Search Location"
+                fullWidth
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loading ? (
+                        <CircularProgress
+                          sx={{ color: theme.palette.primary.dark }}
+                          size={20}
+                        />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
             )}
           />
 
@@ -209,6 +239,10 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
                     parseFloat(selectedLocation.lon),
                   ]}
                   icon={customIcon}
+                  draggable={true}
+                  eventHandlers={{
+                    dragend: handleMarkerDragEnd,
+                  }}
                 />
               )}
             </MapContainer>
