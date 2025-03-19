@@ -16,8 +16,9 @@ import { motion } from "framer-motion";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { adminMenu, userMenu } from "./Items";
-import { useAppSelector } from "../../store/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { checkUserRole } from "../../store/user/authThunk";
 
 const SideBar = () => {
   const theme = useTheme();
@@ -34,6 +35,12 @@ const SideBar = () => {
   useEffect(() => {
     setIsSidebarExpanded(!isMobile);
   }, [isMobile]);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(checkUserRole());
+  }, [dispatch]);
 
   return (
     <Box sx={{ height: "100vh" }}>

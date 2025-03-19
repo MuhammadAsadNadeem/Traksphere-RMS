@@ -26,6 +26,7 @@ import {
 import { UpdateDriverType } from "../../types/driver.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
+import SpanLoader from "../../components/SpanLoader";
 
 const DriverManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -38,14 +39,14 @@ const DriverManagement: React.FC = () => {
   const [driverToDelete, setDriverToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddMode, setIsAddMode] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    dispatch(fetchAllDrivers());
+    setIsLoading(true);
+    dispatch(fetchAllDrivers()).finally(() => setIsLoading(false));
   }, [dispatch]);
-
   const driversWithDisplayId = (drivers || [])
     .filter((driver) => driver != null)
     .map((driver, index) => ({
@@ -257,27 +258,40 @@ const DriverManagement: React.FC = () => {
             width: "95%",
           }}
         >
-          <DataGrid
-            rows={filteredDrivers}
-            columns={columns}
-            getRowId={(row) => row.id}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 10, page: 0 },
-              },
-            }}
-            sx={{
-              "& .MuiDataGrid-cell": {},
-              "& .MuiDataGrid-columnHeader": {
-                backgroundColor: theme.table.backgroundColor,
-                color: theme.table.color,
-              },
-              "& .MuiDataGrid-footerContainer": {
-                backgroundColor: theme.table.backgroundColor,
-                color: theme.table.color,
-              },
-            }}
-          />
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <SpanLoader />
+            </Box>
+          ) : (
+            <DataGrid
+              rows={filteredDrivers}
+              columns={columns}
+              getRowId={(row) => row.id}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 10, page: 0 },
+                },
+              }}
+              sx={{
+                "& .MuiDataGrid-cell": {},
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+              }}
+            />
+          )}
         </Paper>
       </Box>
 

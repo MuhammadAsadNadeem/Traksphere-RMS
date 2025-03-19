@@ -24,13 +24,14 @@ import {
 import { UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
+import SpanLoader from "../../components/SpanLoader";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const users = useAppSelector((state) => state.adminSlice.users);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,7 +39,8 @@ const UserManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    dispatch(fetchAllUsers({}));
+    setIsLoading(true);
+    dispatch(fetchAllUsers({})).finally(() => setIsLoading(false));
   }, [dispatch]);
 
   const handleEditUser = useCallback((user: UserResponse) => {
@@ -138,14 +140,14 @@ const UserManagement: React.FC = () => {
   }, [handleEditUser, handleDeleteUser, isMobile, theme.palette.primary.main]);
 
   return (
-    <Box sx={{ height: "90vh", p: isMobile ? 1 : 3 }}>
+    <Box sx={{ height: "80vh", ml: 1 }}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
           width: "100%",
           p: 3,
-          mt: 7,
+          mt: 10,
           mb: 2,
         }}
       >
@@ -156,83 +158,110 @@ const UserManagement: React.FC = () => {
           isMobile={isMobile}
         />
       </Box>
-      <Typography
-        variant="h4"
-        sx={{ mb: 2, mt: 2, color: theme.palette.primary.main, width: "95%" }}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "95%",
+        }}
       >
-        Manage Users
-      </Typography>
-      <Paper sx={{ height: 400, width: "90%" }}>
-        <DataGrid
-          rows={filteredUsers}
-          columns={columns}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10, page: 0 } },
-          }}
-          pageSizeOptions={[5, 10]}
+        <Typography
+          variant="h4"
           sx={{
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: theme.table.backgroundColor,
-              color: theme.table.color,
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: theme.table.backgroundColor,
-              color: theme.table.color,
-            },
-          }}
-        />
-      </Paper>
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle
-          sx={{
-            backgroundColor: theme.palette.secondary.main,
-            color: "#fff",
-            fontSize: "20px",
+            mb: 2,
+            mt: 2,
+            color: theme.palette.primary.dark,
+            width: "95%",
           }}
         >
-          Update User
-        </DialogTitle>
-        <UserForm
-          selectedUser={selectedUser}
-          onFieldChange={(field, value) =>
-            setSelectedUser((prev) =>
-              prev ? { ...prev, [field]: value } : prev
-            )
-          }
-        />
-        <DialogActions
-          sx={{ backgroundColor: theme.table.backgroundColor, p: "10px" }}
+          Manage Users
+        </Typography>
+        <Paper sx={{ height: 400, mt: 2, width: "95%" }}>
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <SpanLoader />
+            </Box>
+          ) : (
+            <DataGrid
+              rows={filteredUsers}
+              columns={columns}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 10, page: 0 } },
+              }}
+              pageSizeOptions={[5, 10]}
+              sx={{
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+              }}
+            />
+          )}
+        </Paper>
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          fullWidth
+          maxWidth="sm"
         >
-          <Button
-            onClick={() => setOpenDialog(false)}
-            sx={{ color: theme.button.backgroundColor }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleUpdateUser}
+          <DialogTitle
             sx={{
-              backgroundColor: theme.button.backgroundColor,
-              color: theme.button.color,
-              "&:hover": {
-                backgroundColor: theme.button.hoverBackgroundColor,
-              },
+              backgroundColor: theme.palette.secondary.main,
+              color: "#fff",
+              fontSize: "20px",
             }}
           >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
-      />
+            Update User
+          </DialogTitle>
+          <UserForm
+            selectedUser={selectedUser}
+            onFieldChange={(field, value) =>
+              setSelectedUser((prev) =>
+                prev ? { ...prev, [field]: value } : prev
+              )
+            }
+          />
+          <DialogActions
+            sx={{ backgroundColor: theme.table.backgroundColor, p: "10px" }}
+          >
+            <Button
+              onClick={() => setOpenDialog(false)}
+              sx={{ color: theme.button.backgroundColor }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateUser}
+              sx={{
+                backgroundColor: theme.button.backgroundColor,
+                color: theme.button.color,
+                "&:hover": {
+                  backgroundColor: theme.button.hoverBackgroundColor,
+                },
+              }}
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <DeleteConfirmationDialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={confirmDelete}
+        />
+      </Box>
     </Box>
   );
 };

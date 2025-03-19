@@ -19,6 +19,7 @@ import { useAppDispatch } from "../../store/hooks";
 import { LoginType } from "../../types/auth.types";
 import toaster from "../../utils/toaster";
 import { useNavigate } from "react-router-dom";
+// import { theme } from "../../theme";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -61,12 +62,12 @@ const Login = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh", // Ensure the container takes the full viewport height
+        minHeight: "100vh",
       }}
     >
       <Card
         sx={{
-          width: "100%", // Ensure the card takes the full width of the container
+          width: "100%",
           p: 4,
           display: "flex",
           flexDirection: "column",
@@ -76,6 +77,43 @@ const Login = () => {
           gap: 2,
         }}
       >
+        {/* <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            width: "100%",
+            p: 2,
+          }}
+        >
+        
+          <img
+            src="src/assets/images/logo.svg"
+            alt="Traksphere Logo"
+            style={{ width: 100, height: 100 }}
+          />
+
+         
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                color: theme.palette.primary.dark,
+                textAlign: "center",
+              }}
+            >
+              Traksphere
+            </Typography>
+          </Box>
+        </Box> */}
+
         <Typography variant="h4" align="center" fontWeight="bold">
           Login
         </Typography>

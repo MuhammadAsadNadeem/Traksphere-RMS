@@ -36,12 +36,11 @@ interface StopFormProps {
   onClose: () => void;
 }
 
-// Custom map component to handle location updates
 const MapComponent: React.FC<{ center: [number, number] }> = ({ center }) => {
   const map = useMap();
 
   useEffect(() => {
-    map.setView(center, 10);
+    map.setView(center, 12);
   }, [center, map]);
 
   return null;
@@ -77,7 +76,6 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
     shadowSize: [41, 41],
   });
 
-  // Cleanup timeout on component unmount
   useEffect(() => {
     return () => {
       if (searchTimeoutRef.current) {
@@ -160,7 +158,6 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
 
     onSubmit(stopData);
 
-    // Reset form state
     setSelectedLocation(null);
     setStopName("");
     setSearchQuery("");
