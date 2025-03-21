@@ -1,8 +1,7 @@
 import React from "react";
 import { TextField, InputAdornment } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { grey } from "@mui/material/colors";
-
+import theme from "../theme";
 interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -24,18 +23,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
     size="small"
     sx={{
       width: isMobile ? "100%" : "300px",
-      backgroundColor: "#fff",
+      backgroundColor: theme.palette.primary.contrastText,
       "& .MuiOutlinedInput-root": {
-        borderRadius: 2,
+        borderRadius: 3,
         "&:hover fieldset": {
-          borderColor: grey[400],
+          borderColor: theme.palette.primary.dark,
         },
       },
     }}
     InputProps={{
       startAdornment: (
         <InputAdornment position="start">
-          <Search sx={{ color: grey[500] }} />
+          <Search sx={{ color: theme.palette.primary.dark }} />
         </InputAdornment>
       ),
     }}

@@ -54,7 +54,7 @@ const ForgotPassword: React.FC = () => {
   });
 
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="sm">
       <Card
         sx={{
           p: 4,

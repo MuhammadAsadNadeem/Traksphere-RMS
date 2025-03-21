@@ -51,14 +51,14 @@ const SideBar = () => {
         open={isSidebarExpanded}
         onClose={handleSidebarToggle}
         sx={{
-          width: isMobile ? "100vw" : isSidebarExpanded ? 240 : 64,
+          width: isMobile ? "100vw" : isSidebarExpanded ? 240 : 45,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: isMobile ? "64vw" : isSidebarExpanded ? 240 : 64,
+            width: isMobile ? "45vw" : isSidebarExpanded ? 240 : 45,
             bgcolor: theme.palette.primary.main,
-            color: "#fff",
+            color: theme.palette.primary.contrastText,
             height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
-            top: "63px",
+            top: "55px",
             transition: theme.transitions.create(["width", "transform"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
@@ -70,9 +70,13 @@ const SideBar = () => {
           <ListItem sx={{ p: 0 }}>
             <ListItemButton onClick={handleSidebarToggle}>
               {isSidebarExpanded ? (
-                <ChevronLeftIcon sx={{ color: "#fff" }} />
+                <ChevronLeftIcon
+                  sx={{ color: theme.palette.primary.contrastText }}
+                />
               ) : (
-                <ChevronRightIcon sx={{ color: "#fff" }} />
+                <ChevronRightIcon
+                  sx={{ color: theme.palette.primary.contrastText }}
+                />
               )}
             </ListItemButton>
           </ListItem>
@@ -90,9 +94,9 @@ const SideBar = () => {
                   sx={{
                     backgroundColor:
                       location.pathname === item.view
-                        ? "rgba(255, 255, 255, 0.32)"
+                        ? theme.palette.primary.light
                         : "inherit",
-                    "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.32)" },
+                    "&:hover": { backgroundColor: theme.palette.primary.light },
                     mx: 1,
                     borderRadius: 1,
                     minHeight: 48,
@@ -143,12 +147,10 @@ const SideBar = () => {
             transform: "translateY(-50%)",
             zIndex: theme.zIndex.drawer + 1,
             color: theme.palette.primary.main,
-            backgroundColor: "rgba(255, 255, 255, 0.59)",
-            borderRadius: "0 8px 8px 0",
+            backgroundColor: "rgba(255, 255, 255, 0.11)",
+            borderRadius: 5,
             boxShadow: 2,
-            "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 1)",
-            },
+            transition: "transform 0.2s ease",
             visibility: isSidebarExpanded ? "hidden" : "visible",
           }}
         >

@@ -63,20 +63,20 @@ const Navbar: React.FC = () => {
       position="fixed"
       sx={{
         background: theme.palette.primary.main,
-        boxShadow: theme.shadows[3],
+        boxShadow: theme.shadows[5],
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Fade in timeout={1000}>
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box display="flex" alignItems="center" gap={1}>
             <Avatar
               src={logo}
               alt="TrakSphere"
-              sx={{ width: 40, height: 40 }}
+              sx={{ width: 50, height: 50 }}
             />
 
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
                 fontWeight: "bold",
                 color: theme.palette.primary.contrastText,
@@ -97,6 +97,11 @@ const Navbar: React.FC = () => {
                 component={Link}
                 href={routes.landingPage + url}
                 color="inherit"
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.light,
+                  },
+                }}
                 startIcon={icon}
               >
                 {name}
@@ -108,23 +113,39 @@ const Navbar: React.FC = () => {
               color="inherit"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
+              sx={{
+                "&:hover": {
+                  backgroundColor: theme.palette.primary.light,
+                },
+              }}
             >
               Logout
             </Button>
           ) : (
             <Box display="flex" gap={2}>
               <Button
-                variant="outlined"
-                color="inherit"
+                variant="contained"
+                color="secondary"
                 startIcon={<LoginIcon />}
                 onClick={() => navigate(routes.login)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.light,
+                  },
+                }}
               >
                 Login
               </Button>
               <Button
                 variant="contained"
+                color="secondary"
                 startIcon={<PersonAddIcon />}
                 onClick={() => navigate(routes.signup)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.primary.light,
+                  },
+                }}
               >
                 Sign Up
               </Button>
@@ -151,6 +172,7 @@ const Navbar: React.FC = () => {
             links.map(({ name, url, icon }) => (
               <MenuItem
                 key={name}
+                color="primary"
                 onClick={handleMenuClose}
                 component={Link}
                 href={routes.landingPage + url}
@@ -163,7 +185,7 @@ const Navbar: React.FC = () => {
               <Button
                 fullWidth
                 variant="outlined"
-                color="inherit"
+                color="primary"
                 startIcon={<LogoutIcon />}
                 onClick={handleLogout}
               >
@@ -173,8 +195,8 @@ const Navbar: React.FC = () => {
               <>
                 <Button
                   fullWidth
-                  variant="outlined"
-                  color="inherit"
+                  variant="contained"
+                  color="primary"
                   startIcon={<LoginIcon />}
                   onClick={() => navigate(routes.login)}
                 >
