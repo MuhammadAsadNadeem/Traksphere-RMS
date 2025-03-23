@@ -1,60 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import {
   Box,
   Button,
-  Paper,
-  Typography,
   Dialog,
   DialogTitle,
   DialogActions,
-  useTheme,
+  IconButton,
+  Typography,
   useMediaQuery,
+  useTheme,
+  Paper,
+  Tooltip,
+  Popover,
 } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Add } from "@mui/icons-material";
+import { Edit, Delete, Add, MoreVert } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  fetchAllRoutes,
+  deleteRouteById,
+  addNewRoute,
+  editRouteById,
+} from "../../store/user/adminThunk";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
-import RouteForm from "../../components/forms/DriverForm";
+import RouteForm from "./routeForm";
+import { RouteType } from "../../types/route.types";
+import { BusStopType } from "../../types/stop.types";
+import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
-
-interface RouteType {
-  id: number;
-  routeName: string;
-  driverName: string;
-  busNumber: string;
-  stops: string;
-}
+import SpanLoader from "../../components/SpanLoader";
 
 const RouteManagement: React.FC = () => {
-  const [routes, setRoutes] = useState<RouteType[]>([]);
+  const dispatch = useAppDispatch();
+  const routes = useAppSelector((state) => state.adminSlice.routes);
   const [selectedRoute, setSelectedRoute] = useState<RouteType | null>(null);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
-  const [routeToDelete, setRouteToDelete] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isAddMode, setIsAddMode] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isAddMode, setIsAddMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [selectedStopsRowId, setSelectedStopsRowId] = useState<string | null>(
+    null
+  );
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Filter routes based on search query
-  const filteredRoutes = routes.filter(
-    (route) =>
-      route.driverName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      route.routeName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    setIsLoading(true);
+    dispatch(fetchAllRoutes())
+      .unwrap()
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        toaster.error("Failed to fetch routes.");
+      })
+      .finally(() => setIsLoading(false));
+  }, [dispatch]);
 
-  // Handlers
-  const handleAddRoute = () => {
-    setSelectedRoute({
-      id: 0,
-      routeName: "",
-      driverName: "",
-      busNumber: "",
-      stops: "",
-    });
-    setIsAddMode(true);
-    setOpenDialog(true);
-  };
+  const routesWithDisplayId = routes.map((route, index) => ({
+    ...route,
+    displayId: index + 1,
+    driverName: route.driver?.fullName || "N/A",
+    stopsCount: route.busStops?.length || 0,
+  }));
 
   const handleEditRoute = (route: RouteType) => {
     setSelectedRoute(route);
@@ -62,66 +72,183 @@ const RouteManagement: React.FC = () => {
     setOpenDialog(true);
   };
 
-  const handleDeleteRoute = (id: number) => {
-    setRouteToDelete(id);
+  const handleAddRoute = () => {
+    setSelectedRoute({
+      id: "",
+      routeName: "",
+      routeNumber: "",
+      vehicleNumber: "",
+      driver: {
+        id: "",
+        fullName: "",
+        phoneNumber: "",
+        cnicNumber: "",
+      },
+      busStops: [],
+    });
+    setIsAddMode(true);
+    setOpenDialog(true);
+  };
+
+  const handleDeleteRoute = (routeId: string) => {
+    setRouteToDelete(routeId);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = () => {
-    if (routeToDelete !== null) {
-      setRoutes((prevRoutes) =>
-        prevRoutes.filter((route) => route.id !== routeToDelete)
-      );
-      setDeleteDialogOpen(false);
-      setRouteToDelete(null);
+    if (routeToDelete) {
+      dispatch(deleteRouteById(routeToDelete))
+        .unwrap()
+        .then(() => {
+          toaster.success("Route deleted successfully!");
+          setDeleteDialogOpen(false);
+          dispatch(fetchAllRoutes());
+        })
+        .catch(() => {
+          toaster.error("Failed to delete route.");
+        });
     }
   };
 
-  const handleSaveRoute = (newRoute: RouteType) => {
+  const handleSaveRoute = () => {
+    if (!selectedRoute) {
+      toaster.error("No route selected.");
+      return;
+    }
+
+    // Validate required fields
+    if (
+      !selectedRoute.routeName ||
+      !selectedRoute.routeNumber ||
+      !selectedRoute.vehicleNumber ||
+      !selectedRoute.driver?.id
+    ) {
+      toaster.error("All required fields must be filled.");
+      return;
+    }
+
+    if (selectedRoute.busStops.length === 0) {
+      toaster.error("At least one bus stop must be added.");
+      return;
+    }
+
+    // Transform the payload to match the backend's expected structure
+    const backendPayload = {
+      id: selectedRoute.id, // Include the id property
+      vehicleNumber: selectedRoute.vehicleNumber,
+      routeName: selectedRoute.routeName,
+      routeNumber: selectedRoute.routeNumber,
+      driverId: selectedRoute.driver.id, // Use driverId instead of the full driver object
+      busStopIds: selectedRoute.busStops
+        .map((stop) => stop.id)
+        .filter((id): id is string => !!id), // Ensure busStopIds is an array of strings
+    };
+
+    console.log("Payload being sent to backend:", backendPayload);
+
     if (isAddMode) {
-      setRoutes((prevRoutes) => [
-        ...prevRoutes,
-        { ...newRoute, id: prevRoutes.length + 1 },
-      ]);
+      dispatch(addNewRoute(backendPayload))
+        .unwrap()
+        .then(() => {
+          toaster.success("Route added successfully!");
+          setOpenDialog(false);
+          dispatch(fetchAllRoutes());
+        })
+        .catch((error) => {
+          console.error("Error adding route:", error);
+          toaster.error("Failed to add route.");
+        });
     } else {
-      setRoutes((prevRoutes) =>
-        prevRoutes.map((route) => (route.id === newRoute.id ? newRoute : route))
-      );
+      dispatch(
+        editRouteById({ userId: selectedRoute.id, values: backendPayload })
+      )
+        .unwrap()
+        .then(() => {
+          toaster.success("Route updated successfully!");
+          setOpenDialog(false);
+          dispatch(fetchAllRoutes());
+        })
+        .catch((error) => {
+          console.error("Error updating route:", error);
+          toaster.error("Failed to update route.");
+        });
     }
-    setOpenDialog(false);
   };
 
-  // Define columns for DataGrid
+  const handleStopsClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    rowId: string
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedStopsRowId(rowId);
+  };
+
+  const handleStopsClose = () => {
+    setAnchorEl(null);
+    setSelectedStopsRowId(null);
+  };
+
+  const filteredRoutes = routesWithDisplayId.filter((route) => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return (
+      route.routeName.toLowerCase().includes(lowerCaseQuery) ||
+      route.routeNumber.toLowerCase().includes(lowerCaseQuery) ||
+      route.vehicleNumber.toLowerCase().includes(lowerCaseQuery) ||
+      route.driverName.toLowerCase().includes(lowerCaseQuery)
+    );
+  });
+
+  // Find the current route being viewed in the stops popover
+  const currentRouteStops =
+    routes.find((r) => r.id === selectedStopsRowId)?.busStops || [];
+
   const columns: GridColDef[] = [
-    { field: "id", headerName: "#", width: 50 },
-    { field: "routeName", headerName: "Route", width: 150 },
+    { field: "displayId", headerName: "ID", width: 100 },
+    { field: "routeName", headerName: "Route Name", width: 150 },
+    { field: "routeNumber", headerName: "Route Number", width: 150 },
     { field: "driverName", headerName: "Driver Name", width: 150 },
-    { field: "busNumber", headerName: "Bus #", width: 150 },
-    { field: "stops", headerName: "Stops", width: 150 },
+    { field: "vehicleNumber", headerName: "Vehicle Number", width: 150 },
+    {
+      field: "busStops",
+      headerName: "Bus Stops",
+      width: 150,
+      renderCell: (params: GridRenderCellParams) => {
+        const stops = params.row.busStops as BusStopType[];
+
+        if (stops.length === 0) {
+          return <Typography variant="body2">N/A</Typography>;
+        }
+
+        return (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="body2" sx={{ mr: 1 }}>
+              {stops.length > 0 ? `${stops.length} stops` : "N/A"}
+            </Typography>
+            <Tooltip title="View all stops">
+              <IconButton
+                size="small"
+                onClick={(e) => handleStopsClick(e, params.row.id)}
+              >
+                <MoreVert fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      },
+    },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
+      width: 120,
       renderCell: (params) => (
-        <>
-          <Button
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={() => handleEditRoute(params.row)}
-            sx={{ marginRight: 1 }}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => handleDeleteRoute(params.row.id)}
-          >
-            Delete
-          </Button>
-        </>
+        <Box sx={{ display: "flex" }}>
+          <IconButton onClick={() => handleEditRoute(params.row)}>
+            <Edit sx={{ color: theme.palette.primary.main }} />
+          </IconButton>
+          <IconButton onClick={() => handleDeleteRoute(params.row.id)}>
+            <Delete sx={{ color: theme.palette.error.main }} />
+          </IconButton>
+        </Box>
       ),
     },
   ];
@@ -141,7 +268,7 @@ const RouteManagement: React.FC = () => {
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="Search By Driver Name & Route Name"
+          placeholder="Search Route..."
           isMobile={isMobile}
         />
       </Box>
@@ -193,40 +320,85 @@ const RouteManagement: React.FC = () => {
 
         <Paper
           sx={{
-            height: 300,
-            mt: 2,
+            height: 400, // Increased height to show more rows
+            mt: 1,
             width: "95%",
           }}
         >
-          <DataGrid
-            rows={filteredRoutes}
-            columns={columns}
-            getRowId={(row) => row.id}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 10, page: 0 },
-              },
-            }}
-            sx={{
-              "& .MuiDataGrid-cell": {},
-              "& .MuiDataGrid-columnHeader": {
-                backgroundColor: theme.table.backgroundColor,
-                color: theme.table.color,
-              },
-              "& .MuiDataGrid-footerContainer": {
-                backgroundColor: theme.table.backgroundColor,
-                color: theme.table.color,
-              },
-            }}
-          />
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <SpanLoader />
+            </Box>
+          ) : (
+            <DataGrid
+              rows={filteredRoutes}
+              columns={columns}
+              getRowId={(row) => row.id}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 10, page: 0 },
+                },
+              }}
+              sx={{
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  backgroundColor: theme.table.backgroundColor,
+                  color: theme.table.color,
+                },
+              }}
+            />
+          )}
         </Paper>
       </Box>
 
+      {/* Bus Stops Popover */}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleStopsClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Paper sx={{ p: 2, maxWidth: 300, maxHeight: 400, overflow: "auto" }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Bus Stops
+          </Typography>
+          {currentRouteStops.length > 0 ? (
+            currentRouteStops.map((stop: BusStopType, index: number) => (
+              <Box key={stop.id || index} sx={{ mb: 1 }}>
+                <Typography variant="body1">
+                  {index + 1}. {stop.stopName}
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2">No stops available</Typography>
+          )}
+        </Paper>
+      </Popover>
+
+      {/* Route Form Dialog */}
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
+        maxWidth="md"
         fullWidth
-        maxWidth="sm"
       >
         <DialogTitle
           sx={{
@@ -237,7 +409,12 @@ const RouteManagement: React.FC = () => {
         >
           {isAddMode ? "Add New Route" : "Update Route"}
         </DialogTitle>
-        <RouteForm selectedRoute={selectedRoute} onSave={handleSaveRoute} />
+        <RouteForm
+          selectedRoute={selectedRoute}
+          onRouteChange={(field, value) =>
+            setSelectedRoute({ ...selectedRoute!, [field]: value })
+          }
+        />
         <DialogActions
           sx={{
             backgroundColor: theme.table.backgroundColor,
@@ -251,7 +428,7 @@ const RouteManagement: React.FC = () => {
             Cancel
           </Button>
           <Button
-            onClick={() => handleSaveRoute(selectedRoute!)}
+            onClick={handleSaveRoute}
             sx={{
               backgroundColor: theme.button.backgroundColor,
               color: theme.button.color,

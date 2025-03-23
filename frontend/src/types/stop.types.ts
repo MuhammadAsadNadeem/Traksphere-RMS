@@ -1,5 +1,5 @@
 export type BusStopType = {
-    id?: string,
+    id: string,
     stopName: string,
     latitude: number,
     longitude: number,

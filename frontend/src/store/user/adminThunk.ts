@@ -7,6 +7,8 @@ import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from ".
 import toaster from "../../utils/toaster";
 import { DriverType, UpdateDriverType } from "../../types/driver.types";
 import { BusStopType } from "../../types/stop.types";
+import { AddRouteType, UpdateRouteType } from "../../types/route.types";
+
 
 
 
@@ -23,6 +25,10 @@ export enum AdminApiPathEnum {
     ADD_STOP = "api/admin/add-stop",
     UPDATE_STOP = "api/admin/update-stop",
     DElETE_STOP = "api/admin/delete-stop",
+    GET_ROUTES = "api/admin/get-routes",
+    ADD_ROUTE = "api/admin/add-route",
+    UPDATE_ROUTE = "api/admin/update-route",
+    DElETE_ROUTE = "api/admin/delete-route",
 }
 
 
@@ -242,6 +248,71 @@ export const deleteStopById = createAsyncThunk(
     }
 );
 
+export const fetchAllRoutes = createAsyncThunk(AdminApiPathEnum.GET_ROUTES,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get(AdminApiPathEnum.GET_ROUTES)
+
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+export const addNewRoute = createAsyncThunk(AdminApiPathEnum.ADD_ROUTE,
+    async (values: AddRouteType, { rejectWithValue }) => {
+        try {
+            const res = await instance.post(AdminApiPathEnum.ADD_ROUTE, values);
+            if (res.status === HttpStatusCode.Ok) {
+                toaster.success(res.data.message);
+                return res.data.data;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+export const editRouteById = createAsyncThunk(
+    AdminApiPathEnum.UPDATE_ROUTE,
+    async ({ userId, values }: { userId: string; values: UpdateRouteType }, { rejectWithValue }) => {
+        try {
+            const res = await instance.put(AdminApiPathEnum.UPDATE_ROUTE, values, {
+                params: { id: userId },
+            });
+
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data?.data;
+            } else {
+
+                throw new Error("Failed to update Route");
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
+
+export const deleteRouteById = createAsyncThunk(
+    AdminApiPathEnum.DElETE_ROUTE,
+    async (userId: string, { rejectWithValue }) => {
+        try {
+            const res = await instance.delete(AdminApiPathEnum.DElETE_ROUTE, {
+                params: { id: userId },
+            });
+            if (res.status === HttpStatusCode.Ok) {
+                return userId;
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
 export default {
     fetchCounts,
     fetchAllUsers,
@@ -255,6 +326,11 @@ export default {
     addNewStop,
     // editStopById,
     deleteStopById,
+    fetchAllRoutes,
+    addNewRoute,
+    editRouteById,
+    deleteRouteById,
+
 
 
 }

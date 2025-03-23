@@ -40,7 +40,7 @@ export const theme = createTheme({
       main: primaryShades["500"],
       light: primaryShades["300"],
       dark: primaryShades["900"],
-      contrastText: " #ffffff",
+      contrastText: '#fff',
     },
     secondary: {
       main: seconadryShades["500"],

@@ -1,3 +1,6 @@
+import { DriverType } from "./driver.types";
+import { BusStopType } from "./stop.types";
+
 export type CountsResponse = {
 
     totalUsers: number,
@@ -45,3 +48,11 @@ export type DriverResponse = {
     cnicNumber: string;
 }
 
+export type RouteResponse = {
+    id: string;
+    routeName: string;
+    routeNumber: string;
+    vehicleNumber: string;
+    driver: DriverType;
+    busStops: BusStopType[];
+};

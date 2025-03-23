@@ -115,7 +115,7 @@ const UserManagement: React.FC = () => {
           width: 150,
         },
         { field: "departmentName", headerName: "Department", width: 150 },
-        { field: "routeNumber", headerName: "Route No", width: 150 },
+        { field: "routeNumber", headerName: "Route No", width: 130 },
         { field: "stopArea", headerName: "Stop Area", width: 150 }
       );
     }

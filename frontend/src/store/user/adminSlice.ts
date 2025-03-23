@@ -1,16 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-    fetchCounts, fetchAllBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop,
-    // editStopById,
-    deleteStopById,
+    fetchCounts, fetchAllBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop, deleteStopById, fetchAllRoutes, addNewRoute, editRouteById, deleteRouteById, // editStopById,
 } from "./adminThunk";
-import { CountsResponse, BusStopResponse, UserResponse, DriverResponse } from "../../types/admin.types";
+import { CountsResponse, BusStopResponse, UserResponse, DriverResponse, RouteResponse } from "../../types/admin.types";
 
 interface AdminState {
     counts: CountsResponse | null | undefined;
     busStops: BusStopResponse[];
     users: UserResponse[] | undefined;
     drivers: DriverResponse[];
+    routes: RouteResponse[];
     loading: boolean;
     error: string | null;
 }
@@ -20,6 +19,7 @@ const initialState: AdminState = {
     busStops: [],
     users: [],
     drivers: [],
+    routes: [],
     loading: false,
     error: null,
 };
@@ -42,6 +42,9 @@ const adminSlice = createSlice({
         },
         setDrivers: (state, action: PayloadAction<DriverResponse[]>) => {
             state.drivers = action.payload;
+        },
+        setRoutes: (state, action: PayloadAction<RouteResponse[]>) => {
+            state.routes = action.payload;
         },
         setError: (state, action: PayloadAction<string | null>) => {
             state.error = action.payload;
@@ -180,7 +183,58 @@ const adminSlice = createSlice({
             .addCase(deleteStopById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+            .addCase(fetchAllRoutes.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAllRoutes.fulfilled, (state, action) => {
+                state.loading = false;
+                state.routes = action.payload;
+            })
+            .addCase(fetchAllRoutes.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(addNewRoute.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addNewRoute.fulfilled, (state, action) => {
+                state.loading = false;
+                state.drivers.push(action.payload);
+            })
+            .addCase(addNewRoute.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(editRouteById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(editRouteById.fulfilled, (state, action) => {
+                if (!action.payload?.id) return;
+                const index = state.drivers.findIndex(d => d.id === action.payload.id);
+                if (index !== -1) {
+                    state.drivers[index] = action.payload;
+                }
+                state.loading = false;
+            })
+            .addCase(editRouteById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(deleteRouteById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteRouteById.fulfilled, (state, action) => {
+                state.drivers = state.drivers.filter(driver => driver.id !== action.payload);
+                state.loading = false;
+            })
+            .addCase(deleteRouteById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
     },
 });
 

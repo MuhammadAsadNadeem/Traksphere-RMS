@@ -57,8 +57,7 @@ const SideBar = () => {
             width: isMobile ? "45vw" : isSidebarExpanded ? 240 : 45,
             bgcolor: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
-            height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
-            top: "55px",
+            top: "63px",
             transition: theme.transitions.create(["width", "transform"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
