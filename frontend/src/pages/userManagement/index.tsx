@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogActions,
   Typography,
-  Paper,
+  // Paper,
   useTheme,
   useMediaQuery,
   IconButton,
@@ -101,7 +101,7 @@ const UserManagement: React.FC = () => {
 
   const columns: GridColDef[] = useMemo(() => {
     const commonColumns: GridColDef[] = [
-      { field: "displayId", headerName: "ID", width: 80 },
+      { field: "displayId", headerName: "ID", width: 100 },
       { field: "fullName", headerName: "Full Name", width: 150 },
       { field: "email", headerName: "Email", width: 150 },
       { field: "phoneNumber", headerName: "Contact No", width: 120 },
@@ -181,7 +181,7 @@ const UserManagement: React.FC = () => {
             >
               Manage Users
             </Typography>
-            <Paper sx={{ height: 400, mt: 2, width: "100%", p: 3 }}>
+            <Box sx={{ height: 400, mt: 2, width: "100%", p: 3 }}>
               <DataGrid
                 rows={filteredUsers}
                 columns={columns}
@@ -200,7 +200,7 @@ const UserManagement: React.FC = () => {
                   },
                 }}
               />
-            </Paper>
+            </Box>
             <Dialog
               open={openDialog}
               onClose={() => setOpenDialog(false)}
