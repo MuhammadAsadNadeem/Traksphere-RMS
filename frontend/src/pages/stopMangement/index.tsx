@@ -90,6 +90,7 @@ const StopManagement: React.FC = () => {
         stopName: stopData.name,
         latitude: stopData.latitude,
         longitude: stopData.longitude,
+        id: "",
       })
     )
       .unwrap()
@@ -125,140 +126,131 @@ const StopManagement: React.FC = () => {
 
   return (
     <Box sx={{ ml: 1, height: "80vh" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          width: "100%",
-          p: 3,
-          mt: 10,
-          mb: 2,
-        }}
-      >
-        <SearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          placeholder="Search by Stop Name"
-          isMobile={isMobile}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            mt: 2,
-            color: theme.palette.primary.dark,
-            width: "95%",
-          }}
-        >
-          Manage Stops
-        </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "95%",
-            mb: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            startIcon={<AddLocation />}
-            onClick={handleAddStop}
+      {isLoading ? (
+        <SpanLoader />
+      ) : (
+        <>
+          <Box
             sx={{
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
-              "&:hover": {
-                backgroundColor: theme.palette.primary.dark,
-              },
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "100%",
+              p: 3,
+              mt: 10,
+              mb: 2,
             }}
           >
-            Add Stop
-          </Button>
-        </Box>
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              placeholder="Search Stop..."
+              isMobile={isMobile}
+            />
+          </Box>
 
-        <Paper
-          sx={{
-            height: 400,
-            mt: 2,
-            width: "95%",
-          }}
-        >
-          {isLoading ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 2,
+                mt: 2,
+                color: theme.palette.primary.main,
+                width: "95%",
+              }}
+            >
+              Manage Stops
+            </Typography>
+
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 alignItems: "center",
-                height: "100%",
+                width: "95%",
+                mb: 2,
               }}
             >
-              <SpanLoader />
+              <Button
+                variant="contained"
+                startIcon={<AddLocation />}
+                onClick={handleAddStop}
+                sx={{
+                  backgroundColor: theme.button.backgroundColor,
+                  color: theme.palette.primary.contrastText,
+                  "&:hover": {
+                    backgroundColor: theme.button.hoverBackgroundColor,
+                  },
+                }}
+              >
+                Add Stop
+              </Button>
             </Box>
-          ) : (
-            <DataGrid
-              rows={filteredStops}
-              columns={columns}
-              getRowId={(row) => row.id}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 5 },
-                },
-              }}
-              pageSizeOptions={[5, 10]}
+
+            <Paper
               sx={{
-                "& .MuiDataGrid-cell": {},
-                "& .MuiDataGrid-columnHeader": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
+                height: 400,
+                mt: 2,
+                width: "95%",
               }}
+            >
+              <DataGrid
+                rows={filteredStops}
+                columns={columns}
+                getRowId={(row) => row.id}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10, page: 0 } },
+                }}
+                pageSizeOptions={[5, 10, 25, 50, 100]}
+                sx={{
+                  "& .MuiDataGrid-cell": {},
+                  "& .MuiDataGrid-columnHeader": {
+                    backgroundColor: theme.table.backgroundColor,
+                    color: theme.table.color,
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    backgroundColor: theme.table.backgroundColor,
+                    color: theme.table.color,
+                  },
+                }}
+              />
+            </Paper>
+          </Box>
+
+          <Dialog
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
+            fullWidth
+            maxWidth="md"
+          >
+            <DialogTitle
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontSize: "20px",
+              }}
+            >
+              Add New Stop
+            </DialogTitle>
+            <StopForm
+              onSubmit={handleSaveStop}
+              onClose={() => setOpenDialog(false)}
             />
-          )}
-        </Paper>
-      </Box>
+          </Dialog>
 
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            fontSize: "20px",
-          }}
-        >
-          Add New Stop
-        </DialogTitle>
-        <StopForm
-          onSubmit={handleSaveStop}
-          onClose={() => setOpenDialog(false)}
-        />
-      </Dialog>
-
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
-      />
+          <DeleteConfirmationDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            onConfirm={confirmDelete}
+          />
+        </>
+      )}
     </Box>
   );
 };

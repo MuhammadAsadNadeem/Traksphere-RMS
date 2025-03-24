@@ -29,7 +29,6 @@ export const routes = {
   routesDetails: "/routes-details",
   userProfile: "/user-profile",
   changePassword: "/change-password",
-  stopform: "/stop-form",
 };
 
 export const PrivateRoutes = [

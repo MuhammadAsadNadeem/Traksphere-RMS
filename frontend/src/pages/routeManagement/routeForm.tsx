@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchAllDrivers, fetchAllBusStops } from "../../store/user/adminThunk";
 import { BusStopType } from "../../types/stop.types";
 import { DriverType } from "../../types/driver.types";
+import theme from "../../theme";
 
 interface RouteFormProps {
   selectedRoute: {
@@ -47,17 +48,14 @@ const RouteForm: React.FC<RouteFormProps> = ({
     null
   );
 
-  // Fetch drivers and bus stops from the store
   const drivers = useAppSelector((state) => state.adminSlice.drivers) || [];
   const busStops = useAppSelector((state) => state.adminSlice.busStops) || [];
 
-  // Fetch drivers and bus stops on component mount
   useEffect(() => {
     dispatch(fetchAllDrivers());
     dispatch(fetchAllBusStops());
   }, [dispatch]);
 
-  // Handle route number validation
   const handleRouteNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const numberValue = parseInt(value, 10);
@@ -73,7 +71,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
     onRouteChange("routeNumber", value);
   };
 
-  // Handle driver selection change
   const handleDriverChange = (e: { target: { value: string } }) => {
     const selectedDriver = drivers.find(
       (driver) => driver && driver.id === e.target.value
@@ -83,7 +80,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
     }
   };
 
-  // Handle bus stop selection change
   const handleBusStopChange = (
     _: React.SyntheticEvent,
     newValue: BusStopType | null
@@ -91,10 +87,8 @@ const RouteForm: React.FC<RouteFormProps> = ({
     setSelectedBusStop(newValue);
   };
 
-  // Handle adding a bus stop to the route
   const handleAddBusStop = () => {
     if (selectedBusStop && selectedRoute) {
-      // Check if bus stop already exists in the route
       const alreadyExists = selectedRoute.busStops.some(
         (stop) => stop && stop.id === selectedBusStop.id
       );
@@ -108,7 +102,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
     }
   };
 
-  // Handle removing a bus stop from the route
   const handleRemoveBusStop = (stopId: string) => {
     if (selectedRoute) {
       const updatedStops = selectedRoute.busStops.filter(
@@ -118,15 +111,12 @@ const RouteForm: React.FC<RouteFormProps> = ({
     }
   };
 
-  // If no route is selected, show a message
   if (!selectedRoute) {
     return <Typography padding={2}>No route selected.</Typography>;
   }
 
-  // Ensure bus stops is a valid array
   const currentBusStops = selectedRoute.busStops || [];
 
-  // Filter out available bus stops (not already selected)
   const availableBusStops = busStops.filter(
     (stop) =>
       stop && stop.id && !currentBusStops.some((s) => s && s.id === stop.id)
@@ -134,7 +124,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
 
   return (
     <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 3 }}>
-      {/* Route Name */}
       <TextField
         label="Route Name"
         value={selectedRoute.routeName || ""}
@@ -143,7 +132,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
         required
       />
 
-      {/* Route Number */}
       <TextField
         label="Route Number"
         value={selectedRoute.routeNumber || ""}
@@ -156,7 +144,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
         required
       />
 
-      {/* Vehicle Number */}
       <TextField
         label="Vehicle Number"
         value={selectedRoute.vehicleNumber || ""}
@@ -165,7 +152,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
         required
       />
 
-      {/* Driver Selection */}
       <FormControl fullWidth required>
         <InputLabel id="driver-label">Driver</InputLabel>
         <Select
@@ -184,13 +170,17 @@ const RouteForm: React.FC<RouteFormProps> = ({
         </Select>
       </FormControl>
 
-      {/* Bus Stops Section */}
-      <Typography variant="h6" sx={{ mt: 2 }}>
+      <Typography
+        variant="h6"
+        sx={{
+          mt: 2,
+          color: theme.palette.primary.main,
+        }}
+      >
         Bus Stops
       </Typography>
       <Divider />
 
-      {/* Add new bus stop section */}
       <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
         <Autocomplete
           options={availableBusStops}
@@ -221,7 +211,6 @@ const RouteForm: React.FC<RouteFormProps> = ({
         </Button>
       </Box>
 
-      {/* Selected bus stops list */}
       <Paper
         variant="outlined"
         sx={{
@@ -256,7 +245,7 @@ const RouteForm: React.FC<RouteFormProps> = ({
             )}
           </List>
         ) : (
-          <Typography variant="body2" color="text.secondary" align="center">
+          <Typography variant="body2" color="secondary" align="center">
             No bus stops added yet. Add stops using the selector above.
           </Typography>
         )}

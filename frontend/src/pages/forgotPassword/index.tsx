@@ -16,6 +16,7 @@ import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import SendOtpBtn from "../../components/SendOtpBtn";
 import { routes } from "../../routes";
+import MDLink from "../../components/MDLink";
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -122,6 +123,9 @@ const ForgotPassword: React.FC = () => {
           >
             {formik.isSubmitting ? "Sending..." : "Forgot Password"}
           </Button>
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Back to <MDLink to={routes.login}>SignIn</MDLink>
+          </Typography>
         </Box>
       </Card>
     </Container>

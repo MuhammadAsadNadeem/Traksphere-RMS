@@ -255,10 +255,23 @@ const StopForm: React.FC<StopFormProps> = ({ onSubmit, onClose }) => {
           />
 
           <DialogActions>
-            <Button onClick={onClose} color="secondary">
+            <Button
+              onClick={onClose}
+              sx={{ color: theme.button.backgroundColor }}
+            >
               Cancel
             </Button>
-            <Button type="submit" color="primary" variant="contained">
+            <Button
+              type="submit"
+              sx={{
+                backgroundColor: theme.button.backgroundColor,
+                color: theme.button.color,
+                "&:hover": {
+                  backgroundColor: theme.button.hoverBackgroundColor,
+                },
+              }}
+              variant="contained"
+            >
               Add Stop
             </Button>
           </DialogActions>

@@ -188,161 +188,153 @@ const DriverManagement: React.FC = () => {
 
   return (
     <Box sx={{ ml: 1, height: "80vh" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          width: "100%",
-          p: 3,
-          mt: 10,
-          mb: 2,
-        }}
-      >
-        <SearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          placeholder="Search Driver..."
-          isMobile={isMobile}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            mt: 2,
-            color: theme.palette.primary.dark,
-            width: "95%",
-          }}
-        >
-          Manage Drivers
-        </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "95%",
-            mb: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={handleAddDriver}
+      {isLoading ? (
+        <SpanLoader />
+      ) : (
+        <>
+          <Box
             sx={{
-              backgroundColor: theme.button.backgroundColor,
-              color: theme.button.color,
-              "&:hover": {
-                backgroundColor: theme.button.hoverBackgroundColor,
-              },
-              minWidth: isMobile ? "20%" : "auto",
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "100%",
+              p: 3,
+              mt: 10,
+              mb: 2,
             }}
           >
-            Add Driver
-          </Button>
-        </Box>
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              placeholder="Search Driver..."
+              isMobile={isMobile}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 2,
+                mt: 2,
+                color: theme.palette.primary.main,
+                width: "95%",
+              }}
+            >
+              Manage Drivers
+            </Typography>
 
-        <Paper
-          sx={{
-            height: 400,
-            mt: 2,
-            width: "95%",
-          }}
-        >
-          {isLoading ? (
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 alignItems: "center",
-                height: "100%",
+                width: "95%",
+                mb: 2,
               }}
             >
-              <SpanLoader />
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={handleAddDriver}
+                sx={{
+                  backgroundColor: theme.button.backgroundColor,
+                  color: theme.button.color,
+                  "&:hover": {
+                    backgroundColor: theme.button.hoverBackgroundColor,
+                  },
+                  minWidth: isMobile ? "20%" : "auto",
+                }}
+              >
+                Add Driver
+              </Button>
             </Box>
-          ) : (
-            <DataGrid
-              rows={filteredDrivers}
-              columns={columns}
-              getRowId={(row) => row.id}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
-              }}
+
+            <Paper
               sx={{
-                "& .MuiDataGrid-cell": {},
-                "& .MuiDataGrid-columnHeader": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
+                height: 400,
+                mt: 2,
+                width: "95%",
               }}
+            >
+              <DataGrid
+                rows={filteredDrivers}
+                columns={columns}
+                getRowId={(row) => row.id}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10, page: 0 } },
+                }}
+                pageSizeOptions={[5, 10, 25, 50, 100]}
+                sx={{
+                  "& .MuiDataGrid-cell": {},
+                  "& .MuiDataGrid-columnHeader": {
+                    backgroundColor: theme.table.backgroundColor,
+                    color: theme.table.color,
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    backgroundColor: theme.table.backgroundColor,
+                    color: theme.table.color,
+                  },
+                }}
+              />
+            </Paper>
+          </Box>
+
+          <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+            <DialogTitle
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontSize: "20px",
+              }}
+            >
+              {isAddMode ? "Add New Driver" : "Update Driver"}
+            </DialogTitle>
+            <DriverForm
+              selectedDriver={selectedDriver}
+              onFieldChange={(field, value) =>
+                setSelectedDriver({ ...selectedDriver!, [field]: value })
+              }
             />
-          )}
-        </Paper>
-      </Box>
+            <DialogActions
+              sx={{
+                backgroundColor: theme.table.backgroundColor,
+                padding: "10px",
+              }}
+            >
+              <Button
+                onClick={() => setOpenDialog(false)}
+                sx={{ color: theme.button.backgroundColor }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveDriver}
+                sx={{
+                  backgroundColor: theme.button.backgroundColor,
+                  color: theme.button.color,
+                  "&:hover": {
+                    backgroundColor: theme.button.hoverBackgroundColor,
+                  },
+                }}
+              >
+                {isAddMode ? "Add" : "Save"}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            fontSize: "20px",
-          }}
-        >
-          {isAddMode ? "Add New Driver" : "Update Driver"}
-        </DialogTitle>
-        <DriverForm
-          selectedDriver={selectedDriver}
-          onFieldChange={(field, value) =>
-            setSelectedDriver({ ...selectedDriver!, [field]: value })
-          }
-        />
-        <DialogActions
-          sx={{
-            backgroundColor: theme.table.backgroundColor,
-            padding: "10px",
-          }}
-        >
-          <Button
-            onClick={() => setOpenDialog(false)}
-            sx={{ color: theme.button.backgroundColor }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveDriver}
-            sx={{
-              backgroundColor: theme.button.backgroundColor,
-              color: theme.button.color,
-              "&:hover": {
-                backgroundColor: theme.button.hoverBackgroundColor,
-              },
-            }}
-          >
-            {isAddMode ? "Add" : "Save"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
-      />
+          <DeleteConfirmationDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            onConfirm={confirmDelete}
+          />
+        </>
+      )}
     </Box>
   );
 };

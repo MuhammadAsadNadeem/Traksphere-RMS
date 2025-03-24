@@ -70,6 +70,7 @@ const SignUp: React.FC = () => {
     <Container
       maxWidth="sm"
       sx={{
+        mt: "5rem",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -104,6 +105,8 @@ const SignUp: React.FC = () => {
             name="email"
             label="Email"
             type="email"
+            margin="normal"
+            required
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -116,6 +119,8 @@ const SignUp: React.FC = () => {
             name="password"
             label="Password"
             type={showPassword ? "text" : "password"}
+            margin="normal"
+            required
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -139,6 +144,8 @@ const SignUp: React.FC = () => {
           <TextField
             name="confirmPassword"
             label="Confirm Password"
+            margin="normal"
+            required
             type={showConfirmPassword ? "text" : "password"}
             value={formik.values.confirmPassword}
             onChange={formik.handleChange}
@@ -170,6 +177,8 @@ const SignUp: React.FC = () => {
               name="code"
               label="Enter 6-digit code"
               type="text"
+              margin="normal"
+              required
               value={formik.values.code}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

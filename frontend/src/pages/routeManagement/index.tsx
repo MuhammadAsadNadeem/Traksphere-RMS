@@ -116,7 +116,6 @@ const RouteManagement: React.FC = () => {
       return;
     }
 
-    // Validate required fields
     if (
       !selectedRoute.routeName ||
       !selectedRoute.routeNumber ||
@@ -132,16 +131,15 @@ const RouteManagement: React.FC = () => {
       return;
     }
 
-    // Transform the payload to match the backend's expected structure
     const backendPayload = {
-      id: selectedRoute.id, // Include the id property
+      id: selectedRoute.id,
       vehicleNumber: selectedRoute.vehicleNumber,
       routeName: selectedRoute.routeName,
       routeNumber: selectedRoute.routeNumber,
-      driverId: selectedRoute.driver.id, // Use driverId instead of the full driver object
+      driverId: selectedRoute.driver.id,
       busStopIds: selectedRoute.busStops
         .map((stop) => stop.id)
-        .filter((id): id is string => !!id), // Ensure busStopIds is an array of strings
+        .filter((id): id is string => !!id),
     };
 
     console.log("Payload being sent to backend:", backendPayload);
@@ -198,14 +196,13 @@ const RouteManagement: React.FC = () => {
     );
   });
 
-  // Find the current route being viewed in the stops popover
   const currentRouteStops =
     routes.find((r) => r.id === selectedStopsRowId)?.busStops || [];
 
   const columns: GridColDef[] = [
     { field: "displayId", headerName: "ID", width: 100 },
     { field: "routeName", headerName: "Route Name", width: 150 },
-    { field: "routeNumber", headerName: "Route Number", width: 150 },
+    { field: "routeNumber", headerName: "Route No", width: 130 },
     { field: "driverName", headerName: "Driver Name", width: 150 },
     { field: "vehicleNumber", headerName: "Vehicle Number", width: 150 },
     {
@@ -255,198 +252,210 @@ const RouteManagement: React.FC = () => {
 
   return (
     <Box sx={{ ml: 1, height: "80vh" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          width: "100%",
-          p: 3,
-          mt: 10,
-          mb: 2,
-        }}
-      >
-        <SearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          placeholder="Search Route..."
-          isMobile={isMobile}
-        />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            mt: 2,
-            color: theme.palette.primary.dark,
-            width: "95%",
-          }}
-        >
-          Manage Routes
-        </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "95%",
-            mb: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={handleAddRoute}
+      {isLoading ? (
+        <SpanLoader />
+      ) : (
+        <>
+          <Box
             sx={{
-              backgroundColor: theme.button.backgroundColor,
-              color: theme.button.color,
-              "&:hover": {
-                backgroundColor: theme.button.hoverBackgroundColor,
-              },
-              minWidth: isMobile ? "20%" : "auto",
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "100%",
+              p: 3,
+              mt: 10,
+              mb: 2,
             }}
           >
-            Add Route
-          </Button>
-        </Box>
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              placeholder="Search Route..."
+              isMobile={isMobile}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 2,
+                mt: 2,
+                color: theme.palette.primary.main,
+                width: "95%",
+              }}
+            >
+              Manage Routes
+            </Typography>
 
-        <Paper
-          sx={{
-            height: 400, // Increased height to show more rows
-            mt: 1,
-            width: "95%",
-          }}
-        >
-          {isLoading ? (
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
                 alignItems: "center",
-                height: "100%",
+                width: "95%",
+                mb: 2,
               }}
             >
-              <SpanLoader />
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={handleAddRoute}
+                sx={{
+                  backgroundColor: theme.button.backgroundColor,
+                  color: theme.button.color,
+                  "&:hover": {
+                    backgroundColor: theme.button.hoverBackgroundColor,
+                  },
+                  minWidth: isMobile ? "20%" : "auto",
+                }}
+              >
+                Add Route
+              </Button>
             </Box>
-          ) : (
-            <DataGrid
-              rows={filteredRoutes}
-              columns={columns}
-              getRowId={(row) => row.id}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
-              }}
+
+            <Paper
               sx={{
-                "& .MuiDataGrid-columnHeader": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
-                "& .MuiDataGrid-footerContainer": {
-                  backgroundColor: theme.table.backgroundColor,
-                  color: theme.table.color,
-                },
+                height: 400,
+                mt: 1,
+                width: "95%",
               }}
-            />
-          )}
-        </Paper>
-      </Box>
+            >
+              {isLoading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  <SpanLoader />
+                </Box>
+              ) : (
+                <DataGrid
+                  rows={filteredRoutes}
+                  columns={columns}
+                  getRowId={(row) => row.id}
+                  initialState={{
+                    pagination: { paginationModel: { pageSize: 10, page: 0 } },
+                  }}
+                  pageSizeOptions={[5, 10, 25, 50, 100]}
+                  sx={{
+                    "& .MuiDataGrid-columnHeader": {
+                      backgroundColor: theme.table.backgroundColor,
+                      color: theme.table.color,
+                    },
+                    "& .MuiDataGrid-footerContainer": {
+                      backgroundColor: theme.table.backgroundColor,
+                      color: theme.table.color,
+                    },
+                  }}
+                />
+              )}
+            </Paper>
+          </Box>
 
-      {/* Bus Stops Popover */}
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handleStopsClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <Paper sx={{ p: 2, maxWidth: 300, maxHeight: 400, overflow: "auto" }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Bus Stops
-          </Typography>
-          {currentRouteStops.length > 0 ? (
-            currentRouteStops.map((stop: BusStopType, index: number) => (
-              <Box key={stop.id || index} sx={{ mb: 1 }}>
-                <Typography variant="body1">
-                  {index + 1}. {stop.stopName}
-                </Typography>
-              </Box>
-            ))
-          ) : (
-            <Typography variant="body2">No stops available</Typography>
-          )}
-        </Paper>
-      </Popover>
-
-      {/* Route Form Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            fontSize: "20px",
-          }}
-        >
-          {isAddMode ? "Add New Route" : "Update Route"}
-        </DialogTitle>
-        <RouteForm
-          selectedRoute={selectedRoute}
-          onRouteChange={(field, value) =>
-            setSelectedRoute({ ...selectedRoute!, [field]: value })
-          }
-        />
-        <DialogActions
-          sx={{
-            backgroundColor: theme.table.backgroundColor,
-            padding: "10px",
-          }}
-        >
-          <Button
-            onClick={() => setOpenDialog(false)}
-            sx={{ color: theme.button.backgroundColor }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveRoute}
-            sx={{
-              backgroundColor: theme.button.backgroundColor,
-              color: theme.button.color,
-              "&:hover": {
-                backgroundColor: theme.button.hoverBackgroundColor,
-              },
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handleStopsClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "center",
             }}
           >
-            {isAddMode ? "Add" : "Save"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <Paper
+              sx={{ p: 2, maxWidth: 300, maxHeight: 400, overflow: "auto" }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 2,
+                  color: theme.palette.primary.main,
+                }}
+              >
+                Bus Stops
+              </Typography>
 
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
-      />
+              {currentRouteStops.length > 0 ? (
+                currentRouteStops.map((stop: BusStopType, index: number) => (
+                  <Box key={stop.id || index} sx={{ mb: 1 }}>
+                    <Typography variant="body1">
+                      {index + 1}. {stop.stopName}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body2">No stops available</Typography>
+              )}
+            </Paper>
+          </Popover>
+
+          <Dialog
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontSize: "20px",
+              }}
+            >
+              {isAddMode ? "Add New Route" : "Update Route"}
+            </DialogTitle>
+            <RouteForm
+              selectedRoute={selectedRoute}
+              onRouteChange={(field, value) =>
+                setSelectedRoute({ ...selectedRoute!, [field]: value })
+              }
+            />
+            <DialogActions
+              sx={{
+                backgroundColor: theme.table.backgroundColor,
+                padding: "10px",
+              }}
+            >
+              <Button
+                onClick={() => setOpenDialog(false)}
+                sx={{ color: theme.button.backgroundColor }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveRoute}
+                sx={{
+                  backgroundColor: theme.button.backgroundColor,
+                  color: theme.button.color,
+                  "&:hover": {
+                    backgroundColor: theme.button.hoverBackgroundColor,
+                  },
+                }}
+              >
+                {isAddMode ? "Add" : "Save"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <DeleteConfirmationDialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            onConfirm={confirmDelete}
+          />
+        </>
+      )}
     </Box>
   );
 };

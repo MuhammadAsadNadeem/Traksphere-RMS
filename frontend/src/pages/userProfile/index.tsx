@@ -19,6 +19,7 @@ import { UpdateProfileType } from "../../types/user.types";
 import userThunk from "../../store/user/userThunk";
 import toaster from "../../utils/toaster";
 import SpanLoader from "../../components/SpanLoader";
+import theme from "../../theme";
 
 const UserProfile: React.FC = () => {
   const userProfile = useAppSelector((state) => state.userSlice.profile);
@@ -26,7 +27,6 @@ const UserProfile: React.FC = () => {
   const [profile, setProfile] = useState<UpdateProfileType | null>(null);
   const dispatch = useAppDispatch();
 
-  // Predefined bus numbers and departments
   const busNumbers = Array.from({ length: 15 }, (_, i) => (i + 1).toString());
   const departments = [
     "Electrical Engineering",
@@ -77,7 +77,6 @@ const UserProfile: React.FC = () => {
   const handleSave = async () => {
     try {
       if (isEditing && profile) {
-        // Validate phone number
         if (profile.phoneNumber && profile.phoneNumber.length !== 11) {
           toaster.error("Phone number must be exactly 11 digits.");
           return;
@@ -307,7 +306,16 @@ const UserProfile: React.FC = () => {
         <Box sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}>
           <Button
             variant="contained"
-            color={isEditing ? "primary" : "info"}
+            sx={{
+              backgroundColor: isEditing
+                ? theme.button.backgroundColor
+                : theme.button.hoverBackgroundColor,
+              "&:hover": {
+                backgroundColor: isEditing
+                  ? theme.button.hoverBackgroundColor
+                  : theme.button.backgroundColor,
+              },
+            }}
             startIcon={isEditing ? <SaveIcon /> : <EditIcon />}
             onClick={handleSave}
           >

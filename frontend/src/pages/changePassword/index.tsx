@@ -17,6 +17,7 @@ import { routes } from "../../routes";
 import userThunk from "../../store/user/userThunk";
 import { ChangePasswordType } from "../../types/user.types";
 import toaster from "../../utils/toaster";
+import theme from "../../theme";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -181,10 +182,14 @@ const ChangePassword = () => {
               fullWidth
               type="submit"
               variant="contained"
-              color="primary"
               sx={{
                 mt: 2,
                 p: 1.5,
+                backgroundColor: theme.button.backgroundColor,
+                color: theme.button.color,
+                "&:hover": {
+                  backgroundColor: theme.button.hoverBackgroundColor,
+                },
               }}
               disabled={formik.isSubmitting}
             >

@@ -104,7 +104,7 @@ const UserManagement: React.FC = () => {
       { field: "displayId", headerName: "ID", width: 100 },
       { field: "fullName", headerName: "Full Name", width: 150 },
       { field: "email", headerName: "Email", width: 150 },
-      { field: "phoneNumber", headerName: "Contact No", width: 120 },
+      { field: "phoneNumber", headerName: "Contact No", width: 130 },
     ];
 
     if (!isMobile) {
@@ -112,10 +112,10 @@ const UserManagement: React.FC = () => {
         {
           field: "registrationNumber",
           headerName: "Registration No",
-          width: 150,
+          width: 130,
         },
         { field: "departmentName", headerName: "Department", width: 150 },
-        { field: "routeNumber", headerName: "Route No", width: 130 },
+        { field: "routeNumber", headerName: "Route No", width: 120 },
         { field: "stopArea", headerName: "Stop Area", width: 150 }
       );
     }
@@ -175,7 +175,7 @@ const UserManagement: React.FC = () => {
               sx={{
                 mb: 2,
                 mt: 2,
-                color: theme.palette.primary.dark,
+                color: theme.palette.primary.main,
                 width: "95%",
               }}
             >
@@ -188,7 +188,7 @@ const UserManagement: React.FC = () => {
                 initialState={{
                   pagination: { paginationModel: { pageSize: 10, page: 0 } },
                 }}
-                pageSizeOptions={[5, 10]}
+                pageSizeOptions={[5, 10, 25, 50, 100]}
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: theme.table.backgroundColor,

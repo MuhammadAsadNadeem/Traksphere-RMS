@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{ mt: 7 }}>
       <Card
         sx={{
           my: 4,
@@ -93,6 +93,8 @@ const Profile: React.FC = () => {
             <TextField
               name="fullName"
               label="Full Name"
+              margin="normal"
+              required
               value={formik.values.fullName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -106,6 +108,8 @@ const Profile: React.FC = () => {
             <TextField
               name="departmentName"
               label="Department"
+              margin="normal"
+              required
               select
               value={formik.values.departmentName}
               onChange={formik.handleChange}
@@ -139,6 +143,8 @@ const Profile: React.FC = () => {
             <TextField
               name="registrationNumber"
               label="Registration No"
+              margin="normal"
+              required
               value={formik.values.registrationNumber}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -158,6 +164,8 @@ const Profile: React.FC = () => {
           <TextField
             name="phoneNumber"
             label="Phone Number"
+            margin="normal"
+            required
             type="tel"
             onKeyDown={handleKeyPress}
             value={formik.values.phoneNumber}
@@ -177,6 +185,8 @@ const Profile: React.FC = () => {
             <TextField
               name="gender"
               label="Gender"
+              margin="normal"
+              required
               select
               value={formik.values.gender}
               onChange={formik.handleChange}
@@ -194,6 +204,8 @@ const Profile: React.FC = () => {
             <TextField
               name="routeNumber"
               label="Route Number"
+              margin="normal"
+              required
               select
               value={formik.values.routeNumber}
               onChange={formik.handleChange}
@@ -218,6 +230,8 @@ const Profile: React.FC = () => {
           <TextField
             name="stopArea"
             label="Stop Area"
+            margin="normal"
+            required
             value={formik.values.stopArea}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
