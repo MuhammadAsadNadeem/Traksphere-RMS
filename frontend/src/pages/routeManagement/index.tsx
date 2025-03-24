@@ -249,6 +249,9 @@ const RouteManagement: React.FC = () => {
       ),
     },
   ];
+  if (selectedRoute) {
+    return <SpanLoader></SpanLoader>;
+  }
 
   return (
     <Box sx={{ ml: 1, height: "80vh" }}>

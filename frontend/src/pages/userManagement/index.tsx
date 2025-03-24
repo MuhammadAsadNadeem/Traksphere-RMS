@@ -139,6 +139,10 @@ const UserManagement: React.FC = () => {
     return commonColumns;
   }, [handleEditUser, handleDeleteUser, isMobile, theme.palette.primary.main]);
 
+  if (selectedUser) {
+    return <SpanLoader></SpanLoader>;
+  }
+
   return (
     <Box sx={{ height: "80vh", ml: 2 }}>
       {isLoading ? (
