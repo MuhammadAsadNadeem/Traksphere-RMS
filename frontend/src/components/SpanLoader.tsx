@@ -9,7 +9,7 @@ interface SpanLoaderProps {
 
 const SpanLoader: React.FC<SpanLoaderProps> = ({
   size = 150,
-  speed = 2,
+  speed = 0.5,
   message,
 }) => {
   const theme = useTheme();
@@ -28,11 +28,11 @@ const SpanLoader: React.FC<SpanLoaderProps> = ({
     >
       <CircularProgress
         size={size + 40}
-        thickness={4}
+        thickness={3}
         sx={{
           position: "absolute",
           animation: `spin ${speed}s linear infinite`,
-          color: theme.palette.primary.main,
+          color: theme.palette.primary.light,
         }}
       />
 

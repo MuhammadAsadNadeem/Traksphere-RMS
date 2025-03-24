@@ -68,7 +68,7 @@ const SignUp: React.FC = () => {
 
   return (
     <Container
-      maxWidth="sm"
+      maxWidth="xs"
       sx={{
         mt: "5rem",
         display: "flex",

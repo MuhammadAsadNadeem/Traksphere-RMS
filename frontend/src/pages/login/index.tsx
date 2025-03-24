@@ -57,7 +57,7 @@ const Login = () => {
 
   return (
     <Container
-      maxWidth="sm"
+      maxWidth="xs"
       sx={{
         display: "flex",
         justifyContent: "center",
@@ -77,43 +77,6 @@ const Login = () => {
           gap: 2,
         }}
       >
-        {/* <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            width: "100%",
-            p: 2,
-          }}
-        >
-        
-          <img
-            src="src/assets/images/logo.svg"
-            alt="Traksphere Logo"
-            style={{ width: 100, height: 100 }}
-          />
-
-         
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography
-              variant="h4"
-              sx={{
-                color: theme.palette.primary.dark,
-                textAlign: "center",
-              }}
-            >
-              Traksphere
-            </Typography>
-          </Box>
-        </Box> */}
-
         <Typography variant="h4" align="center" fontWeight="bold">
           Login
         </Typography>
