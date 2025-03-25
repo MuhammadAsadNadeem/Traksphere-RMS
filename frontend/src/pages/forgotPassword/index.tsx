@@ -86,7 +86,7 @@ const ForgotPassword: React.FC = () => {
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
           />
-          <Box sx={{ display: "flex", width: "100%" }}>
+          <Box sx={{ mt: 4, display: "flex", width: "100%" }}>
             <TextField
               name="code"
               label="Enter 6-digit code"
