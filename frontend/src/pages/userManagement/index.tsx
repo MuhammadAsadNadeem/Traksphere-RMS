@@ -92,13 +92,14 @@ const UserManagement: React.FC = () => {
       }))
       .filter(
         (user) =>
-          user.fullName.toLowerCase().includes(lowerCaseQuery) ||
+          (user.fullName?.toLowerCase() || "").includes(lowerCaseQuery) ||
           user.email.toLowerCase().includes(lowerCaseQuery) ||
-          user.phoneNumber.toLowerCase().includes(lowerCaseQuery) ||
-          user.registrationNumber.toLowerCase().includes(lowerCaseQuery)
+          (user.phoneNumber?.toLowerCase() || "").includes(lowerCaseQuery) ||
+          (user.registrationNumber?.toLowerCase() || "").includes(
+            lowerCaseQuery
+          )
       );
   }, [users, searchQuery]);
-
   const columns: GridColDef[] = useMemo(() => {
     const commonColumns: GridColDef[] = [
       { field: "displayId", headerName: "ID", width: 100 },
@@ -138,10 +139,6 @@ const UserManagement: React.FC = () => {
 
     return commonColumns;
   }, [handleEditUser, handleDeleteUser, isMobile, theme.palette.primary.main]);
-
-  if (selectedUser) {
-    return <SpanLoader></SpanLoader>;
-  }
 
   return (
     <Box sx={{ height: "80vh", ml: 2 }}>
