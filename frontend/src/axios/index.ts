@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const instance = axios.create({
-    baseURL: "https://traksphere-rms-backend-production.up.railway.app/",
+    baseURL: "http://localhost:5000",
 });
 
 instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
