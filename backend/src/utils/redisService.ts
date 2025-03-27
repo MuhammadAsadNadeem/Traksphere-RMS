@@ -13,7 +13,7 @@ class RedisService extends Singleton<RedisService> {
                 host: config.redis.host,
                 port: config.redis.port,
             },
-            // password: config.redis.password,  // Uncomment if production in railway 
+            password: config.redis.password,
         });
 
         this.client.on('connect', () => {
