@@ -178,48 +178,48 @@ const FeatureSection = () => {
         <Grid container spacing={4}>
           {features.map((feature, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
-              <FeatureCard
-                component={motion.div}
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                elevation={0}
               >
-                <Box sx={{ position: "relative" }}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      position: "absolute",
-                      top: -theme.spacing(2),
-                      right: 0,
-                      color: "text.secondary",
-                      backgroundColor: "background.paper",
-                      px: 1,
-                      borderRadius: 1,
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    {feature.category}
-                  </Typography>
-                  <IconWrapper className="feature-icon">
-                    {feature.icon}
-                  </IconWrapper>
-                  <Typography
-                    variant="h5"
-                    gutterBottom
-                    sx={{ fontWeight: 600, mb: 2 }}
-                  >
-                    {feature.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ lineHeight: 1.7 }}
-                  >
-                    {feature.description}
-                  </Typography>
-                </Box>
-              </FeatureCard>
+                <FeatureCard elevation={0}>
+                  <Box sx={{ position: "relative" }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        position: "absolute",
+                        top: -theme.spacing(2),
+                        right: 0,
+                        color: "text.secondary",
+                        backgroundColor: "background.paper",
+                        px: 1,
+                        borderRadius: 1,
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      {feature.category}
+                    </Typography>
+                    <IconWrapper className="feature-icon">
+                      {feature.icon}
+                    </IconWrapper>
+                    <Typography
+                      variant="h5"
+                      gutterBottom
+                      sx={{ fontWeight: 600, mb: 2 }}
+                    >
+                      {feature.title}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ lineHeight: 1.7 }}
+                    >
+                      {feature.description}
+                    </Typography>
+                  </Box>
+                </FeatureCard>
+              </motion.div>
             </Grid>
           ))}
         </Grid>
