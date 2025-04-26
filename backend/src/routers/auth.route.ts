@@ -9,6 +9,7 @@ router.post("/complete-signup", controller.completeSignUp);
 router.post("/signin", controller.signIn);
 router.post("/forgot-password", controller.forgotPassword);
 router.get("/get-stopsNames", controller.getAllStopNames)
+router.post('/send-message', controller.sendMessage);
 
 
 export default router;

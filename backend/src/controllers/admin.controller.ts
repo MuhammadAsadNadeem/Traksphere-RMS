@@ -6,6 +6,7 @@ import { HttpError } from "../utils/errorHandler";
 import { StopDto } from "../dto/stop.dto";
 import { UpdateRouteDto, RouteDto } from "../dto/route.dto";
 import { UpdateUserDto } from "../dto/user.dto";
+import authService from "../services/auth.service";
 
 
 
@@ -341,6 +342,18 @@ const getAllCounts = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 
+const getAllMessages = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const messages = await authService.getAllMessages();
+        res.status(StatusCodes.OK).json({
+            message: "Messages fetched successfully",
+            data: messages
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
     getAllUsers,
     updateUserById,
@@ -358,5 +371,6 @@ export default {
     deleteRouteById,
     updateRouteById,
     getAllCounts,
+    getAllMessages,
 
 };

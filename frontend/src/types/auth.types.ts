@@ -31,4 +31,10 @@ export type BusStopType = {
 
 }
 
+export type MessageType = {
 
+    fullName: string,
+    email: string,
+    message: string,
+
+};

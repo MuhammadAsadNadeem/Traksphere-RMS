@@ -8,14 +8,18 @@ import { User } from "../entities/user.entity";
 import { HttpError } from "../utils/errorHandler";
 import { StatusCodes } from 'http-status-codes';
 import { BusStop } from "../entities/stop.entity";
+import { Message } from "../entities/message.entity";
+import { MessageDto } from "../dto/message.dto";
 
 export class authService {
     private userRepository: Repository<User>;
     private busStopRepository: Repository<BusStop>
+    private messageRepository: Repository<Message>;
 
     constructor() {
         this.userRepository = db.user;
-        this.busStopRepository = db.busStop
+        this.busStopRepository = db.busStop;
+        this.messageRepository = db.message;
     }
 
     async signUp(userData: SignUpDto) {
@@ -81,7 +85,29 @@ export class authService {
         }
     }
 
+    async sendMessage(data: MessageDto) {
+        const { fullName, email, message } = data;
 
+        if (!fullName || !email || !message) {
+            throw new HttpError("All fields are required", StatusCodes.BAD_REQUEST);
+        }
+
+        try {
+            const newMessage = this.messageRepository.create({ fullName, email, message });
+            await this.messageRepository.save(newMessage);
+            return newMessage;
+        } catch (error) {
+            throw new HttpError("Error saving message", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getAllMessages() {
+        try {
+            return await this.messageRepository.find({ order: { createdAt: "DESC" } });
+        } catch (error) {
+            throw new HttpError("Error fetching messages", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
 

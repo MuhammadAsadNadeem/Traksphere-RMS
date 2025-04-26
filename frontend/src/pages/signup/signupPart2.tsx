@@ -7,6 +7,7 @@ import {
   Card,
   Container,
   MenuItem,
+  Autocomplete,
 } from "@mui/material";
 import { useFormik, FormikHelpers } from "formik";
 import { userProfileSchema } from "../../validationSchema";
@@ -238,26 +239,29 @@ const Profile: React.FC = () => {
             </TextField>
           </Box>
 
-          <TextField
-            name="stopArea"
-            label="Stop Area"
-            margin="normal"
-            required
-            select
+          <Autocomplete
+            freeSolo
+            options={stops.map((stop) => stop.stopName)}
             value={formik.values.stopArea}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.stopArea && Boolean(formik.errors.stopArea)}
-            helperText={formik.touched.stopArea && formik.errors.stopArea}
-            fullWidth
-            variant="outlined"
-          >
-            {stops.map((stop) => (
-              <MenuItem key={stop.id} value={stop.stopName}>
-                {stop.stopName}
-              </MenuItem>
-            ))}
-          </TextField>
+            onChange={(value) => formik.setFieldValue("stopArea", value || "")}
+            onInputChange={(value) => formik.setFieldValue("stopArea", value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                name="stopArea"
+                label="Stop Area"
+                margin="normal"
+                required
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.stopArea && Boolean(formik.errors.stopArea)
+                }
+                helperText={formik.touched.stopArea && formik.errors.stopArea}
+                fullWidth
+                variant="outlined"
+              />
+            )}
+          />
 
           <Button
             type="submit"

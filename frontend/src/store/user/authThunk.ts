@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../axios";
-import { ForgotPasswordType, LoginType, SignUpPart1Type, SignUpPart2Type } from "../../types/auth.types";
+import { ForgotPasswordType, LoginType, MessageType, SignUpPart1Type, SignUpPart2Type } from "../../types/auth.types";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
@@ -14,7 +14,8 @@ export enum AuthApiPathEnum {
     OTP = "api/auth/send-otp",
     FORGOT_PASSWORD = "api/auth/forgot-password",
     USER_ROLE = "api/user/user-role",
-    GET_BUSSTOP_NAMES = "api/auth/get-stopsNames"
+    GET_BUSSTOP_NAMES = "api/auth/get-stopsNames",
+    SEND_MESSAGE = "api/auth/send-message",
 }
 
 const login = createAsyncThunk(AuthApiPathEnum.LOGIN, async (values: LoginType, { rejectWithValue }) => {
@@ -121,6 +122,18 @@ export const getBusStopNames = createAsyncThunk<BusStopType[]>(
     }
 );
 
+const sendMessage = createAsyncThunk(AuthApiPathEnum.SEND_MESSAGE, async (values: MessageType, { rejectWithValue }) => {
+    try {
+        const res = await instance.post(AuthApiPathEnum.SEND_MESSAGE, values)
+        if (res.status === HttpStatusCode.Ok) {
+            toaster.success(res.data.message)
+            return res.data.data
+        }
+    } catch (error) {
+        return rejectWithValue(errorReturn(error))
+    }
+})
+
 export default {
     login,
     signup,
@@ -129,4 +142,5 @@ export default {
     forgotPassword,
     checkUserRole,
     getBusStopNames,
+    sendMessage
 }

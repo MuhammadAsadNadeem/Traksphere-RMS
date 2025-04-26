@@ -22,4 +22,5 @@ const router = Router()
     .delete("/delete-route", controller.deleteRouteById)
     .put("/update-route", controller.updateRouteById)
     .get("/get-counts", controller.getAllCounts)
+    .get('/get-messages', controller.getAllMessages);
 export default router;

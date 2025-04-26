@@ -17,6 +17,7 @@ export class AdminService {
     private busStopRepository: Repository<BusStop>
     private routeRepository: Repository<Route>
 
+
     constructor() {
         this.userRepository = db.user;
         this.driverRepository = db.driver
@@ -330,6 +331,8 @@ export class AdminService {
             throw new HttpError("Error fetching counts.", StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
 }

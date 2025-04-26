@@ -8,6 +8,7 @@ import mailerService from '../utils/mailerService';
 import userService from '../services/user.service';
 import bcrypt from 'bcryptjs';
 import adminService from '../services/admin.service';
+import { MessageDto } from '../dto/message.dto';
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -151,12 +152,37 @@ const getAllStopNames = async (req: Request, res: Response, next: NextFunction) 
 };
 
 
+const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { fullName, email, message }: MessageDto = req.body;
+
+        if (!fullName || !email || !message) {
+            throw new HttpError("All fields are required", StatusCodes.BAD_REQUEST);
+        }
+
+        const savedMessage = await authService.sendMessage({ fullName, email, message });
+
+        res.status(StatusCodes.CREATED).json({
+            message: 'Message sent successfully',
+            data: savedMessage
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 export default {
     signUp,
     completeSignUp,
     signIn,
     sendOtp,
     forgotPassword,
-    getAllStopNames
+    getAllStopNames,
+    sendMessage,
+
 
 }
+
+

@@ -167,17 +167,10 @@ const ContactSection = () => {
                     Send us a Message
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12}>
                       <StyledTextField
                         fullWidth
-                        label="First Name"
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <StyledTextField
-                        fullWidth
-                        label="Last Name"
+                        label="Name"
                         variant="outlined"
                       />
                     </Grid>
