@@ -243,8 +243,12 @@ const Profile: React.FC = () => {
             freeSolo
             options={stops.map((stop) => stop.stopName)}
             value={formik.values.stopArea}
-            onChange={(value) => formik.setFieldValue("stopArea", value || "")}
-            onInputChange={(value) => formik.setFieldValue("stopArea", value)}
+            onChange={(_, value) =>
+              formik.setFieldValue("stopArea", value || "")
+            }
+            onInputChange={(_, value) =>
+              formik.setFieldValue("stopArea", value)
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
