@@ -23,7 +23,7 @@ import {
 import SearchBar from "../../components/SearchBar";
 import StopForm from "./stopForm";
 import SpanLoader from "../../components/SpanLoader";
-import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
+import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 
 interface StopData {
   name: string;

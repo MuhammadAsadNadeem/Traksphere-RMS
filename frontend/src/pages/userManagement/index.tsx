@@ -25,7 +25,7 @@ import { UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
-import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
+import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();

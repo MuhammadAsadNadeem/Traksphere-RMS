@@ -29,7 +29,7 @@ import { BusStopType } from "../../types/stop.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
-import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
+import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 
 const RouteManagement: React.FC = () => {
   const dispatch = useAppDispatch();

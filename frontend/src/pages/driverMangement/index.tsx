@@ -27,7 +27,7 @@ import { UpdateDriverType } from "../../types/driver.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
-import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
+import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 
 const DriverManagement: React.FC = () => {
   const dispatch = useAppDispatch();
