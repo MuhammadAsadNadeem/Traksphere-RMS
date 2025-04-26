@@ -18,11 +18,12 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   addNewStop,
   deleteStopById,
-  fetchAllBusStops,
+  getAllBusStops,
 } from "../../store/user/adminThunk";
 import SearchBar from "../../components/SearchBar";
 import StopForm from "./stopForm";
 import SpanLoader from "../../components/SpanLoader";
+import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
 
 interface StopData {
   name: string;
@@ -44,7 +45,7 @@ const StopManagement: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(fetchAllBusStops()).finally(() => setIsLoading(false));
+    dispatch(getAllBusStops()).finally(() => setIsLoading(false));
   }, [dispatch]);
 
   const processedStops = (stops || [])
@@ -77,7 +78,7 @@ const StopManagement: React.FC = () => {
         .unwrap()
         .then(() => {
           toaster.success("Stop deleted successfully!");
-          dispatch(fetchAllBusStops());
+          dispatch(getAllBusStops());
         })
         .catch(() => toaster.error("Failed to delete stop."))
         .finally(() => setDeleteDialogOpen(false));
@@ -97,7 +98,7 @@ const StopManagement: React.FC = () => {
       .then(() => {
         toaster.success("Stop added successfully!");
         setOpenDialog(false);
-        dispatch(fetchAllBusStops());
+        dispatch(getAllBusStops());
       })
       .catch(() => toaster.error("Failed to add stop."));
   };
@@ -208,8 +209,12 @@ const StopManagement: React.FC = () => {
                   pagination: { paginationModel: { pageSize: 10, page: 0 } },
                 }}
                 pageSizeOptions={[5, 10, 25, 50, 100]}
+                slots={{
+                  noRowsOverlay: () => (
+                    <CustomNoRowsOverlay message="No Stop available" />
+                  ),
+                }}
                 sx={{
-                  "& .MuiDataGrid-cell": {},
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: theme.table.backgroundColor,
                     color: theme.table.color,

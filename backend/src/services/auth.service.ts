@@ -7,12 +7,15 @@ import jwt from "jsonwebtoken";
 import { User } from "../entities/user.entity";
 import { HttpError } from "../utils/errorHandler";
 import { StatusCodes } from 'http-status-codes';
+import { BusStop } from "../entities/stop.entity";
 
 export class authService {
     private userRepository: Repository<User>;
+    private busStopRepository: Repository<BusStop>
 
     constructor() {
         this.userRepository = db.user;
+        this.busStopRepository = db.busStop
     }
 
     async signUp(userData: SignUpDto) {
@@ -63,6 +66,19 @@ export class authService {
         const { password: _, ...userData } = user;
         return { token };
         // return { token, user: userData };
+    }
+
+
+    async getAllStopNames(): Promise<BusStop[]> {
+        try {
+            const stops = await this.busStopRepository.find({
+                select: ["id", "stopName"]
+            });
+            return stops;
+        } catch (error) {
+
+            throw new HttpError("Error fetching stops", StatusCodes.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

@@ -17,7 +17,7 @@ import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
 import UserForm from "../../components/forms/UserForm";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  fetchAllUsers,
+  getAllUsers,
   deleteUserById,
   editUserById,
 } from "../../store/user/adminThunk";
@@ -25,6 +25,7 @@ import { UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
+import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(fetchAllUsers({})).finally(() => setIsLoading(false));
+    dispatch(getAllUsers({})).finally(() => setIsLoading(false));
   }, [dispatch]);
 
   const handleEditUser = useCallback((user: UserResponse) => {
@@ -60,7 +61,7 @@ const UserManagement: React.FC = () => {
         .then(() => {
           toaster.success("User deleted successfully!");
           setDeleteDialogOpen(false);
-          dispatch(fetchAllUsers({}));
+          dispatch(getAllUsers({}));
         })
         .catch(() => {
           toaster.error("Failed to delete user.");
@@ -75,7 +76,7 @@ const UserManagement: React.FC = () => {
         .then(() => {
           toaster.success("User updated successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllUsers({}));
+          dispatch(getAllUsers({}));
         })
         .catch(() => {
           toaster.error("Failed to update user.");
@@ -186,10 +187,16 @@ const UserManagement: React.FC = () => {
               <DataGrid
                 rows={filteredUsers}
                 columns={columns}
+                getRowId={(row) => row.id}
                 initialState={{
                   pagination: { paginationModel: { pageSize: 10, page: 0 } },
                 }}
                 pageSizeOptions={[5, 10, 25, 50, 100]}
+                slots={{
+                  noRowsOverlay: () => (
+                    <CustomNoRowsOverlay message="No User available" />
+                  ),
+                }}
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: theme.table.backgroundColor,

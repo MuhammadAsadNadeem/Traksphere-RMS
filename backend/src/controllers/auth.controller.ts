@@ -7,6 +7,7 @@ import redisService from "../utils/redisService";
 import mailerService from '../utils/mailerService';
 import userService from '../services/user.service';
 import bcrypt from 'bcryptjs';
+import adminService from '../services/admin.service';
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -140,6 +141,14 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
     }
 };
 
+const getAllStopNames = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const stops = await authService.getAllStopNames();
+        res.status(StatusCodes.OK).json(stops);
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 export default {
@@ -148,5 +157,6 @@ export default {
     signIn,
     sendOtp,
     forgotPassword,
+    getAllStopNames
 
 }

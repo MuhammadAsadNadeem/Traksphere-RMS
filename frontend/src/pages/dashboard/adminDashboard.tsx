@@ -18,7 +18,7 @@ import * as L from "leaflet";
 import "leaflet.gridlayer.googlemutant";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchAllBusStops, fetchCounts } from "../../store/user/adminThunk";
+import { getAllBusStops, getCounts } from "../../store/user/adminThunk";
 import SpanLoader from "../../components/SpanLoader";
 import MapIcon from "../../components/MapIcon";
 
@@ -113,8 +113,8 @@ const AdminDashboard: React.FC = () => {
   );
 
   const refreshData = useCallback(() => {
-    dispatch(fetchCounts()).unwrap();
-    dispatch(fetchAllBusStops()).unwrap();
+    dispatch(getCounts()).unwrap();
+    dispatch(getAllBusStops()).unwrap();
   }, [dispatch]);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-    fetchCounts, fetchAllBusStops, fetchAllUsers, fetchAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop, deleteStopById, fetchAllRoutes, addNewRoute, editRouteById, deleteRouteById, // editStopById,
+    getCounts, getAllBusStops, getAllUsers, getAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop, deleteStopById, getAllRoutes, addNewRoute, editRouteById, deleteRouteById, // editStopById,
 } from "./adminThunk";
 import { CountsResponse, BusStopResponse, UserResponse, DriverResponse, RouteResponse } from "../../types/admin.types";
 
@@ -52,40 +52,40 @@ const adminSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchCounts.pending, (state) => {
+            .addCase(getCounts.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchCounts.fulfilled, (state, action) => {
+            .addCase(getCounts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.counts = action.payload;
             })
-            .addCase(fetchCounts.rejected, (state, action) => {
+            .addCase(getCounts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
 
-            .addCase(fetchAllUsers.pending, (state) => {
+            .addCase(getAllUsers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAllUsers.fulfilled, (state, action) => {
+            .addCase(getAllUsers.fulfilled, (state, action) => {
                 state.loading = false;
                 state.users = action.payload;
             })
-            .addCase(fetchAllUsers.rejected, (state, action) => {
+            .addCase(getAllUsers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(fetchAllDrivers.pending, (state) => {
+            .addCase(getAllDrivers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAllDrivers.fulfilled, (state, action) => {
+            .addCase(getAllDrivers.fulfilled, (state, action) => {
                 state.drivers = action.payload;
                 state.loading = false;
             })
-            .addCase(fetchAllDrivers.rejected, (state, action) => {
+            .addCase(getAllDrivers.rejected, (state, action) => {
                 state.error = action.payload as string;
                 state.loading = false;
             })
@@ -130,16 +130,16 @@ const adminSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            .addCase(fetchAllBusStops.pending, (state) => {
+            .addCase(getAllBusStops.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAllBusStops.fulfilled, (state, action: PayloadAction<BusStopResponse[]>) => {
+            .addCase(getAllBusStops.fulfilled, (state, action: PayloadAction<BusStopResponse[]>) => {
                 state.loading = false;
                 state.busStops = action.payload;
             })
 
-            .addCase(fetchAllBusStops.rejected, (state, action) => {
+            .addCase(getAllBusStops.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
@@ -184,14 +184,17 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            .addCase(fetchAllRoutes.pending, (state) => {
+            .addCase(getAllRoutes.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchAllRoutes.fulfilled, (state, action) => {
-                state.loading = false;
-                state.routes = action.payload;
+            .addCase(getAllRoutes.fulfilled, (state, action) => {
+                if (Array.isArray(action.payload)) {
+                    state.routes = action.payload;
+                } else {
+                    state.routes = [];
+                }
             })
-            .addCase(fetchAllRoutes.rejected, (state, action) => {
+            .addCase(getAllRoutes.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })

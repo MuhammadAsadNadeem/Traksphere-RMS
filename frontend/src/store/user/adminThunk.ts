@@ -14,12 +14,12 @@ import { AddRouteType, UpdateRouteType } from "../../types/route.types";
 
 export enum AdminApiPathEnum {
     COUNTS = "api/admin/get-counts",
-    BUS_STOPS = "api/admin/get-stops",
-    FETCH_USERS = "api/admin/get-users",
+    GET_BUS_STOPS = "api/admin/get-stops",
+    GET_USERS = "api/admin/get-users",
     UPDATE_USER = "api/admin/update-user",
     DELETE_USER = "api/admin/delete-user",
     ADD_Driver = "api/admin/add-driver",
-    FETCH_DRIVERS = "api/admin/get-drivers",
+    GET_DRIVERS = "api/admin/get-drivers",
     UPDATE_DRIVER = "api/admin/update-driver",
     DElETE_DRIVER = "api/admin/delete-driver",
     ADD_STOP = "api/admin/add-stop",
@@ -32,7 +32,7 @@ export enum AdminApiPathEnum {
 }
 
 
-export const fetchCounts = createAsyncThunk(
+export const getCounts = createAsyncThunk(
     AdminApiPathEnum.COUNTS,
     async (_, { dispatch, rejectWithValue }) => {
         dispatch(setLoading(true));
@@ -52,12 +52,12 @@ export const fetchCounts = createAsyncThunk(
 
 
 
-export const fetchAllUsers = createAsyncThunk(
-    AdminApiPathEnum.FETCH_USERS,
+export const getAllUsers = createAsyncThunk(
+    AdminApiPathEnum.GET_USERS,
     async (params: Partial<UserResponse>, { dispatch, rejectWithValue }) => {
         dispatch(setLoading(true));
         try {
-            const res = await instance.get<UserResponse[]>(AdminApiPathEnum.FETCH_USERS, { params });
+            const res = await instance.get<UserResponse[]>(AdminApiPathEnum.GET_USERS, { params });
             if (res.status === HttpStatusCode.Ok) {
                 const users: UserResponse[] = res.data.map((user) => ({
                     id: user.id,
@@ -129,10 +129,10 @@ export const addNewDriver = createAsyncThunk(AdminApiPathEnum.ADD_Driver,
 );
 
 
-export const fetchAllDrivers = createAsyncThunk(AdminApiPathEnum.FETCH_DRIVERS,
+export const getAllDrivers = createAsyncThunk(AdminApiPathEnum.GET_DRIVERS,
     async (_, { rejectWithValue }) => {
         try {
-            const res = await instance.get(AdminApiPathEnum.FETCH_DRIVERS)
+            const res = await instance.get(AdminApiPathEnum.GET_DRIVERS)
             if (res.status === HttpStatusCode.Ok) {
                 return res.data;
             }
@@ -178,11 +178,11 @@ export const deleteDriverById = createAsyncThunk(
     }
 );
 
-export const fetchAllBusStops = createAsyncThunk<BusStopResponse[]>(
-    AdminApiPathEnum.BUS_STOPS,
+export const getAllBusStops = createAsyncThunk<BusStopResponse[]>(
+    AdminApiPathEnum.GET_BUS_STOPS,
     async (_, { rejectWithValue }) => {
         try {
-            const res = await instance.get<BusStopResponse[]>(AdminApiPathEnum.BUS_STOPS);
+            const res = await instance.get<BusStopResponse[]>(AdminApiPathEnum.GET_BUS_STOPS);
             if (res.status === HttpStatusCode.Ok) {
                 return res.data.map(stop => ({
                     id: stop.id,
@@ -191,7 +191,7 @@ export const fetchAllBusStops = createAsyncThunk<BusStopResponse[]>(
                     longitude: stop.longitude,
                 }));
             }
-            return rejectWithValue('Failed to fetch bus stops');
+            return rejectWithValue('Failed to get bus stops');
         } catch (error) {
             return rejectWithValue(errorReturn(error));
         }
@@ -248,7 +248,7 @@ export const deleteStopById = createAsyncThunk(
     }
 );
 
-export const fetchAllRoutes = createAsyncThunk(AdminApiPathEnum.GET_ROUTES,
+export const getAllRoutes = createAsyncThunk(AdminApiPathEnum.GET_ROUTES,
     async (_, { rejectWithValue }) => {
         try {
             const res = await instance.get(AdminApiPathEnum.GET_ROUTES)
@@ -314,19 +314,19 @@ export const deleteRouteById = createAsyncThunk(
 );
 
 export default {
-    fetchCounts,
-    fetchAllUsers,
+    getCounts,
+    getAllUsers,
     editUserById,
     deleteUserById,
     addNewDriver,
-    fetchAllDrivers,
+    getAllDrivers,
     editDriverById,
     deleteDriverById,
-    fetchAllBusStops,
+    getAllBusStops,
     addNewStop,
     // editStopById,
     deleteStopById,
-    fetchAllRoutes,
+    getAllRoutes,
     addNewRoute,
     editRouteById,
     deleteRouteById,

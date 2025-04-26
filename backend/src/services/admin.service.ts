@@ -237,15 +237,14 @@ export class AdminService {
         await this.routeRepository.save(newRoute);
         return newRoute
     }
-    async getAllRoutes(): Promise<Route[]> {
+    async getAllRoutes(): Promise<Route[] | { message: string }> {
         try {
-
             const routes = await this.routeRepository.find({
                 relations: ["driver", "busStops"],
             });
 
             if (!routes || routes.length === 0) {
-                throw new HttpError("No routes found.", StatusCodes.NOT_FOUND);
+                return { message: "No routes available." };
             }
 
             return routes;

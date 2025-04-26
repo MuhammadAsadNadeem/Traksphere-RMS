@@ -8,7 +8,7 @@ router.post("/signup", controller.signUp);
 router.post("/complete-signup", controller.completeSignUp);
 router.post("/signin", controller.signIn);
 router.post("/forgot-password", controller.forgotPassword);
-
+router.get("/get-stopsNames", controller.getAllStopNames)
 
 
 export default router;

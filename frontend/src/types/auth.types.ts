@@ -24,3 +24,11 @@ export type ForgotPasswordType = {
     code: string,
 }
 
+export type BusStopType = {
+    id: string,
+    stopName: string,
+
+
+}
+
+

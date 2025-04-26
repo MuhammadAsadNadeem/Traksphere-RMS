@@ -62,10 +62,10 @@ export const userSlice = createSlice({
             state.isSuperUser = action.payload;
         })
 
-        // builder.addCase(userThunk.fetchAllRoutes.pending, (state) => {
+        // builder.addCase(userThunk.getAllRoutes.pending, (state) => {
         //     state.isLoading = true
         // })
-        builder.addCase(userThunk.fetchAllRoutes.fulfilled, (state, action: PayloadAction<RouteType[]>) => {
+        builder.addCase(userThunk.getAllRoutes.fulfilled, (state, action: PayloadAction<RouteType[]>) => {
             state.isLoading = false
             state.routes = action.payload;
         });

@@ -20,7 +20,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
   icon,
   title,
   value,
-  color = "#3f51b5",
+  color = " theme.palette.secondary.main",
   sx,
 }) => {
   return (

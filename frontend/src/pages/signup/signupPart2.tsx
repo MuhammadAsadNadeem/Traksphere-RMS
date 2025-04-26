@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   TextField,
@@ -12,18 +12,29 @@ import { useFormik, FormikHelpers } from "formik";
 import { userProfileSchema } from "../../validationSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
-
-import authThunk from "../../store/user/authThunk";
+import authThunk, { getBusStopNames } from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { routes } from "../../routes";
-import { SignUpPart2Type } from "../../types/auth.types";
+import { BusStopType, SignUpPart2Type } from "../../types/auth.types";
 
 const Profile: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const email = location.state?.email;
+  const [stops, setStops] = useState<BusStopType[]>([]);
+
+  useEffect(() => {
+    const fetchStops = async () => {
+      try {
+        const response = await dispatch(getBusStopNames()).unwrap();
+        setStops(response);
+      } catch {
+        toaster.error("Failed to load bus stops");
+      }
+    };
+    fetchStops();
+  }, [dispatch]);
 
   const onSubmit = async (
     values: SignUpPart2Type,
@@ -220,7 +231,7 @@ const Profile: React.FC = () => {
               variant="outlined"
             >
               {Array.from({ length: 15 }, (_, i) => (
-                <MenuItem key={i + 1} value={i + 1}>
+                <MenuItem key={i + 1} value={(i + 1).toString()}>
                   {i + 1}
                 </MenuItem>
               ))}
@@ -232,6 +243,7 @@ const Profile: React.FC = () => {
             label="Stop Area"
             margin="normal"
             required
+            select
             value={formik.values.stopArea}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -239,7 +251,13 @@ const Profile: React.FC = () => {
             helperText={formik.touched.stopArea && formik.errors.stopArea}
             fullWidth
             variant="outlined"
-          />
+          >
+            {stops.map((stop) => (
+              <MenuItem key={stop.id} value={stop.stopName}>
+                {stop.stopName}
+              </MenuItem>
+            ))}
+          </TextField>
 
           <Button
             type="submit"

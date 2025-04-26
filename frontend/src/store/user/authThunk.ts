@@ -4,6 +4,7 @@ import { ForgotPasswordType, LoginType, SignUpPart1Type, SignUpPart2Type } from 
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
+import { BusStopType } from "../../types/auth.types";
 
 
 export enum AuthApiPathEnum {
@@ -13,6 +14,7 @@ export enum AuthApiPathEnum {
     OTP = "api/auth/send-otp",
     FORGOT_PASSWORD = "api/auth/forgot-password",
     USER_ROLE = "api/user/user-role",
+    GET_BUSSTOP_NAMES = "api/auth/get-stopsNames"
 }
 
 const login = createAsyncThunk(AuthApiPathEnum.LOGIN, async (values: LoginType, { rejectWithValue }) => {
@@ -100,6 +102,25 @@ export const checkUserRole = createAsyncThunk(
 );
 
 
+export const getBusStopNames = createAsyncThunk<BusStopType[]>(
+    AuthApiPathEnum.GET_BUSSTOP_NAMES,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get<BusStopType[]>(AuthApiPathEnum.GET_BUSSTOP_NAMES);
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data.map(stop => ({
+                    id: stop.id,
+                    stopName: stop.stopName,
+
+                }));
+            }
+            return rejectWithValue('Failed to get bus stops');
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
+
 export default {
     login,
     signup,
@@ -107,4 +128,5 @@ export default {
     completeSignup,
     forgotPassword,
     checkUserRole,
+    getBusStopNames,
 }

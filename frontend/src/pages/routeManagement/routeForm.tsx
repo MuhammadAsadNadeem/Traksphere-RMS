@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchAllDrivers, fetchAllBusStops } from "../../store/user/adminThunk";
+import { getAllDrivers, getAllBusStops } from "../../store/user/adminThunk";
 import { BusStopType } from "../../types/stop.types";
 import { DriverType } from "../../types/driver.types";
 import theme from "../../theme";
@@ -52,8 +52,8 @@ const RouteForm: React.FC<RouteFormProps> = ({
   const busStops = useAppSelector((state) => state.adminSlice.busStops) || [];
 
   useEffect(() => {
-    dispatch(fetchAllDrivers());
-    dispatch(fetchAllBusStops());
+    dispatch(getAllDrivers());
+    dispatch(getAllBusStops());
   }, [dispatch]);
 
   const handleRouteNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {

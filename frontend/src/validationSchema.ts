@@ -25,17 +25,16 @@ export const signUpSchema = Yup.object({
 });
 
 export const userProfileSchema = Yup.object({
-    fullName: Yup.string().required("Full Name is required."),
+    fullName: Yup.string().matches(/^[aA-zZ\s]+$/, "Name should only contain letters and spaces.").required("Full Name is required."),
     departmentName: Yup.string().required("Department Name is required."),
-    registrationNumber: Yup.string().required("Registration Number is required."),
+    registrationNumber: Yup.string().matches(/^\d{4}[A-Z]{2}\d{3}$/, "Registration number must be in format: XXXXXX").required("Registration Number is required."),
     phoneNumber: Yup.string()
         .matches(/^\d{11}$/, "Phone number must be 11 digits.")
         .required("Phone number is required."),
     gender: Yup.string().required("Please select a gender."),
     routeNumber: Yup.string().required("Bus number is required."),
-    stopArea: Yup.string().required("Stop Area is required."),
+    stopArea: Yup.string().matches(/^[A-Za-z\s]+$/, "Stop area must only contain letters, and spaces").required("Stop Area is required."),
 });
-
 export const forgotPasswordSchema = Yup.object({
     email: Yup.string()
         .email("Invalid email format")

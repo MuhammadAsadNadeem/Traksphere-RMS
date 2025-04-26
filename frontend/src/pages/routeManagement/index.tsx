@@ -17,7 +17,7 @@ import {
 import { Edit, Delete, Add, MoreVert } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  fetchAllRoutes,
+  getAllRoutes,
   deleteRouteById,
   addNewRoute,
   editRouteById,
@@ -29,6 +29,7 @@ import { BusStopType } from "../../types/stop.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
+import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
 
 const RouteManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -50,21 +51,22 @@ const RouteManagement: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(fetchAllRoutes())
+    dispatch(getAllRoutes())
       .unwrap()
-      .catch((error) => {
-        console.error("Fetch error:", error);
-        toaster.error("Failed to fetch routes.");
+      .catch(() => {
+        toaster.error("Failed to get routes.");
       })
       .finally(() => setIsLoading(false));
   }, [dispatch]);
 
-  const routesWithDisplayId = routes.map((route, index) => ({
-    ...route,
-    displayId: index + 1,
-    driverName: route.driver?.fullName || "N/A",
-    stopsCount: route.busStops?.length || 0,
-  }));
+  const routesWithDisplayId = Array.isArray(routes)
+    ? routes.map((route, index) => ({
+        ...route,
+        displayId: index + 1,
+        driverName: route.driver?.fullName || "N/A",
+        stopsCount: route.busStops?.length || 0,
+      }))
+    : [];
 
   const handleEditRoute = (route: RouteType) => {
     setSelectedRoute(route);
@@ -102,7 +104,7 @@ const RouteManagement: React.FC = () => {
         .then(() => {
           toaster.success("Route deleted successfully!");
           setDeleteDialogOpen(false);
-          dispatch(fetchAllRoutes());
+          dispatch(getAllRoutes());
         })
         .catch(() => {
           toaster.error("Failed to delete route.");
@@ -150,7 +152,7 @@ const RouteManagement: React.FC = () => {
         .then(() => {
           toaster.success("Route added successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllRoutes());
+          dispatch(getAllRoutes());
         })
         .catch((error) => {
           console.error("Error adding route:", error);
@@ -164,7 +166,7 @@ const RouteManagement: React.FC = () => {
         .then(() => {
           toaster.success("Route updated successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllRoutes());
+          dispatch(getAllRoutes());
         })
         .catch((error) => {
           console.error("Error updating route:", error);
@@ -196,8 +198,9 @@ const RouteManagement: React.FC = () => {
     );
   });
 
-  const currentRouteStops =
-    routes.find((r) => r.id === selectedStopsRowId)?.busStops || [];
+  const currentRouteStops = Array.isArray(routes)
+    ? routes.find((r) => r.id === selectedStopsRowId)?.busStops || []
+    : [];
 
   const columns: GridColDef[] = [
     { field: "displayId", headerName: "ID", width: 100 },
@@ -346,6 +349,11 @@ const RouteManagement: React.FC = () => {
                     pagination: { paginationModel: { pageSize: 10, page: 0 } },
                   }}
                   pageSizeOptions={[5, 10, 25, 50, 100]}
+                  slots={{
+                    noRowsOverlay: () => (
+                      <CustomNoRowsOverlay message="No routes available" />
+                    ),
+                  }}
                   sx={{
                     "& .MuiDataGrid-columnHeader": {
                       backgroundColor: theme.table.backgroundColor,

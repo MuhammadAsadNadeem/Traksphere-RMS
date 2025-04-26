@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
 import DriverForm from "../../components/forms/DriverForm";
 import {
-  fetchAllDrivers,
+  getAllDrivers,
   deleteDriverById,
   addNewDriver,
   editDriverById,
@@ -27,6 +27,7 @@ import { UpdateDriverType } from "../../types/driver.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
+import CustomNoRowsOverlay from "../../components/NoAvailableinTable";
 
 const DriverManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -45,7 +46,7 @@ const DriverManagement: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(fetchAllDrivers()).finally(() => setIsLoading(false));
+    dispatch(getAllDrivers()).finally(() => setIsLoading(false));
   }, [dispatch]);
   const driversWithDisplayId = (drivers || [])
     .filter((driver) => driver != null)
@@ -84,7 +85,7 @@ const DriverManagement: React.FC = () => {
         .then(() => {
           toaster.success("Driver deleted successfully!");
           setDeleteDialogOpen(false);
-          dispatch(fetchAllDrivers());
+          dispatch(getAllDrivers());
         })
         .catch(() => {
           toaster.error("Failed to delete driver.");
@@ -130,7 +131,7 @@ const DriverManagement: React.FC = () => {
         .then(() => {
           toaster.success("Driver added successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllDrivers());
+          dispatch(getAllDrivers());
         })
         .catch(() => {
           toaster.error("Failed to add driver.");
@@ -143,7 +144,7 @@ const DriverManagement: React.FC = () => {
         .then(() => {
           toaster.success("Driver updated successfully!");
           setOpenDialog(false);
-          dispatch(fetchAllDrivers());
+          dispatch(getAllDrivers());
         })
         .catch(() => {
           toaster.error("Failed to update driver.");
@@ -270,8 +271,12 @@ const DriverManagement: React.FC = () => {
                   pagination: { paginationModel: { pageSize: 10, page: 0 } },
                 }}
                 pageSizeOptions={[5, 10, 25, 50, 100]}
+                slots={{
+                  noRowsOverlay: () => (
+                    <CustomNoRowsOverlay message="No Driver available" />
+                  ),
+                }}
                 sx={{
-                  "& .MuiDataGrid-cell": {},
                   "& .MuiDataGrid-columnHeader": {
                     backgroundColor: theme.table.backgroundColor,
                     color: theme.table.color,

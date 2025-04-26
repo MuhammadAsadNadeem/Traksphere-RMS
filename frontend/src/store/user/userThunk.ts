@@ -55,7 +55,7 @@ const getProfile = createAsyncThunk(UserApiPathEnum.GET_PROFILE,
     }
 );
 
-export const fetchAllRoutes = createAsyncThunk(UserApiPathEnum.GET_ROUTES,
+export const getAllRoutes = createAsyncThunk(UserApiPathEnum.GET_ROUTES,
     async (_, { rejectWithValue }) => {
         try {
             const res = await instance.get(UserApiPathEnum.GET_ROUTES)
@@ -76,6 +76,6 @@ export default {
     changePassword,
     getProfile,
     updateProfile,
-    fetchAllRoutes,
+    getAllRoutes,
 
 };
