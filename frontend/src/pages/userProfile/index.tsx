@@ -10,7 +10,7 @@ import {
   Select,
   FormControl,
   InputLabel,
-  SelectChangeEvent, // Import SelectChangeEvent
+  SelectChangeEvent,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -20,11 +20,17 @@ import userThunk from "../../store/user/userThunk";
 import toaster from "../../utils/toaster";
 import SpanLoader from "../../components/SpanLoader";
 import theme from "../../theme";
+import { getBusStopNames } from "../../store/user/authThunk";
+import { updateProfileSchema } from "../../validationSchema";
+import * as Yup from "yup";
 
 const UserProfile: React.FC = () => {
   const userProfile = useAppSelector((state) => state.userSlice.profile);
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UpdateProfileType | null>(null);
+  const [stopNames, setStopNames] = useState<
+    Array<{ id: string; stopName: string }>
+  >([]);
   const dispatch = useAppDispatch();
 
   const busNumbers = Array.from({ length: 15 }, (_, i) => (i + 1).toString());
@@ -37,6 +43,16 @@ const UserProfile: React.FC = () => {
     "Biotechnology",
     "Basic Science",
   ];
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      updateProfileSchema
+        .validate(profile, { abortEarly: false })
+        .then(() => setIsFormValid(true))
+        .catch(() => setIsFormValid(false));
+    }
+  }, [profile]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -47,14 +63,46 @@ const UserProfile: React.FC = () => {
       }
     };
 
+    const fetchStopNames = async () => {
+      try {
+        const stops = await dispatch(getBusStopNames()).unwrap();
+        setStopNames(stops);
+      } catch (error) {
+        console.error("Failed to fetch stop names:", error);
+      }
+    };
     if (!userProfile) {
       fetchProfile();
     } else {
       setProfile(userProfile);
     }
+
+    fetchStopNames();
   }, [dispatch, userProfile]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSave = async () => {
+    try {
+      if (isEditing && profile) {
+        await updateProfileSchema.validate(profile, { abortEarly: false });
+        await dispatch(userThunk.updateProfile(profile)).unwrap();
+        toaster.success("Profile updated successfully!");
+      }
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        error.inner.forEach((err) => {
+          if (err.message) {
+            toaster.error(err.message);
+          }
+        });
+      } else {
+        toaster.error(error as string);
+      }
+    } finally {
+      handleToggle();
+    }
+  };
+
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setProfile((prevProfile) => ({
       ...prevProfile!,
@@ -62,7 +110,7 @@ const UserProfile: React.FC = () => {
     }));
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfile((prevProfile) => ({
       ...prevProfile!,
@@ -74,39 +122,16 @@ const UserProfile: React.FC = () => {
     setIsEditing((prev) => !prev);
   };
 
-  const handleSave = async () => {
-    try {
-      if (isEditing && profile) {
-        if (profile.phoneNumber && profile.phoneNumber.length !== 11) {
-          toaster.error("Phone number must be exactly 11 digits.");
-          return;
-        }
-
-        await dispatch(userThunk.updateProfile(profile)).unwrap();
-        toaster.success("Profile updated successfully!");
-      }
-    } catch (error) {
-      toaster.error(error as string);
-    } finally {
-      handleToggle();
-    }
-  };
-
   function stringToColor(string: string) {
     let hash = 0;
-    let i;
-
-    for (i = 0; i < string.length; i += 1) {
+    for (let i = 0; i < string.length; i += 1) {
       hash = string.charCodeAt(i) + ((hash << 5) - hash);
     }
-
     let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 3; i += 1) {
       const value = (hash >> (i * 8)) & 0xff;
       color += `00${value.toString(16)}`.slice(-2);
     }
-
     return color;
   }
 
@@ -116,7 +141,6 @@ const UserProfile: React.FC = () => {
       nameParts.length > 1
         ? `${nameParts[0][0]}${nameParts[1][0]}`
         : `${nameParts[0][0] || ""}`;
-
     return {
       sx: {
         bgcolor: stringToColor(name),
@@ -129,7 +153,7 @@ const UserProfile: React.FC = () => {
   }
 
   if (!profile) {
-    return <SpanLoader></SpanLoader>;
+    return <SpanLoader />;
   }
 
   return (
@@ -198,8 +222,15 @@ const UserProfile: React.FC = () => {
                 onChange={handleChange}
                 disabled={!isEditing}
                 size="small"
+                error={/\d/.test(profile.fullName || "")}
+                helperText={
+                  /\d/.test(profile.fullName || "")
+                    ? "Name should not contain numbers."
+                    : ""
+                }
               />
             </Box>
+
             <Box
               sx={{
                 width: { xs: "100%", sm: "calc(50% - 8px)" },
@@ -223,6 +254,7 @@ const UserProfile: React.FC = () => {
                 </Select>
               </FormControl>
             </Box>
+
             <Box
               sx={{
                 width: { xs: "100%", sm: "calc(50% - 8px)" },
@@ -239,6 +271,7 @@ const UserProfile: React.FC = () => {
                 size="small"
               />
             </Box>
+
             <Box
               sx={{
                 width: { xs: "100%", sm: "calc(50% - 8px)" },
@@ -261,6 +294,7 @@ const UserProfile: React.FC = () => {
                 }
               />
             </Box>
+
             <Box
               sx={{
                 width: { xs: "100%", sm: "calc(50% - 8px)" },
@@ -284,21 +318,42 @@ const UserProfile: React.FC = () => {
                 </Select>
               </FormControl>
             </Box>
+
             <Box
               sx={{
                 width: { xs: "100%", sm: "calc(50% - 8px)" },
                 flexShrink: 0,
               }}
             >
-              <TextField
-                fullWidth
-                label="Stop Area"
-                name="stopArea"
-                value={profile.stopArea}
-                onChange={handleChange}
-                disabled={!isEditing}
-                size="small"
-              />
+              {stopNames.length > 0 ? (
+                <FormControl fullWidth size="small">
+                  <InputLabel>Stop Area</InputLabel>
+                  <Select
+                    label="Stop Area"
+                    name="stopArea"
+                    value={profile.stopArea || ""}
+                    onChange={handleSelectChange}
+                    disabled={!isEditing}
+                  >
+                    {stopNames.map((stop) => (
+                      <MenuItem key={stop.id} value={stop.stopName}>
+                        {stop.stopName}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="Other">Other (Please Specify)</MenuItem>
+                  </Select>
+                </FormControl>
+              ) : (
+                <TextField
+                  fullWidth
+                  label="Stop Area"
+                  name="stopArea"
+                  value={profile.stopArea || ""}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  size="small"
+                />
+              )}
             </Box>
           </Box>
         </Box>
@@ -317,7 +372,8 @@ const UserProfile: React.FC = () => {
               },
             }}
             startIcon={isEditing ? <SaveIcon /> : <EditIcon />}
-            onClick={handleSave}
+            onClick={isEditing ? handleSave : handleToggle}
+            disabled={isEditing && !isFormValid}
           >
             {isEditing ? "Save" : "Edit Profile"}
           </Button>
