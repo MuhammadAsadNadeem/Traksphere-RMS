@@ -5,7 +5,8 @@ import {
   Typography,
   Button,
   useTheme,
-  useMediaQuery,
+  Stack,
+  alpha,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -15,211 +16,225 @@ import { routes } from "../../../routes";
 const HeroSection: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box
       component="section"
       sx={{
         position: "relative",
-        minHeight: { xs: "calc(100vh - 64px)", md: "calc(100vh - 80px)" },
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         overflow: "hidden",
-        pt: { xs: 8, sm: 12, md: 16 },
-        pb: { xs: 12, sm: 16, md: 20 },
+        background: `
+          radial-gradient(circle at 10% 20%, ${alpha(
+            theme.palette.primary.light,
+            0.15
+          )} 0%, transparent 40%),
+          radial-gradient(circle at 90% 80%, ${alpha(
+            theme.palette.secondary.light,
+            0.15
+          )} 0%, transparent 40%)
+        `,
       }}
     >
-      {/* Background Gradient */}
+      {/* Animated floating elements */}
       <Box
         sx={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}15 100%)`,
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
           zIndex: -1,
         }}
-      />
+      >
+        {[1, 2, 3].map((i) => (
+          <Box
+            key={i}
+            component={motion.div}
+            initial={{ y: 0, x: i % 2 === 0 ? -100 : 100 }}
+            animate={{
+              y: [0, 100, 0],
+              x: [i % 2 === 0 ? -100 : 100, i % 2 === 0 ? 100 : -100, 0],
+              rotate: 360,
+            }}
+            transition={{
+              duration: 15 + i * 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            sx={{
+              position: "absolute",
+              top: `${i * 25}%`,
+              left: `${i * 20}%`,
+              width: 400,
+              height: 400,
+              background: `linear-gradient(45deg, ${alpha(
+                theme.palette.primary.main,
+                0.1
+              )} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`,
+              borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%",
+              filter: "blur(40px)",
+              opacity: 0.4,
+            }}
+          />
+        ))}
+      </Box>
 
-      {/* Content Container */}
       <Container maxWidth="lg">
-        <Box
+        <Stack
+          alignItems="center"
+          textAlign="center"
+          spacing={{ xs: 4, md: 6 }}
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: { xs: 6, md: 8 },
+            position: "relative",
+            zIndex: 1,
+            py: { xs: 8, md: 12 },
           }}
         >
-          {/* Left Content */}
           <Box
             component={motion.div}
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            sx={{
-              flex: "1 1 auto",
-              maxWidth: { xs: "100%", md: "60%" },
-              textAlign: { xs: "center", md: "left" },
-            }}
           >
             <Typography
               variant="h1"
-              component={motion.h1}
               sx={{
                 fontSize: {
-                  xs: "2.5rem",
+                  xs: "2.75rem",
                   sm: "3.5rem",
-                  md: "4rem",
-                  lg: "4.5rem",
+                  md: "4.5rem",
+                  lg: "5rem",
                 },
-                fontWeight: 800,
+                fontWeight: 900,
                 lineHeight: 1.1,
-                mb: { xs: 2, md: 3 },
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                letterSpacing: "-0.03em",
+                maxWidth: "1200px",
+                mx: "auto",
+                mb: 3,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                 backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
+                WebkitTextFillColor: "transparent",
               }}
             >
-              Traksphere Smart Transit Solutions for Modern Campus
+              Revolutionizing Campus Transportation Through Smart Technology
             </Typography>
 
             <Typography
               variant="h2"
               sx={{
-                fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
-                color: theme.palette.text.secondary,
+                fontSize: { xs: "1.25rem", md: "1.5rem" },
+                color: "text.secondary",
                 fontWeight: 400,
-                lineHeight: 1.5,
-                mb: { xs: 4, md: 5 },
-                maxWidth: "600px",
-                mx: { xs: "auto", md: 0 },
+                lineHeight: 1.6,
+                maxWidth: "800px",
+                mx: "auto",
+                mb: 4,
               }}
             >
-              Experience seamless campus transportation with real-time tracking
-              and smart notifications
+              Optimize campus mobility with real-time tracking, predictive
+              analytics, and AI-powered route optimization for students and
+              faculty
             </Typography>
 
-            <Box
+            <Button
+              component={motion.button}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              variant="contained"
+              size="large"
+              onClick={() => navigate(routes.signup)}
+              endIcon={<ArrowForwardIcon />}
               sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 2, sm: 3 },
-                justifyContent: { xs: "center", md: "flex-start" },
-              }}
-            >
-              <Button
-                component={motion.button}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                variant="contained"
-                size={isMobile ? "large" : "large"}
-                onClick={() => navigate(routes.signup)}
-                endIcon={<ArrowForwardIcon />}
-                sx={{
-                  py: { xs: 1.5, md: 2 },
-                  px: { xs: 4, md: 6 },
-                  borderRadius: 2,
-                  fontSize: { xs: "1rem", md: "1.125rem" },
-                  fontWeight: 600,
-                  textTransform: "none",
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-                  "&:hover": {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-                  },
-                }}
-              >
-                Get Started Free
-              </Button>
-            </Box>
-
-            {/* Stats */}
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(3, 1fr)",
+                px: 6,
+                py: 2,
+                borderRadius: 3,
+                fontSize: "1.1rem",
+                fontWeight: 700,
+                textTransform: "none",
+                background: `linear-gradient(150deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                boxShadow: `0 12px 24px ${alpha(
+                  theme.palette.primary.main,
+                  0.2
+                )}`,
+                "&:hover": {
+                  boxShadow: `0 16px 32px ${alpha(
+                    theme.palette.primary.main,
+                    0.3
+                  )}`,
                 },
-                gap: { xs: 3, sm: 4 },
-                mt: { xs: 6, md: 8 },
               }}
             >
-              {[
-                { value: "50+", label: "Active Routes" },
-                { value: "1000+", label: "Daily Riders" },
-                { value: "99.9%", label: "On-time Rate" },
-              ].map((stat, index) => (
-                <Box
-                  key={index}
-                  component={motion.div}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 }}
-                  sx={{
-                    textAlign: "center",
-                    p: 2,
-                  }}
-                >
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      fontSize: { xs: "2rem", md: "2.5rem" },
-                      fontWeight: 700,
-                      mb: 1,
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
-                    {stat.value}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      fontSize: { xs: "1rem", md: "1.125rem" },
-                    }}
-                  >
-                    {stat.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+              Start Free Trial
+            </Button>
           </Box>
 
-          {/* Right Content - Image */}
+          {/* Stats Grid */}
           <Box
             component={motion.div}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
             sx={{
-              flex: "0 0 auto",
-              width: { xs: "100%", md: "40%" },
-              display: { xs: "none", md: "block" },
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+              gap: 4,
+              width: "100%",
+              maxWidth: "1000px",
+              mx: "auto",
+              mt: { xs: 4, md: 8 },
             }}
           >
-            <Box
-              component="img"
-              src="src/assets/images/hero-illustration.svg"
-              alt="Smart Transit"
-              sx={{
-                width: "100%",
-                height: "auto",
-                maxWidth: "500px",
-                mx: "auto",
-                filter: "drop-shadow(0 8px 24px rgba(0, 0, 0, 0.1))",
-              }}
-            />
+            {[
+              { value: "50+", label: "Optimized Routes" },
+              { value: "1000+", label: "Daily Commuters" },
+              { value: "99.9%", label: "Service Reliability" },
+            ].map((stat, index) => (
+              <Box
+                key={index}
+                component={motion.div}
+                whileHover={{ y: -5 }}
+                sx={{
+                  textAlign: "center",
+                  p: 3,
+                  background: alpha(theme.palette.background.paper, 0.8),
+                  borderRadius: 4,
+                  backdropFilter: "blur(12px)",
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  boxShadow: `0 8px 32px ${alpha(
+                    theme.palette.primary.main,
+                    0.05
+                  )}`,
+                }}
+              >
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontSize: { xs: "2.25rem", md: "2.75rem" },
+                    fontWeight: 800,
+                    mb: 1,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 100%)`,
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "text.secondary",
+                    fontSize: "1.1rem",
+                    fontWeight: 500,
+                  }}
+                >
+                  {stat.label}
+                </Typography>
+              </Box>
+            ))}
           </Box>
-        </Box>
+        </Stack>
       </Container>
     </Box>
   );
