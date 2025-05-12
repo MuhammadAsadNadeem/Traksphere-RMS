@@ -1,93 +1,69 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
-import "leaflet-routing-machine";
 import { Box } from "@mui/material";
-import SpanLoader from "../../components/SpanLoader";
 
 const busIcon = new L.Icon({
-  iconUrl: "../../../src/assets/images/bus-stop.png",
-  iconSize: [40, 40],
+  iconUrl: "../../../src/assets/images/bus-stop.svg",
+  iconSize: [100, 100],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
 });
 
-const START_POINT = L.latLng(31.5799417, 74.35464377811556);
-const END_POINT = L.latLng(31.694468449462903, 74.24724019481333);
-
 const LiveTracking: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
-  const routingControl = useRef<L.Routing.Control | null>(null);
   const busMarker = useRef<L.Marker | null>(null);
-  const routePolyline = useRef<L.Polyline | null>(null);
-  const [routeCoordinates, setRouteCoordinates] = useState<L.LatLng[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
-    if (!mapInstance.current && mapRef.current) {
-      const map = L.map(mapRef.current).setView(START_POINT, 13);
-      mapInstance.current = map;
+    const socket = new WebSocket("ws://localhost:5000");
 
-      L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-        maxZoom: 20,
-        subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      }).addTo(map);
-
-      busMarker.current = L.marker(START_POINT, { icon: busIcon })
-        .addTo(map)
-        .bindPopup("Route 1");
-
-      routingControl.current = L.Routing.control({
-        waypoints: [START_POINT, END_POINT],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        fitSelectedRoutes: true,
-        lineOptions: {
-          styles: [{ color: "transparent", weight: 4 }],
-          extendToWaypoints: true,
-          missingRouteTolerance: 10,
-        } as L.Routing.LineOptions,
-      }).addTo(map);
-
-      routingControl.current.on("routesfound", (e) => {
-        const coordinates = e.routes[0].coordinates;
-        setRouteCoordinates(coordinates);
-
-        routePolyline.current = L.polyline(coordinates, {
-          color: "blue",
-          weight: 4,
-        }).addTo(map);
-      });
-    }
-
-    return () => {
-      mapInstance.current?.remove();
-      mapInstance.current = null;
+    socket.onopen = () => {
+      console.log("WebSocket connected");
     };
-  }, []);
 
-  useEffect(() => {
-    if (!routeCoordinates.length || currentIndex >= routeCoordinates.length)
-      return;
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const lat = parseFloat(data.latitude);
+      const lng = parseFloat(data.longitude);
 
-    const interval = setInterval(() => {
-      if (busMarker.current && routePolyline.current) {
-        busMarker.current.setLatLng(routeCoordinates[currentIndex]);
+      if (isNaN(lat) || isNaN(lng)) return;
+      const latLng = L.latLng(lat, lng);
 
-        const remainingCoordinates = routeCoordinates.slice(currentIndex);
-        routePolyline.current.setLatLngs(remainingCoordinates);
+      // Initialize map on first coordinate
+      if (!mapReady && mapRef.current) {
+        const map = L.map(mapRef.current).setView(latLng, 13);
+        mapInstance.current = map;
+        setMapReady(true);
 
-        setCurrentIndex((prev) => prev + 1);
+        L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+          maxZoom: 20,
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        }).addTo(map);
+
+        busMarker.current = L.marker(latLng, { icon: busIcon })
+          .addTo(map)
+          .bindPopup("Live Bus Location")
+          .openPopup();
       }
-    }, 500);
 
-    return () => clearInterval(interval);
-  }, [routeCoordinates, currentIndex]);
-  if (!routingControl) {
-    return <SpanLoader></SpanLoader>;
-  }
+      // Update marker position
+      if (busMarker.current) {
+        busMarker.current.setLatLng(latLng);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error", error);
+    };
+
+    return () => socket.close();
+  }, [mapReady]);
 
   return (
     <Box

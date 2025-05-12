@@ -302,7 +302,7 @@ const UserProfile: React.FC = () => {
               }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel>Bus Number</InputLabel>
+                <InputLabel>Route Number</InputLabel>
                 <Select
                   label="Bus Number"
                   name="routeNumber"
