@@ -202,11 +202,11 @@ export class AdminService {
         const { vehicleNumber, routeName, routeNumber, driverId, busStopIds } = RouteData;
 
         const existingRoute = await this.routeRepository.findOne({
-            where: { vehicleNumber },
+            where: { routeNumber },
         });
         if (existingRoute) {
             throw new HttpError(
-                "A route with this vehicle number already exists.",
+                "A route with this route number already exists.",
                 StatusCodes.BAD_REQUEST
             );
         }

@@ -7,7 +7,7 @@ const receiveLocation = async (req: Request, res: Response, next: NextFunction) 
     try {
         const data = locationService.validateAndStore(req.body);
 
-        // console.log("Received telemetry data:", data);
+        console.log("Received telemetry data:", data);
         broadcastTelemetry(data);
 
         res.status(StatusCodes.OK).json({

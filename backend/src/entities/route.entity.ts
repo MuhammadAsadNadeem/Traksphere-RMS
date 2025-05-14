@@ -10,7 +10,7 @@ export class Route {
     @Column()
     routeName: string;
 
-    @Column()
+    @Column({ unique: true })
     routeNumber: string;
 
     @Column()
