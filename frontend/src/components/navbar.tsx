@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const isLogin = useAppSelector((state) => state.userSlice.token);
+  const isLogin = useAppSelector((state) => !!state.userSlice.token); // Ensure boolean
   const theme = useTheme();
 
   const links = [
@@ -43,10 +43,10 @@ const Navbar: React.FC = () => {
     { name: "Contact", url: "#contact", icon: <ContactIcon /> },
   ];
 
-  const handleLogout = async () => {
-    localStorage.clear();
-    navigate(routes.login);
-    await dispatch(logout());
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove only token
+    dispatch(logout()); // Update Redux state
+    navigate(routes.login); // Redirect
     handleMenuClose();
   };
 
@@ -74,7 +74,6 @@ const Navbar: React.FC = () => {
               alt="TrakSphere"
               sx={{ width: 50, height: 50 }}
             />
-
             <Typography
               variant="h5"
               sx={{
@@ -82,7 +81,7 @@ const Navbar: React.FC = () => {
                 color: theme.palette.primary.contrastText,
                 cursor: "pointer",
               }}
-              onClick={() => navigate(0)}
+              onClick={() => navigate(routes.landingPage)} // Navigate to home
             >
               TRAKSPHERE
             </Typography>
@@ -172,7 +171,6 @@ const Navbar: React.FC = () => {
             links.map(({ name, url, icon }) => (
               <MenuItem
                 key={name}
-                color="primary"
                 onClick={handleMenuClose}
                 component={Link}
                 href={routes.landingPage + url}
@@ -198,7 +196,10 @@ const Navbar: React.FC = () => {
                   variant="contained"
                   color="primary"
                   startIcon={<LoginIcon />}
-                  onClick={() => navigate(routes.login)}
+                  onClick={() => {
+                    navigate(routes.login);
+                    handleMenuClose();
+                  }}
                 >
                   Login
                 </Button>
@@ -206,7 +207,10 @@ const Navbar: React.FC = () => {
                   fullWidth
                   variant="contained"
                   startIcon={<PersonAddIcon />}
-                  onClick={() => navigate(routes.signup)}
+                  onClick={() => {
+                    navigate(routes.signup);
+                    handleMenuClose();
+                  }}
                 >
                   Sign Up
                 </Button>

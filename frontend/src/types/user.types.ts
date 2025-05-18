@@ -42,6 +42,7 @@ export type UpdateProfileType = {
     stopArea?: string,
 }
 
+
 export type RouteType = {
     id: string;
     routeName: string;
@@ -51,3 +52,7 @@ export type RouteType = {
     driver: DriverType;
     busStops: BusStopType[];
 };
+
+
+
+

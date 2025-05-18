@@ -10,6 +10,7 @@ import {
   ListItem,
   ListItemText,
   useTheme,
+  Alert,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -19,7 +20,9 @@ import { RouteType } from "../../types/user.types";
 
 const RouteDetails: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { routes, isLoading } = useAppSelector((state) => state.userSlice);
+  const { routes, isLoading, error } = useAppSelector(
+    (state) => state.userSlice
+  );
   const [expandedRoute, setExpandedRoute] = useState<string | null>(null);
   const theme = useTheme();
 
@@ -41,7 +44,18 @@ const RouteDetails: React.FC = () => {
       }}
     >
       {isLoading ? (
-        <SpanLoader />
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
+          <SpanLoader />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: theme.spacing(2) }}>
+          {error || "Failed to load routes. Please try again later."}
+        </Alert>
       ) : (
         <>
           <Typography
@@ -53,7 +67,6 @@ const RouteDetails: React.FC = () => {
             Available Routes
           </Typography>
           <Box display="flex" flexDirection="column" gap={theme.spacing(2)}>
-            {" "}
             {Array.isArray(routes) && routes.length > 0 ? (
               routes.map((route: RouteType) => (
                 <Card
@@ -63,7 +76,9 @@ const RouteDetails: React.FC = () => {
                     color: theme.palette.primary.contrastText,
                     borderRadius: 2,
                     transition: "0.3s",
-                    "&:hover": { backgroundColor: theme.palette.primary.dark },
+                    "&:hover": {
+                      backgroundColor: theme.palette.secondary.dark,
+                    },
                   }}
                 >
                   <Box
@@ -78,25 +93,25 @@ const RouteDetails: React.FC = () => {
                       <Typography variant="h6" fontWeight="bold">
                         Route Name:{" "}
                         <Typography component="span" fontWeight="light">
-                          {route.routeName}
+                          {route.routeName || "N/A"}
                         </Typography>
                       </Typography>
                       <Typography>
                         Route Number:{" "}
                         <Typography component="span" fontWeight="light">
-                          {route.routeNumber}
+                          {route.routeNumber || "N/A"}
                         </Typography>
                       </Typography>
                       <Typography>
                         Driver Name:{" "}
                         <Typography component="span" fontWeight="light">
-                          {route.driver?.fullName}
+                          {route.driver?.fullName || "N/A"}
                         </Typography>
                       </Typography>
                       <Typography>
                         Bus No:{" "}
                         <Typography component="span" fontWeight="light">
-                          {route.vehicleNumber}
+                          {route.vehicleNumber || "N/A"}
                         </Typography>
                       </Typography>
                     </Box>
@@ -130,11 +145,17 @@ const RouteDetails: React.FC = () => {
                         Bus Stops
                       </Typography>
                       <List>
-                        {(route.busStops ?? []).map((stop) => (
-                          <ListItem key={stop.id}>
-                            <ListItemText primary={stop.stopName} />
+                        {(route.busStops ?? []).length > 0 ? (
+                          route.busStops.map((stop) => (
+                            <ListItem key={stop.id}>
+                              <ListItemText primary={stop.stopName || "N/A"} />
+                            </ListItem>
+                          ))
+                        ) : (
+                          <ListItem>
+                            <ListItemText primary="No bus stops available." />
                           </ListItem>
-                        ))}
+                        )}
                       </List>
                     </CardContent>
                   </Collapse>

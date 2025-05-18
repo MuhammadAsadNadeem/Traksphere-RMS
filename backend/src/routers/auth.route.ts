@@ -10,6 +10,7 @@ router.post("/signin", controller.signIn);
 router.post("/forgot-password", controller.forgotPassword);
 router.get("/get-stopsNames", controller.getAllStopNames)
 router.post('/send-message', controller.sendMessage);
-
+router.get('/get-messages', controller.getMessages);
+router.delete('/delete-message', controller.deleteMessageById);
 
 export default router;

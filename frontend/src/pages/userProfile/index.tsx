@@ -16,11 +16,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { UpdateProfileType } from "../../types/user.types";
-import userThunk from "../../store/user/userThunk";
+import userThunk, { getBusStopNames } from "../../store/user/userThunk";
 import toaster from "../../utils/toaster";
 import SpanLoader from "../../components/SpanLoader";
 import theme from "../../theme";
-import { getBusStopNames } from "../../store/user/authThunk";
+
 import { updateProfileSchema } from "../../validationSchema";
 import * as Yup from "yup";
 

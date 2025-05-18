@@ -29,7 +29,7 @@ import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 
 const UserManagement: React.FC = () => {
   const dispatch = useAppDispatch();
-  const users = useAppSelector((state) => state.adminSlice.users);
+  const users = useAppSelector((state) => state.adminSlice.allUsers);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isLoading, setIsLoading] = useState(true);

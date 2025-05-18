@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Typography,
   Container,
@@ -19,12 +19,18 @@ import { useAppDispatch } from "../../store/hooks";
 import { LoginType } from "../../types/auth.types";
 import toaster from "../../utils/toaster";
 import { useNavigate } from "react-router-dom";
-// import { theme } from "../../theme";
+import { logout } from "../../store/user/userSlice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  // Clear localStorage and Redux state on mount
+  useEffect(() => {
+    localStorage.removeItem("token");
+    dispatch(logout()); // Clear token, user, profile, routes
+  }, [dispatch]);
 
   const onSubmit = async (
     values: LoginType,
@@ -36,7 +42,7 @@ const Login = () => {
       resetForm();
       navigate(routes.Dashboard);
     } catch (error) {
-      toaster.error(error as string);
+      toaster.error(typeof error === "string" ? error : "Login failed");
     } finally {
       setSubmitting(false);
     }

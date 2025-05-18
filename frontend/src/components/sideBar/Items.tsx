@@ -3,6 +3,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import TrafficOutlinedIcon from "@mui/icons-material/TrafficOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 // import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
@@ -14,6 +15,11 @@ export const adminMenu = [
     label: "Dashboard",
     icon: <DashboardOutlinedIcon />,
     view: routes.Dashboard,
+  },
+  {
+    label: "Bus Status",
+    icon: <LocationOnOutlinedIcon />,
+    view: routes.busStatus,
   },
   {
     label: "User Management",
@@ -35,7 +41,11 @@ export const adminMenu = [
     icon: <RouteOutlinedIcon />,
     view: routes.routeManagement,
   },
-
+  {
+    label: "Email Messages",
+    icon: <EmailOutlinedIcon />,
+    view: routes.emailMessages,
+  },
   {
     label: "Account Settings",
     icon: <SettingsOutlinedIcon />,

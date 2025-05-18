@@ -9,6 +9,7 @@ const SpeedGauge: React.FC<SpeedGaugeProps> = ({ speed }) => {
   return (
     <ReactSpeedometer
       value={speed}
+      needleTransitionDuration={2000}
       minValue={0}
       maxValue={120}
       segments={10}

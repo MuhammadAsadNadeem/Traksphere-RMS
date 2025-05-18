@@ -13,10 +13,12 @@ import { useFormik, FormikHelpers } from "formik";
 import { userProfileSchema } from "../../validationSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
-import authThunk, { getBusStopNames } from "../../store/user/authThunk";
+import authThunk from "../../store/user/authThunk";
 import toaster from "../../utils/toaster";
 import { routes } from "../../routes";
-import { BusStopType, SignUpPart2Type } from "../../types/auth.types";
+import { SignUpPart2Type } from "../../types/auth.types";
+import { BusStopType } from "../../types/stop.types";
+import { getBusStopNames } from "../../store/user/userThunk";
 
 const Profile: React.FC = () => {
   const location = useLocation();

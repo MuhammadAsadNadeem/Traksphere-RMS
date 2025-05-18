@@ -3,10 +3,10 @@ import instance from "../../axios";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import { setCounts, setLoading, setUsers } from "./adminSlice";
-import { BusStopResponse, CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
+import { CountsResponse, UpdateUserType, UserResponse } from "../../types/admin.types";
 import toaster from "../../utils/toaster";
 import { DriverType, UpdateDriverType } from "../../types/driver.types";
-import { BusStopType } from "../../types/stop.types";
+import { BusStopResponse, BusStopType } from "../../types/stop.types";
 import { AddRouteType, UpdateRouteType } from "../../types/route.types";
 
 

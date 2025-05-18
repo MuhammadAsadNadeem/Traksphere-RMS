@@ -1,4 +1,3 @@
-// components/BatteryGauge.tsx
 import React from "react";
 import BatteryGauge from "react-battery-gauge";
 
@@ -12,14 +11,15 @@ interface BatteryGaugeProps {
 const BatteryState: React.FC<BatteryGaugeProps> = ({
   value,
   size = 150,
+  orientation = "vertical",
   label,
 }) => {
   return (
     <div style={{ textAlign: "center" }}>
+      <BatteryGauge value={value} size={size} orientation={orientation} />
       {label && (
-        <div style={{ marginBottom: "8px", fontWeight: "bold" }}>{label}</div>
+        <div style={{ marginTop: "0.5rem", fontWeight: "bold" }}>{label}</div>
       )}
-      <BatteryGauge value={value} size={size} />
     </div>
   );
 };

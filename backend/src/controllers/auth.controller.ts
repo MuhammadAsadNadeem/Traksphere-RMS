@@ -9,6 +9,7 @@ import userService from '../services/user.service';
 import bcrypt from 'bcryptjs';
 import adminService from '../services/admin.service';
 import { MessageDto } from '../dto/message.dto';
+import { validate as isUUID } from "uuid";
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -164,14 +165,40 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
 
         res.status(StatusCodes.CREATED).json({
             message: 'Message sent successfully',
-            data: savedMessage
+
         });
     } catch (error) {
         next(error);
     }
 };
 
+export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const messages = await authService.getAllMessages();
+        res.status(StatusCodes.OK).json(messages);
+    } catch (error) {
+        next(error);
+    }
+};
 
+
+const deleteMessageById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.query;
+
+        if (!isUUID(id)) {
+            throw new HttpError("Invalid Message ID format", StatusCodes.BAD_REQUEST);
+        }
+
+        await authService.deleteMessageById(id as string);
+        res.status(StatusCodes.OK).json({
+            message: "Message deleted successfully",
+
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 export default {
     signUp,
@@ -181,8 +208,11 @@ export default {
     forgotPassword,
     getAllStopNames,
     sendMessage,
+    getMessages,
+    deleteMessageById,
 
 
 }
+
 
 

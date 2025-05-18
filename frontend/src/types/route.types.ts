@@ -28,4 +28,12 @@ export type AddRouteType = {
     busStopIds: string[];
 };
 
+export type RouteResponseType = {
+    id: string;
+    routeName: string;
+    routeNumber: string;
+    vehicleNumber: string;
+    driver: DriverType;
+    busStops: BusStopType[];
+};
 

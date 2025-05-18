@@ -81,3 +81,17 @@ export const updateProfileSchema = Yup.object({
     routeNumber: Yup.string().required("Bus number is required."),
     stopArea: Yup.string().matches(/^[A-Za-z\s]+$/, "Stop area must only contain letters, and spaces").required("Stop Area is required."),
 });
+
+
+
+export const contactFormSchema = Yup.object({
+    fullName: Yup.string()
+        .matches(/^[aA-zZ\s]+$/, "Name should only contain letters and spaces.")
+        .required("Full Name is required."),
+    email: Yup.string()
+        .email("Invalid email format.")
+        .required("Email is required."),
+    message: Yup.string()
+        .matches(/^[A-Za-z0-9\s.,!?'"-]+$/, "Message contains invalid characters.")
+        .required("Message is required."),
+});

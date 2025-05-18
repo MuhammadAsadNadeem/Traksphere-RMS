@@ -13,7 +13,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
-import { DriverResponse } from "../../types/admin.types";
+
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import DeleteConfirmationDialog from "../../components/DeleteDialogBox";
 import DriverForm from "../../components/forms/DriverForm";
@@ -23,7 +23,7 @@ import {
   addNewDriver,
   editDriverById,
 } from "../../store/user/adminThunk";
-import { UpdateDriverType } from "../../types/driver.types";
+import { DriverResponseType, UpdateDriverType } from "../../types/driver.types";
 import toaster from "../../utils/toaster";
 import SearchBar from "../../components/SearchBar";
 import SpanLoader from "../../components/SpanLoader";
@@ -32,9 +32,8 @@ import CustomNoRowsOverlay from "../../components/TableNoRowsOverlay";
 const DriverManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const drivers = useAppSelector((state) => state.adminSlice.drivers);
-  const [selectedDriver, setSelectedDriver] = useState<DriverResponse | null>(
-    null
-  );
+  const [selectedDriver, setSelectedDriver] =
+    useState<DriverResponseType | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [driverToDelete, setDriverToDelete] = useState<string | null>(null);
@@ -56,7 +55,7 @@ const DriverManagement: React.FC = () => {
       id: driver.id || `driver-${index + 1}`,
     }));
 
-  const handleEditDriver = (driver: DriverResponse) => {
+  const handleEditDriver = (driver: DriverResponseType) => {
     setSelectedDriver(driver);
     setIsAddMode(false);
     setOpenDialog(true);

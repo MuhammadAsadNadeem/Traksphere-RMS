@@ -144,8 +144,6 @@ const RouteManagement: React.FC = () => {
         .filter((id): id is string => !!id),
     };
 
-    console.log("Payload being sent to backend:", backendPayload);
-
     if (isAddMode) {
       dispatch(addNewRoute(backendPayload))
         .unwrap()
@@ -154,8 +152,7 @@ const RouteManagement: React.FC = () => {
           setOpenDialog(false);
           dispatch(getAllRoutes());
         })
-        .catch((error) => {
-          console.error("Error adding route:", error);
+        .catch(() => {
           toaster.error("Failed to add route.");
         });
     } else {
@@ -168,8 +165,7 @@ const RouteManagement: React.FC = () => {
           setOpenDialog(false);
           dispatch(getAllRoutes());
         })
-        .catch((error) => {
-          console.error("Error updating route:", error);
+        .catch(() => {
           toaster.error("Failed to update route.");
         });
     }

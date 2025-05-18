@@ -25,9 +25,6 @@ const SignalStrength: React.FC<SignalStrengthProps> = ({ value }) => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
-      <Typography variant="subtitle1" mb={1}>
-        Signal Strength
-      </Typography>
       <Stack direction="row" spacing={0.5} alignItems="flex-end">
         {[0, 1, 2, 3, 4].map((bar) => (
           <Box
@@ -36,12 +33,15 @@ const SignalStrength: React.FC<SignalStrengthProps> = ({ value }) => {
               width: 10,
               height: 10 + bar * 10,
               borderRadius: 1,
-              backgroundColor: bar <= level ? color : " #e0e0e0",
+              backgroundColor: bar <= level ? color : "#e0e0e0",
               transition: "background-color 0.2s ease",
             }}
           />
         ))}
       </Stack>
+      <Typography variant="subtitle1" mt={8} sx={{ fontWeight: "bold" }}>
+        Signal Strength
+      </Typography>
     </Box>
   );
 };

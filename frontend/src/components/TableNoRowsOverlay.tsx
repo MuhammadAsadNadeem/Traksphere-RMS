@@ -1,12 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import theme from "../theme";
 
-// Define the props interface
 interface CustomNoRowsOverlayProps {
   message: string;
 }
 
-// Correctly destructure the props in the component function
 const CustomNoRowsOverlay = ({
   message,
 }: CustomNoRowsOverlayProps): JSX.Element => (

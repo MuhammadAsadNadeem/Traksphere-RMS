@@ -101,12 +101,39 @@ export class authService {
         }
     }
 
-    async getAllMessages() {
+    async getAllMessages(): Promise<any[]> {
         try {
-            return await this.messageRepository.find({ order: { createdAt: "DESC" } });
+            const messages = await this.messageRepository.find({
+                order: { createdAt: 'DESC' },
+            });
+
+            // Convert time to format in PKT
+            return messages.map(msg => ({
+                ...msg,
+                createdAt: new Date(msg.createdAt).toLocaleString('en-PK', {
+                    timeZone: 'Asia/Karachi',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                }),
+            }));
         } catch (error) {
             throw new HttpError("Error fetching messages", StatusCodes.INTERNAL_SERVER_ERROR);
         }
+    }
+    async deleteMessageById(id: string): Promise<Message> {
+        const message = await this.messageRepository.findOneBy({ id });
+
+        if (!message) {
+            throw new HttpError("Message not found", StatusCodes.NOT_FOUND);
+        }
+
+        await this.messageRepository.delete(id);
+        return message;
     }
 
 }

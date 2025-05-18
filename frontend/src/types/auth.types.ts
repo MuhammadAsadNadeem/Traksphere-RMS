@@ -24,17 +24,5 @@ export type ForgotPasswordType = {
     code: string,
 }
 
-export type BusStopType = {
-    id: string,
-    stopName: string,
 
 
-}
-
-export type MessageType = {
-
-    fullName: string,
-    email: string,
-    message: string,
-
-};

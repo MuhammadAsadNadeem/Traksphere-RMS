@@ -2,14 +2,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
     getCounts, getAllBusStops, getAllUsers, getAllDrivers, addNewDriver, editDriverById, deleteDriverById, addNewStop, deleteStopById, getAllRoutes, addNewRoute, editRouteById, deleteRouteById, // editStopById,
 } from "./adminThunk";
-import { CountsResponse, BusStopResponse, UserResponse, DriverResponse, RouteResponse } from "../../types/admin.types";
+import { CountsResponse, UserResponse } from "../../types/admin.types";
+import { BusStopResponse } from "../../types/stop.types";
+import { DriverResponseType } from "../../types/driver.types";
+import { RouteResponseType } from "../../types/route.types";
 
 interface AdminState {
     counts: CountsResponse | null | undefined;
     busStops: BusStopResponse[];
-    users: UserResponse[] | undefined;
-    drivers: DriverResponse[];
-    routes: RouteResponse[];
+    allUsers: UserResponse[] | undefined;
+    drivers: DriverResponseType[];
+    routes: RouteResponseType[];
     loading: boolean;
     error: string | null;
 }
@@ -17,7 +20,7 @@ interface AdminState {
 const initialState: AdminState = {
     counts: null,
     busStops: [],
-    users: [],
+    allUsers: [],
     drivers: [],
     routes: [],
     loading: false,
@@ -38,12 +41,12 @@ const adminSlice = createSlice({
             state.busStops = action.payload;
         },
         setUsers: (state, action: PayloadAction<UserResponse[]>) => {
-            state.users = action.payload;
+            state.allUsers = action.payload;
         },
-        setDrivers: (state, action: PayloadAction<DriverResponse[]>) => {
+        setDrivers: (state, action: PayloadAction<DriverResponseType[]>) => {
             state.drivers = action.payload;
         },
-        setRoutes: (state, action: PayloadAction<RouteResponse[]>) => {
+        setRoutes: (state, action: PayloadAction<RouteResponseType[]>) => {
             state.routes = action.payload;
         },
         setError: (state, action: PayloadAction<string | null>) => {
@@ -71,7 +74,7 @@ const adminSlice = createSlice({
             })
             .addCase(getAllUsers.fulfilled, (state, action) => {
                 state.loading = false;
-                state.users = action.payload;
+                state.allUsers = action.payload;
             })
             .addCase(getAllUsers.rejected, (state, action) => {
                 state.loading = false;

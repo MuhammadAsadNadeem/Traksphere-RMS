@@ -42,4 +42,5 @@ declare module "*.svg" {
 }
 
 declare module 'react-leaflet-geosearch';
+declare module 'react-d3-speedometer';
 declare module 'lodash.debounce';

@@ -4,6 +4,7 @@ import { UpdateProfileType, ChangePasswordType } from "../../types/user.types";
 import { HttpStatusCode } from "axios";
 import { errorReturn } from "../../utils/errorReturn";
 import toaster from "../../utils/toaster";
+import { BusStopType } from "../../types/stop.types";
 
 
 export enum UserApiPathEnum {
@@ -11,6 +12,7 @@ export enum UserApiPathEnum {
     GET_PROFILE = "api/user/get-profile",
     UPDATE_PROFILE = "api/user/update-profile",
     GET_ROUTES = "api/user/get-routes",
+    GET_BUSSTOP_NAMES = "api/auth/get-stopsNames",
 
 
 }
@@ -69,7 +71,24 @@ export const getAllRoutes = createAsyncThunk(UserApiPathEnum.GET_ROUTES,
     }
 );
 
-
+export const getBusStopNames = createAsyncThunk<BusStopType[]>(
+    UserApiPathEnum.GET_BUSSTOP_NAMES,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await instance.get<BusStopType[]>(UserApiPathEnum.GET_BUSSTOP_NAMES);
+            if (res.status === HttpStatusCode.Ok) {
+                return res.data.map(stop => ({
+                    id: stop.id,
+                    stopName: stop.stopName,
+                })) as BusStopType[];
+            } else {
+                return rejectWithValue('Failed to get bus stops');
+            }
+        } catch (error) {
+            return rejectWithValue(errorReturn(error));
+        }
+    }
+);
 
 
 export default {
@@ -77,5 +96,6 @@ export default {
     getProfile,
     updateProfile,
     getAllRoutes,
+    getBusStopNames,
 
 };

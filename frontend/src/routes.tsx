@@ -10,8 +10,10 @@ import RouteManagement from "./pages/routeManagement";
 import RouteDetails from "./pages/routeDetails";
 import UserProfile from "./pages/userProfile";
 import Profile from "./pages/signUp/signupPart2";
-import LiveTracking from "./pages/liveTracking";
+import LiveTracking from "./pages/userLiveTracking";
 import LandingPage from "./pages/landingPage";
+import EmailMessages from "./pages/emailMessages";
+import BusStatus from "./pages/busStatus";
 
 export const routes = {
   login: "/login",
@@ -21,11 +23,13 @@ export const routes = {
   landingPage: "/",
   Dashboard: "/dashboard",
   sideBar: "/sidebar",
+  busStatus: "/bus-status",
   userManagement: "/user-management",
   driverManagement: "/driver-management",
   stopManagement: "/stop-mangement",
   routeManagement: "/route-mangement",
-  liveTracking: "/live-tracking",
+  emailMessages: "/email-messages",
+  liveTracking: "/live-location",
   routesDetails: "/routes-details",
   userProfile: "/user-profile",
   changePassword: "/change-password",
@@ -54,6 +58,10 @@ export const PrivateRoutes = [
     element: <RouteManagement />,
   },
   {
+    path: routes.busStatus,
+    element: <BusStatus />,
+  },
+  {
     path: routes.liveTracking,
     element: <LiveTracking />,
   },
@@ -64,6 +72,10 @@ export const PrivateRoutes = [
   {
     path: routes.userProfile,
     element: <UserProfile />,
+  },
+  {
+    path: routes.emailMessages,
+    element: <EmailMessages />,
   },
   {
     path: routes.changePassword,

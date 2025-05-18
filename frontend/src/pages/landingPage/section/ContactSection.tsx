@@ -1,287 +1,195 @@
+import React, { useState } from "react";
 import {
   Box,
+  TextField,
   Typography,
+  Button,
+  Card,
   Container,
   Grid,
-  TextField,
-  Button,
-  useTheme,
 } from "@mui/material";
-import { motion } from "framer-motion";
-import { styled } from "@mui/material/styles";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import toaster from "../../../utils/toaster";
+import messageThunk from "../../../store/user/messageThunk";
+import { ContactFormType } from "../../../types/message.types";
+import { useAppDispatch } from "../../../store/hooks";
 
-const ContactContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.paper,
-  padding: theme.spacing(12, 0),
-  position: "relative",
-  overflow: "hidden",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: `url('/assets/pattern.svg') repeat`,
-    opacity: 0.05,
-    zIndex: 1,
-  },
-}));
+const ContactSection: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-const ContactCard = styled(motion.div)(({ theme }) => ({
-  background: `rgba(${theme.palette.primary.main}, 0.05)`,
-  backdropFilter: "blur(10px)",
-  borderRadius: "20px",
-  padding: theme.spacing(4),
-  border: `1px solid rgba(${theme.palette.primary.main}, 0.1)`,
-  height: "100%",
-  transition: "all 0.3s ease",
-}));
+  const [form, setForm] = useState<ContactFormType>({
+    fullName: "",
+    email: "",
+    message: "",
+  });
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    color: theme.palette.text.primary,
-    "& fieldset": {
-      borderColor: `rgba(${theme.palette.primary.main}, 0.2)`,
-    },
-    "&:hover fieldset": {
-      borderColor: `rgba(${theme.palette.primary.main}, 0.4)`,
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: `rgba(${theme.palette.primary.main}, 0.8)`,
-    },
-  },
-  "& .MuiInputLabel-root": {
-    color: theme.palette.text.secondary,
-  },
-}));
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ContactFormType, string>>
+  >({});
+  const [submitting, setSubmitting] = useState(false);
 
-const ContactButton = styled(Button)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-  color: theme.palette.text.primary,
-  padding: theme.spacing(1.5, 4),
-  borderRadius: "30px",
-  fontSize: "1.1rem",
-  fontWeight: 600,
-  textTransform: "none",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 8px 20px ${theme.palette.primary.dark}`,
-  },
-}));
-
-const InfoItem = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  padding: theme.spacing(2),
-  background: `rgba(${theme.palette.primary.main}, 0.05)`,
-  borderRadius: "10px",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    background: `rgba(${theme.palette.primary.main}, 0.08)`,
-    transform: "translateX(5px)",
-  },
-}));
-
-const ContactSection = () => {
-  const theme = useTheme();
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8 },
-    },
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof ContactFormType, string>> = {};
+
+    if (!form.fullName.trim()) {
+      newErrors.fullName = "Full Name is required.";
+    } else if (!/^[a-zA-Z\s]+$/.test(form.fullName)) {
+      newErrors.fullName = "Name should only contain letters and spaces.";
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = "Invalid email address.";
+    }
+
+    if (!form.message.trim()) {
+      newErrors.message = "Message is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setSubmitting(true);
+      await dispatch(messageThunk.sendMessage(form)).unwrap();
+      toaster.success("Message sent successfully!");
+      setForm({ fullName: "", email: "", message: "" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <ContactContainer id="contact">
-      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={containerVariants}
-        >
-          {/* Section Header */}
-          <Box sx={{ textAlign: "center", mb: 8 }}>
-            <motion.div variants={itemVariants}>
-              <Typography
-                variant="h2"
-                sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: "2.5rem", md: "3.5rem" },
-                  color: theme.palette.primary.main,
-                  mb: 3,
-                }}
-              >
-                Get in Touch
-              </Typography>
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <Typography
-                variant="h5"
-                sx={{
-                  color: theme.palette.text.secondary,
-                  maxWidth: "800px",
-                  mx: "auto",
-                  lineHeight: 1.8,
-                  fontSize: { xs: "1.1rem", md: "1.3rem" },
-                }}
-              >
-                Have questions about TrakSphere? We're here to help you optimize
-                your fleet management experience.
-              </Typography>
-            </motion.div>
-          </Box>
+    <Container maxWidth="lg" sx={{ py: 10 }}>
+      <Typography variant="h3" align="center" fontWeight="bold" mb={4}>
+        Get in Touch
+      </Typography>
+      <Typography
+        variant="h6"
+        align="center"
+        color="text.secondary"
+        maxWidth={800}
+        mx="auto"
+        mb={6}
+      >
+        Have questions about TrakSphere? We're here to help you optimize your
+        fleet management experience.
+      </Typography>
 
-          <Grid container spacing={6}>
-            {/* Contact Form */}
-            <Grid item xs={12} md={7}>
-              <motion.div variants={itemVariants}>
-                <ContactCard>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: theme.palette.text.primary,
-                      mb: 4,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Send us a Message
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <StyledTextField
-                        fullWidth
-                        label="Name"
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <StyledTextField
-                        fullWidth
-                        label="Email"
-                        variant="outlined"
-                        type="email"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <StyledTextField
-                        fullWidth
-                        label="Message"
-                        variant="outlined"
-                        multiline
-                        rows={4}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <ContactButton fullWidth>Send Message</ContactButton>
-                    </Grid>
-                  </Grid>
-                </ContactCard>
-              </motion.div>
-            </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={7}>
+          <Card sx={{ p: 4, borderRadius: 2, boxShadow: 3 }}>
+            <Typography variant="h5" fontWeight="bold" mb={3}>
+              Send us a Message
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+              noValidate
+            >
+              <TextField
+                name="fullName"
+                label="Full Name"
+                fullWidth
+                value={form.fullName}
+                onChange={handleChange}
+                error={Boolean(errors.fullName)}
+                helperText={errors.fullName}
+                autoComplete="name"
+              />
+              <TextField
+                name="email"
+                label="Email"
+                type="email"
+                fullWidth
+                value={form.email}
+                onChange={handleChange}
+                error={Boolean(errors.email)}
+                helperText={errors.email}
+                autoComplete="email"
+              />
+              <TextField
+                name="message"
+                label="Message"
+                multiline
+                rows={4}
+                fullWidth
+                value={form.message}
+                onChange={handleChange}
+                error={Boolean(errors.message)}
+                helperText={errors.message}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={submitting}
+              >
+                {submitting ? "Sending..." : "Send Message"}
+              </Button>
+            </Box>
+          </Card>
+        </Grid>
 
-            {/* Contact Info */}
-            <Grid item xs={12} md={5}>
-              <motion.div variants={itemVariants}>
-                <ContactCard>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: theme.palette.text.primary,
-                      mb: 4,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Contact Information
-                  </Typography>
-                  <Box>
-                    <InfoItem>
-                      <EmailIcon
-                        sx={{ color: theme.palette.primary.main, fontSize: 30 }}
-                      />
-                      <Box>
-                        <Typography
-                          variant="body1"
-                          sx={{ color: theme.palette.text.secondary, mb: 0.5 }}
-                        >
-                          Email Us
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{ color: theme.palette.text.primary }}
-                        >
-                          traksphere@gmail.com
-                        </Typography>
-                      </Box>
-                    </InfoItem>
-                    <InfoItem>
-                      <PhoneIcon
-                        sx={{ color: theme.palette.primary.main, fontSize: 30 }}
-                      />
-                      <Box>
-                        <Typography
-                          variant="body1"
-                          sx={{ color: theme.palette.text.secondary, mb: 0.5 }}
-                        >
-                          Call Us
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{ color: theme.palette.text.primary }}
-                        >
-                          +92 320 9450014
-                        </Typography>
-                      </Box>
-                    </InfoItem>
-                    <InfoItem>
-                      <LocationOnIcon
-                        sx={{ color: theme.palette.primary.main, fontSize: 30 }}
-                      />
-                      <Box>
-                        <Typography
-                          variant="body1"
-                          sx={{ color: theme.palette.text.secondary, mb: 0.5 }}
-                        >
-                          Visit Us
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{ color: theme.palette.text.primary }}
-                        >
-                          University of Engineering and Technology, Lahore{" "}
-                          <br /> (New Campus)
-                          <br />
-                          Electrical Engineering Department
-                        </Typography>
-                      </Box>
-                    </InfoItem>
-                  </Box>
-                </ContactCard>
-              </motion.div>
-            </Grid>
-          </Grid>
-        </motion.div>
-      </Container>
-    </ContactContainer>
+        <Grid item xs={12} md={5}>
+          <Card sx={{ p: 4, borderRadius: 2, boxShadow: 3 }}>
+            <Typography variant="h5" fontWeight="bold" mb={3}>
+              Contact Information
+            </Typography>
+            <Box display="flex" alignItems="center" gap={2} mb={3}>
+              <EmailIcon color="primary" fontSize="large" />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Email Us
+                </Typography>
+                <Typography variant="subtitle1">
+                  traksphere@gmail.com
+                </Typography>
+              </Box>
+            </Box>
+            <Box display="flex" alignItems="center" gap={2} mb={3}>
+              <PhoneIcon color="primary" fontSize="large" />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Call Us
+                </Typography>
+                <Typography variant="subtitle1">+92 320 9450014</Typography>
+              </Box>
+            </Box>
+            <Box display="flex" alignItems="center" gap={2}>
+              <LocationOnIcon color="primary" fontSize="large" />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Visit Us
+                </Typography>
+                <Typography variant="subtitle1">
+                  University of Engineering and Technology, Lahore (New Campus)
+                  <br />
+                  Electrical Engineering Department
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 
